@@ -1,0 +1,115 @@
+/* Short defaults, with the complete tools available on request. */
+html:has(.pickup-form:focus-within) {
+  /* Keep the viewport stable while editing. Excluding only the form lets the
+     browser anchor to the FAQ below it and still skip newly expanded fields. */
+  overflow-anchor: none;
+}
+.pickup-form .form-disclosure {
+  border: 0;
+  border-block: 1px solid #756a7d;
+  margin: 0;
+  min-width: 0;
+}
+.form-disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 12px 0;
+  color: var(--cream);
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.form-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.form-disclosure > summary > svg {
+  flex-shrink: 0;
+}
+.form-disclosure > summary > svg:last-child {
+  margin-left: auto;
+}
+.form-disclosure[open] > summary > svg:last-child {
+  transform: rotate(180deg);
+}
+.form-disclosure[open] > summary {
+  margin-bottom: 12px;
+}
+.form-disclosure > summary small {
+  display: block;
+  color: #d3ccd7;
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-top: 4px;
+}
+.form-disclosure[open] {
+  padding-bottom: 16px;
+}
+.pickup-form .photo-disclosure {
+  margin-top: 20px;
+}
+.photo-disclosure .photo-upload {
+  border: 0;
+  margin: 0;
+  padding: 4px 0 0;
+}
+.pickup-form .form-haul-list > p {
+  margin: 0 0 16px;
+}
+.pickup-form .form-haul-list .item-review-note {
+  margin: 12px 0 0;
+}
+.pickup-form .form-haul-options legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.pickup-form .field textarea {
+  min-height: 96px;
+}
+.pickup-form .compact-review {
+  padding: 0;
+  margin: 24px 0 0;
+  border: 0;
+}
+.pickup-review-essentials {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.pickup-review-essentials strong,
+.pickup-review-essentials span {
+  display: block;
+}
+.pickup-review-essentials strong {
+  color: var(--lime);
+}
+.pickup-review-essentials span {
+  color: #d3ccd7;
+  margin-top: 4px;
+}
+.review-disclosure dl {
+  padding-top: 6px;
+}
+.pickup-form .sms-disclosure {
+  margin-top: 20px;
+}
+.sms-disclosure .sms-consent {
+  border: 0;
+  padding: 0;
+  margin: 8px 0 0;
+}
+.sms-disclosure .sms-consent legend {
+  padding: 0;
+}
+.pickup-form .pickup-progress {
+  margin-bottom: 18px;
+}
+.pickup-form .pickup-step-actions {
+  margin-top: 24px;
+}

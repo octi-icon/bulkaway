@@ -1,0 +1,153 @@
+.atomic-click-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+  pointer-events: none;
+}
+.atomic-click-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.atomic-click-word {
+  position: absolute;
+  white-space: nowrap;
+  padding: 8px 16px;
+  background: var(--gold);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 48% 42% 46% 34%;
+  font:
+    1.5rem/1.1 Brookvale,
+    serif;
+  letter-spacing: 0.025em;
+  opacity: 0;
+  animation: atomic-word-pop 1150ms ease-out both;
+}
+@keyframes atomic-word-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -35%) rotate(-8deg) scale(0.8);
+  }
+  15%,
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(-5deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -65%) rotate(-3deg) scale(0.98);
+  }
+}
+.form-success .submission-message {
+  font:
+    1.6rem/1.15 Brookvale,
+    serif;
+  color: var(--gold);
+  margin: 0 0 12px;
+  letter-spacing: 0.04em;
+}
+.atomic-spark-particle {
+  position: absolute;
+  width: 16px;
+  height: 23px;
+  margin: -11px 0 0 -8px;
+  opacity: 0;
+  animation: atomic-click-spark 750ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+@keyframes atomic-click-spark {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3) rotate(0);
+  }
+  18%,
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--spark-x), var(--spark-y)) scale(0.65)
+      rotate(var(--spark-turn));
+  }
+}
+.submission-sparkle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 126px;
+  margin: 0 auto 14px;
+  pointer-events: none;
+}
+.submission-check {
+  width: 54px;
+  height: 54px;
+  color: var(--lime);
+}
+.submission-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+.submission-burst .atomic-spark-particle {
+  width: 15px;
+  height: 23px;
+  animation-name: atomic-success-spark;
+  animation-duration: 1050ms;
+}
+@keyframes atomic-success-spark {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2) rotate(0);
+  }
+  22% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--spark-x), var(--spark-y)) scale(0.8)
+      rotate(var(--spark-turn));
+  }
+}
+.submission-orbit {
+  position: absolute;
+  left: -54px;
+  top: -21px;
+  width: 108px;
+  height: 42px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  opacity: 0;
+  animation: submission-orbit 1050ms ease-out both;
+}
+@keyframes submission-orbit {
+  0% {
+    opacity: 0;
+    transform: rotate(-25deg) scale(0.45);
+  }
+  22% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(20deg) scale(1.25);
+  }
+}
+html[data-motion='paused'] .atomic-click-layer,
+html[data-motion='paused'] .submission-burst {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .atomic-click-layer,
+  .submission-burst {
+    display: none;
+  }
+  .atomic-spark-particle,
+  .submission-orbit {
+    animation: none;
+  }
+}

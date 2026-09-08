@@ -1,0 +1,11 @@
+# Bulk Away visual direction
+
+An atomic-era roadside sign meets the next generation of hauling. The supplied rocket truck and neon lettering carry the world. An oversized, ink-colored hero pairs cream Brookvale type and gold TaldoseScript with the actual logo, elliptical orbital lines, a lime launch button, and a movable service selector. Services flow into an open cream editorial section; a lime process strip and dark pickup form establish distinct rhythms. Family brands close the page on cream.
+
+Tokens: ink #1d1724, lime #b2d34c, gold #efc24b, cream #f5efd9. Geograph body at 16–18px, Brookvale display, TaldoseScript used sparingly for emotional emphasis. Buttons and links have visible focus, strong contrast, and generous hit areas. Motion is transform-based and respects reduced motion. No invented testimonials, prices, guaranteed timing, or current power-washing availability.
+
+## Reference-driven atomic-era expansion
+
+The user supplied Retool, Donut Studios, Overpass Studio, Zig, Recent, Robby Yeager and CauseHouse as references, then asked for stronger atomic-era retrofuturism. Preserve Bulk Away's established palette, logos and lettering while increasing period-specific form: Googie sign fins, inset neon contours, asymmetrical starbursts, orbital geometry, and tactile selectors. The hero now uses a big typographic poster and a sign-shaped interactive illustration made from the supplied logo. Visitors can clear three labeled demo items; this never submits a pickup request. A motion control and reduced-motion CSS support visitors who prefer a quiet page.
+
+Reference observations: Retool's central interactive focus; Donut's expressive lettering; Overpass and Zig's direct service framing; Recent's examples of material interaction; Robby Yeager's coherent period world; CauseHouse's consistent illustrative metaphor. These inform composition, not copied artwork, claims, or branding. SEO uses accurate service headings, canonical metadata, an organization/service catalog schema, and launch-controlled robots/sitemap; visual style is not claimed to guarantee rankings. Confirmed Utah service areas appear in the page copy and structured data: Salt Lake County, Utah County, Weber County, and Davis County.

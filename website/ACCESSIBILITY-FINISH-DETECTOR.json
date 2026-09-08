@@ -1,0 +1,28 @@
+[
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\octii\\Documents\\git\\bulk away site\\website\\app\\privacy-controls.css",
+    "line": 196,
+    "snippet": "border-left: 5px solid #53651b",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  },
+  {
+    "antipattern": "border-accent-on-rounded",
+    "name": "Border accent on rounded element",
+    "description": "Thick accent border on a rounded card — the border clashes with the rounded corners. Remove the border or the border-radius.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "C:\\Users\\octii\\Documents\\git\\bulk away site\\website\\app\\privacy-controls.css",
+    "line": 37,
+    "snippet": "border-top: 8px solid",
+    "importedBy": [
+      "layout.tsx"
+    ]
+  }
+]

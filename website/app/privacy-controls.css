@@ -1,0 +1,223 @@
+.privacy-controls {
+  background: var(--ink);
+  color: var(--cream);
+  border-top: 1px solid #f5efd930;
+}
+.privacy-controls nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 30px;
+  padding-block: 18px;
+}
+.privacy-controls a,
+.privacy-controls button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 0.875rem;
+  color: inherit;
+  text-decoration: underline;
+}
+.privacy-controls :focus-visible {
+  outline-color: var(--gold);
+}
+.cookie-dialog {
+  position: fixed;
+  inset: auto 26px 26px auto;
+  margin: 0;
+  width: min(570px, calc(100% - 40px));
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  background: var(--cream);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-top: 8px solid var(--lime);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 18px 60px #00000055;
+}
+.cookie-dialog::backdrop {
+  background: #19141f88;
+}
+.cookie-dialog h2 {
+  font-size: 2.75rem;
+  margin-bottom: 22px;
+  padding-right: 25px;
+}
+.cookie-dialog h2 em {
+  color: #53651b;
+}
+.cookie-dialog p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.cookie-close {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+}
+.cookie-close:hover {
+  background: #e8e2ca;
+}
+.cookie-policy-link {
+  display: inline-block;
+  margin-top: 18px;
+  padding-block: 8px;
+  font-size: 0.875rem;
+  text-decoration: underline;
+}
+.cookie-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+.cookie-actions .button {
+  padding: 13px 18px;
+  font-size: 0.875rem;
+  min-height: 48px;
+}
+.cookie-secondary {
+  background: transparent;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+}
+.cookie-secondary:hover {
+  background: #e8e2ca;
+}
+.cookie-options {
+  margin-top: 22px;
+  border-top: 1px solid #b4ad98;
+  padding-top: 22px;
+}
+.cookie-options h3 {
+  font:
+    500 1rem Geograph,
+    sans-serif;
+  margin-bottom: 8px;
+}
+.cookie-options h3 span {
+  display: block;
+  margin-top: 5px;
+  color: #53651b;
+  font-size: 0.8rem;
+}
+.cookie-options p + h3 {
+  margin-top: 20px;
+}
+.cookie-remember {
+  display: flex;
+  gap: 12px;
+  margin: 22px 0 12px;
+  font-size: 0.9rem;
+}
+.cookie-remember input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  accent-color: #53651b;
+}
+.sms-consent {
+  border: 1px solid #938598;
+  border-radius: 12px;
+  padding: 18px;
+  margin: 24px 0;
+  min-width: 0;
+}
+.sms-consent legend {
+  padding: 0 8px;
+  font-size: 1rem;
+}
+.sms-consent legend span {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.sms-consent .sms-coming {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.sms-consent .form-consent {
+  font-size: 0.85rem;
+}
+.sms-consent > p:last-child {
+  font-size: 0.8rem;
+}
+.sms-consent a {
+  text-decoration: underline;
+}
+.legal-page .wordmark {
+  color: #725408;
+  text-decoration: none;
+}
+.legal-page .button {
+  text-decoration: none;
+}
+.legal-page h1 em {
+  color: #53651b;
+  white-space: normal;
+  font-size: 0.8em;
+}
+.legal-page .legal-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 25px;
+  padding: 22px 0;
+  margin: 26px 0;
+  border-block: 1px solid #b4ad98;
+}
+.legal-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.legal-page h2 {
+  line-height: 1.2;
+}
+.legal-page section {
+  scroll-margin-top: 25px;
+}
+.legal-page code {
+  overflow-wrap: anywhere;
+}
+.sms-launch-note {
+  border-left: 5px solid #53651b;
+  padding: 5px 0 5px 24px;
+  margin: 30px 0;
+}
+.sms-launch-note h2 {
+  margin-top: 0;
+}
+.sms-launch-note p {
+  margin-bottom: 0;
+}
+@media (max-width: 600px) {
+  .cookie-dialog {
+    inset: auto 20px 20px;
+    padding: 26px 22px;
+  }
+  .cookie-dialog h2 {
+    font-size: 2.35rem;
+  }
+  .cookie-actions {
+    flex-direction: column;
+  }
+  .cookie-actions .button {
+    width: 100%;
+  }
+  .legal-page h1 {
+    font-size: 3rem;
+  }
+}

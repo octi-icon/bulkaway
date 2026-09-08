@@ -1,0 +1,123 @@
+@import 'react-day-picker/style.css';
+
+.pickup-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 49px;
+  border: 1px solid #756a7d;
+  border-radius: 6px;
+  background: #211b28;
+  color: var(--cream);
+  padding: 12px;
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+}
+.pickup-selector > svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--cream);
+}
+.pickup-selector:hover,
+.pickup-selector[aria-expanded='true'] {
+  border-color: var(--lime);
+}
+.pickup-options,
+.pickup-calendar {
+  background: #292230;
+  color: var(--cream);
+  border: 1px solid #92859a;
+  border-radius: 10px;
+  box-shadow: 0 12px 36px #0006;
+  animation: none;
+}
+.pickup-options {
+  padding: 6px;
+  min-width: min(300px, calc(100vw - 24px));
+}
+.pickup-options [data-slot='select-item'] {
+  min-height: 44px;
+  padding: 10px 30px 10px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.pickup-options [data-slot='select-item'] > span {
+  white-space: normal;
+  flex-shrink: 1;
+  min-width: 0;
+}
+.pickup-options [data-highlighted] {
+  background: var(--lime);
+  color: var(--ink);
+}
+.pickup-options [data-slot^='select-scroll-'] {
+  background: #292230;
+}
+.pickup-calendar {
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  /* The positioner measures the free space on its chosen side of the trigger. */
+  max-height: min(var(--available-height), calc(100dvh - 24px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+  gap: 12px;
+}
+.pickup-calendar > * {
+  flex-shrink: 0;
+}
+.pickup-calendar h2 {
+  font: inherit;
+  font-weight: 600;
+  margin: 0;
+}
+.pickup-calendar .rdp-root {
+  --rdp-accent-color: var(--lime);
+  --rdp-accent-background-color: #3b4430;
+  --rdp-day-height: 40px;
+  --rdp-day-width: 40px;
+  --rdp-day_button-height: 38px;
+  --rdp-day_button-width: 38px;
+  --rdp-disabled-opacity: 0.35;
+  font-size: 0.95rem;
+}
+.pickup-calendar .rdp-month_caption {
+  font-size: 1rem;
+}
+.pickup-calendar .rdp-day_button:hover:not(:disabled) {
+  background: #3b4430;
+}
+.pickup-calendar .rdp-selected .rdp-day_button {
+  background: var(--lime);
+  color: var(--ink);
+}
+.clear-pickup-date {
+  min-height: 44px;
+  border-top: 1px solid #756a7d;
+  color: var(--cream);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.pickup-selector:focus-visible,
+.pickup-options [data-slot='select-item']:focus-visible,
+.pickup-calendar button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+@media (max-width: 360px) {
+  .pickup-calendar {
+    padding: 12px;
+  }
+  .pickup-calendar .rdp-root {
+    --rdp-day-width: 36px;
+    --rdp-day_button-width: 34px;
+  }
+}

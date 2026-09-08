@@ -1,0 +1,7 @@
+# Fresh-start doorway
+
+Created September 6, 2026 with the built-in image-generation tool. Source: `fresh-start-door.png`. Website asset: `public/illustrations/fresh-start-door.webp`, 520 × 541 with transparency preserved. This decorative illustration accompanies the how-it-works heading; it conveys no information beyond the adjacent copy and uses an empty alt attribute.
+
+Prompt: Create a small website spot illustration for Bulk Away, an atomic-era retrofuturist junk removal brand. A welcoming open mid-century modern doorway viewed at a slight angle, with a clean cream threshold and a tiny gold doormat, suggesting a newly cleared space and fresh start. One bold four-point atomic gold starburst beside the open door and two small diamond sparkles. Minimal, confident 1950s Googie screenprint illustration, crisp bold dark aubergine outlines (#1d1724), warm cream (#f5efd9) and golden yellow (#efc24b) flat fills, restrained grain only inside objects. No thin orbital lines, no people, no truck, no words or lettering, no photorealism, no scenery or background panel. Isolated compact composition with a genuinely transparent background so it can sit directly on a lime green website section. Objects must remain legible displayed around 160 pixels tall. Square framing, generous transparent margin.
+
+Verified at 1440px and 390px: image loads, transparent edges blend into the section, and no horizontal page overflow. Lint and production build pass.

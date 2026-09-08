@@ -1,0 +1,266 @@
+.hero .hero-coverage {
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  max-width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  color: var(--cream);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.hero-coverage svg {
+  flex-shrink: 0;
+  color: var(--lime);
+}
+.hero-coverage:hover {
+  color: var(--lime);
+}
+.request-copy .request-note h3 {
+  font:
+    1.7rem/1.2 Brookvale,
+    serif;
+  color: var(--cream);
+  margin: 0 0 10px;
+}
+.request-copy .request-note p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+.request-note a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 10px;
+  color: var(--lime);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.footer-utility {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  padding-block: 16px;
+  border-top: 1px solid #756a7d;
+}
+.footer-utility a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+}
+.footer-utility a:hover {
+  color: var(--lime);
+}
+.missing-page {
+  padding-block: 48px 90px;
+  min-height: 85vh;
+}
+.missing-page > .wordmark {
+  color: var(--ink);
+  display: block;
+  width: fit-content;
+  margin-bottom: 70px;
+}
+.missing-page > svg {
+  color: #6e7e2b;
+  margin-bottom: 22px;
+}
+.missing-page h1 {
+  font:
+    clamp(3.5rem, 7vw, 6rem)/1.08 Brookvale,
+    serif;
+}
+.missing-page h1 em {
+  display: inline-block;
+  font:
+    1.05em/1.25 Taldose,
+    cursive;
+  color: #6e7e2b;
+}
+.missing-page > p {
+  max-width: 48ch;
+  font-size: 1rem;
+  margin: 24px 0;
+}
+.missing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  align-items: center;
+}
+.missing-help a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+@media (max-width: 760px) {
+  .hero .hero-coverage {
+    font-size: 0.8rem;
+  }
+  .footer-utility {
+    gap: 2px 24px;
+  }
+  .missing-page > .wordmark {
+    margin-bottom: 48px;
+  }
+}
+@media (min-width: 761px) and (max-width: 900px) {
+  .menu-toggle {
+    display: flex;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #ffffff38;
+    color: var(--cream);
+    border-radius: 50%;
+  }
+  .header-inner nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--ink);
+    padding: 20px;
+    border-bottom: 1px solid #ffffff30;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .header-inner nav.is-open {
+    display: flex;
+    flex-direction: column;
+  }
+  .header-inner nav > a {
+    padding: 13px 8px;
+  }
+  .header-inner nav > a.button {
+    margin-top: 5px;
+    padding: 14px;
+  }
+}
+/* The receipt remains readable and selectable at every screen size. */
+.pickup-receipt {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+  padding: 20px 0;
+  border-block: 1px solid #756a7d;
+  text-align: left;
+}
+.pickup-receipt > div {
+  min-width: 0;
+}
+.pickup-receipt dt {
+  color: var(--lime);
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+.pickup-receipt dd {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.form-success .receipt-help {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.receipt-help a,
+.form-loading a,
+.pickup-form noscript a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (min-width: 600px) {
+  .pickup-receipt {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 24px;
+  }
+}
+.service-finder[open] summary > svg:last-child,
+.preflight[open] .disclosure-plus {
+  transform: rotate(180deg);
+}
+.privacy-controls .motion-toggle {
+  gap: 8px;
+}
+
+/* Explain protected detours without interrupting the request with a dialog. */
+a .draft-link-note,
+.brand-links a > .draft-link-note {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  margin-top: 4px;
+  color: inherit;
+}
+.privacy-controls a:has(> .draft-link-note) {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+.family-match-link:has(> .draft-link-note) {
+  flex-wrap: wrap;
+}
+.family-match-link > .draft-link-note {
+  flex-basis: 100%;
+}
+.arcade-invitation {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+.arcade-invitation h2 {
+  font:
+    400 clamp(28px, 3vw, 42px)/1.15 Brookvale,
+    sans-serif;
+  margin: 0 0 10px;
+}
+.arcade-invitation h2 em {
+  font-family: Taldose, cursive;
+  color: #697c2c;
+}
+.arcade-invitation p {
+  margin: 0;
+  font-size: 14px;
+}
+.arcade-invitation > svg {
+  flex-shrink: 0;
+  color: #697c2c;
+}
+.arcade-invitation .button {
+  margin-left: auto;
+  font-size: 14px;
+}
+.arcade-offer-note {
+  padding: 14px;
+  border: 1px solid var(--lime);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--cream);
+  margin: 0 0 22px;
+}
+@media (max-width: 700px) {
+  .arcade-invitation {
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .arcade-invitation > svg {
+    width: 32px;
+  }
+  .arcade-invitation .button {
+    margin-left: 0;
+  }
+  .arcade-invitation > div {
+    flex: 1;
+    min-width: 210px;
+  }
+}

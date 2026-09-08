@@ -1,0 +1,134 @@
+/* Native cursors preserve exact pointing, with no trailing DOM element. */
+@media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+  html[data-cursor='atomic'] body {
+    cursor:
+      url('/brand/cursor-atomic.svg') 3 3,
+      auto;
+  }
+  html[data-cursor='atomic']
+    :where(
+      a,
+      button,
+      summary,
+      select,
+      [role='button'],
+      [role='option'],
+      input:is([type='checkbox'], [type='radio']),
+      .consent-checkbox
+    ) {
+    cursor:
+      url('/brand/cursor-atomic-active.svg') 3 3,
+      pointer !important;
+  }
+  html[data-cursor='atomic'] input[type='file']::file-selector-button {
+    cursor:
+      url('/brand/cursor-atomic-active.svg') 3 3,
+      pointer;
+  }
+  input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  textarea,
+  [contenteditable]:not([contenteditable='false']) {
+    cursor: text;
+  }
+  [disabled]:disabled,
+  [aria-disabled='true'],
+  button[aria-disabled='true'] {
+    cursor: not-allowed !important;
+  }
+}
+
+/* Preserve contextual browser pointers in both modes, including disabled links. */
+html[data-cursor] [disabled]:disabled,
+html[data-cursor] [aria-disabled='true'] {
+  cursor: not-allowed !important;
+}
+html[data-click-effects='off'] .atomic-click-layer {
+  display: none;
+}
+@media (forced-colors: active) {
+  .atomic-click-layer {
+    display: none;
+  }
+}
+.hero-accessibility {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.cursor-options {
+  letter-spacing: 0;
+  max-width: 22rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.cursor-options > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  list-style: none;
+  cursor: pointer;
+}
+.cursor-options > summary::-webkit-details-marker {
+  display: none;
+}
+.cursor-options > summary svg {
+  flex-shrink: 0;
+}
+.cursor-options[open] > summary svg:last-child {
+  transform: rotate(180deg);
+}
+.cursor-options-content {
+  padding: 16px 0;
+  color: var(--cream);
+}
+.cursor-options fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.cursor-options legend {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.cursor-options label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.cursor-options input {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  accent-color: var(--lime);
+}
+.cursor-options p {
+  margin: 4px 0 14px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.cursor-options .cursor-save-note {
+  display: block;
+  border-top: 1px solid currentColor;
+  padding-top: 12px;
+  margin-bottom: 0;
+}
+@media (max-width: 700px) {
+  .hero-bottom { flex-wrap: wrap; align-items: flex-start; }
+  .hero-accessibility {
+    justify-content: flex-start;
+    width: 100%;
+  }
+  .hero-accessibility .cursor-options[open] {
+    flex-basis: 100%;
+  }
+}

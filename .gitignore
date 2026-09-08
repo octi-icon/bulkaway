@@ -1,0 +1,24 @@
+node_modules/
+website/node_modules/
+website/dist/
+website/.vinext/
+website/.wrangler/
+website/.env*
+!website/.env.example
+website/.dev.vars*
+website/*.tsbuildinfo
+# Private source material stays local; optimized site assets live in website/public.
+/art assets/
+/fonts/
+/reference - READ ONLY/
+/.impeccable/
+**/.npm-cache/
+**/.openai/
+**/.codex/
+**/.agents/
+*.log
+*.pem
+*.key
+.env*
+!.env.example
+/.release-check/

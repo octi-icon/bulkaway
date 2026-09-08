@@ -1,0 +1,166 @@
+{
+  "scope": "Local production HTTP response payloads; not browser timing or field metrics",
+  "routes": {
+    "/": {
+      "status": 200,
+      "wireBytes": 57610,
+      "decodedBytes": 237028,
+      "encoding": "gzip",
+      "cache": "",
+      "styles": [
+        "/_next/static/css/index.D7PJdQIw.css"
+      ],
+      "declaredJavascript": {
+        "scripts": [
+          "/_next/static/chunks/index-B2oaap9l.js",
+          "/_next/static/chunks/rolldown-runtime-hePW80VL.js",
+          "/_next/static/chunks/framework-DTZGTDtF.js",
+          "/_next/static/chunks/vinext-Cp6KI0hc.js",
+          "/_next/static/chunks/layout-segment-context-BVxXWLyC.js",
+          "/_next/static/chunks/site-experience-BiGnm4ro.js",
+          "/_next/static/chunks/createLucideIcon-C0Hk8rLa.js",
+          "/_next/static/chunks/Icon-jpk45vUa.js",
+          "/_next/static/chunks/chevron-down-Bpoyw2JQ.js",
+          "/_next/static/chunks/haul-list-cdT-35TN.js",
+          "/_next/static/chunks/bed-double-C2ddN6YK.js",
+          "/_next/static/chunks/check-Da7XzLFi.js",
+          "/_next/static/chunks/sofa-BYuYRbxJ.js",
+          "/_next/static/chunks/click-sparkles-BCE7dTvo.js",
+          "/_next/static/chunks/sparkle-rays-Dxb-DmOg.js",
+          "/_next/static/chunks/cookie-preferences-DHvTjLq_.js",
+          "/_next/static/chunks/x-PZG-sgpA.js",
+          "/_next/static/chunks/link-9MBjZIdF.js",
+          "/_next/static/chunks/query-DugiHe4Q.js",
+          "/_next/static/chunks/draft-safe-link-YMGRTxVH.js",
+          "/_next/static/chunks/interactive-D2OEmJlH.js",
+          "/_next/static/chunks/image-DzmYN9uW.js",
+          "/_next/static/chunks/arrow-up-right-BaRrL3MR.js",
+          "/_next/static/chunks/service-guide-BQrYoWmZ.js",
+          "/_next/static/chunks/sparkles-BuWhhhYw.js",
+          "/_next/static/chunks/atomic-experience-O04GDQ5b.js",
+          "/_next/static/chunks/request-dock-CMp51MjO.js",
+          "/_next/static/chunks/engagement-F3utH2Uy.js",
+          "/_next/static/chunks/pickup-form-CoRahLnI.js"
+        ],
+        "wireBytes": 259938,
+        "decodedBytes": 806400
+      }
+    },
+    "/privacy": {
+      "status": 200,
+      "wireBytes": 7775,
+      "decodedBytes": 39029,
+      "encoding": "gzip",
+      "cache": "",
+      "styles": [
+        "/_next/static/css/index.D7PJdQIw.css"
+      ],
+      "declaredJavascript": {
+        "scripts": [
+          "/_next/static/chunks/index-B2oaap9l.js",
+          "/_next/static/chunks/rolldown-runtime-hePW80VL.js",
+          "/_next/static/chunks/framework-DTZGTDtF.js",
+          "/_next/static/chunks/vinext-Cp6KI0hc.js",
+          "/_next/static/chunks/layout-segment-context-BVxXWLyC.js",
+          "/_next/static/chunks/site-experience-BiGnm4ro.js",
+          "/_next/static/chunks/createLucideIcon-C0Hk8rLa.js",
+          "/_next/static/chunks/Icon-jpk45vUa.js",
+          "/_next/static/chunks/chevron-down-Bpoyw2JQ.js",
+          "/_next/static/chunks/haul-list-cdT-35TN.js",
+          "/_next/static/chunks/bed-double-C2ddN6YK.js",
+          "/_next/static/chunks/check-Da7XzLFi.js",
+          "/_next/static/chunks/sofa-BYuYRbxJ.js",
+          "/_next/static/chunks/click-sparkles-BCE7dTvo.js",
+          "/_next/static/chunks/sparkle-rays-Dxb-DmOg.js",
+          "/_next/static/chunks/cookie-preferences-DHvTjLq_.js",
+          "/_next/static/chunks/x-PZG-sgpA.js",
+          "/_next/static/chunks/link-9MBjZIdF.js",
+          "/_next/static/chunks/query-DugiHe4Q.js",
+          "/_next/static/chunks/draft-safe-link-YMGRTxVH.js"
+        ],
+        "wireBytes": 153270,
+        "decodedBytes": 485471
+      }
+    },
+    "/sms": {
+      "status": 200,
+      "wireBytes": 6846,
+      "decodedBytes": 33794,
+      "encoding": "gzip",
+      "cache": "",
+      "styles": [
+        "/_next/static/css/index.D7PJdQIw.css"
+      ],
+      "declaredJavascript": {
+        "scripts": [
+          "/_next/static/chunks/index-B2oaap9l.js",
+          "/_next/static/chunks/rolldown-runtime-hePW80VL.js",
+          "/_next/static/chunks/framework-DTZGTDtF.js",
+          "/_next/static/chunks/vinext-Cp6KI0hc.js",
+          "/_next/static/chunks/layout-segment-context-BVxXWLyC.js",
+          "/_next/static/chunks/site-experience-BiGnm4ro.js",
+          "/_next/static/chunks/createLucideIcon-C0Hk8rLa.js",
+          "/_next/static/chunks/Icon-jpk45vUa.js",
+          "/_next/static/chunks/chevron-down-Bpoyw2JQ.js",
+          "/_next/static/chunks/haul-list-cdT-35TN.js",
+          "/_next/static/chunks/bed-double-C2ddN6YK.js",
+          "/_next/static/chunks/check-Da7XzLFi.js",
+          "/_next/static/chunks/sofa-BYuYRbxJ.js",
+          "/_next/static/chunks/click-sparkles-BCE7dTvo.js",
+          "/_next/static/chunks/sparkle-rays-Dxb-DmOg.js",
+          "/_next/static/chunks/cookie-preferences-DHvTjLq_.js",
+          "/_next/static/chunks/x-PZG-sgpA.js",
+          "/_next/static/chunks/link-9MBjZIdF.js",
+          "/_next/static/chunks/query-DugiHe4Q.js",
+          "/_next/static/chunks/draft-safe-link-YMGRTxVH.js"
+        ],
+        "wireBytes": 153270,
+        "decodedBytes": 485471
+      }
+    },
+    "/delivery-review-missing": {
+      "status": 404,
+      "wireBytes": 4462,
+      "decodedBytes": 25374,
+      "encoding": "gzip",
+      "cache": "",
+      "styles": [
+        "/_next/static/css/index.D7PJdQIw.css"
+      ],
+      "declaredJavascript": {
+        "scripts": [
+          "/_next/static/chunks/index-B2oaap9l.js",
+          "/_next/static/chunks/rolldown-runtime-hePW80VL.js",
+          "/_next/static/chunks/framework-DTZGTDtF.js",
+          "/_next/static/chunks/vinext-Cp6KI0hc.js",
+          "/_next/static/chunks/site-experience-BiGnm4ro.js",
+          "/_next/static/chunks/createLucideIcon-C0Hk8rLa.js",
+          "/_next/static/chunks/Icon-jpk45vUa.js",
+          "/_next/static/chunks/chevron-down-Bpoyw2JQ.js",
+          "/_next/static/chunks/haul-list-cdT-35TN.js",
+          "/_next/static/chunks/bed-double-C2ddN6YK.js",
+          "/_next/static/chunks/check-Da7XzLFi.js",
+          "/_next/static/chunks/sofa-BYuYRbxJ.js",
+          "/_next/static/chunks/link-9MBjZIdF.js",
+          "/_next/static/chunks/query-DugiHe4Q.js",
+          "/_next/static/chunks/click-sparkles-BCE7dTvo.js",
+          "/_next/static/chunks/sparkle-rays-Dxb-DmOg.js",
+          "/_next/static/chunks/cookie-preferences-DHvTjLq_.js",
+          "/_next/static/chunks/x-PZG-sgpA.js",
+          "/_next/static/chunks/draft-safe-link-YMGRTxVH.js"
+        ],
+        "wireBytes": 152774,
+        "decodedBytes": 484975
+      }
+    }
+  },
+  "css": {
+    "/_next/static/css/index.D7PJdQIw.css": {
+      "status": 200,
+      "wireBytes": 21405,
+      "decodedBytes": 103277,
+      "encoding": "gzip",
+      "cache": "public, max-age=31536000, immutable"
+    }
+  }
+}

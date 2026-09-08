@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: bulk-away
+    runtime: node
+    rootDir: website
+    plan: starter
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: HOST
+        value: 0.0.0.0
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 465
+      - key: SMTP_USER
+        value: mailer@wsitrashvalet.com
+      - key: SMTP_PASS
+        sync: false
+      - key: PUBLIC_LAUNCH
+        value: "false"
+      - key: GOOGLE_MAPS_BROWSER_KEY
+        sync: false

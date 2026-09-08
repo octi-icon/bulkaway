@@ -1,0 +1,132 @@
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+
+// UGRC geometry is NAD83 / UTM zone 12N (meters), not unprojected lat/lon.
+// Uniform scaling preserves proportions; reversing Y keeps grid north up.
+const data = JSON.parse(
+  readFileSync(
+    new URL('../assets/geography/utah-service-counties.json', import.meta.url),
+  ),
+);
+const expected = new Map([
+  ['SALT LAKE', '49035'],
+  ['UTAH', '49049'],
+  ['WEBER', '49057'],
+  ['DAVIS', '49011'],
+]);
+if (
+  data.features?.length !== 4 ||
+  (data.spatialReference.latestWkid ?? data.spatialReference.wkid) !== 26912
+) {
+  throw new Error('Expected four county features in EPSG:26912.');
+}
+const output = new URL('../public/counties/', import.meta.url);
+mkdirSync(output, { recursive: true });
+for (const { attributes, geometry } of data.features) {
+  if (expected.get(attributes.NAME) !== attributes.FIPS_STR)
+    throw new Error('Unexpected county identity.');
+  expected.delete(attributes.NAME);
+  const points = geometry.rings.flat();
+  const xs = points.map(([x]) => x),
+    ys = points.map(([, y]) => y);
+  const minX = Math.min(...xs),
+    maxX = Math.max(...xs),
+    minY = Math.min(...ys),
+    maxY = Math.max(...ys);
+  const scale = Math.min(174 / (maxX - minX), 134 / (maxY - minY));
+  const dx = (200 - (maxX - minX) * scale) / 2,
+    dy = (160 - (maxY - minY) * scale) / 2;
+  const path = geometry.rings
+    .map(
+      (ring) =>
+        ring
+          .map(
+            ([x, y], index) =>
+              `${index ? 'L' : 'M'}${((x - minX) * scale + dx).toFixed(2)},${((maxY - y) * scale + dy).toFixed(2)}`,
+          )
+          .join(' ') + 'Z',
+    )
+    .join(' ');
+  const slug = attributes.NAME.toLowerCase().replaceAll(' ', '-');
+  const fill = ['DAVIS', 'SALT LAKE'].includes(attributes.NAME)
+    ? '#b2d34c'
+    : '#efc24b';
+  writeFileSync(
+    new URL(`${slug}.svg`, output),
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160"><path d="${path}" fill="${fill}" fill-rule="evenodd" stroke="#1d1724" stroke-width="2" stroke-linejoin="round"/></svg>\n`,
+  );
+  console.log(
+    `${attributes.NAME}: ${points.length} vertices, uniform scale ${scale.toFixed(6)}`,
+  );
+}
+if (expected.size) throw new Error('Missing county.');
+
+// One transform for the whole region preserves county adjacency and relative size.
+const allPoints = data.features.flatMap(({ geometry }) =>
+  geometry.rings.flat(),
+);
+const west = Math.min(...allPoints.map(([x]) => x));
+const east = Math.max(...allPoints.map(([x]) => x));
+const south = Math.min(...allPoints.map(([, y]) => y));
+const north = Math.max(...allPoints.map(([, y]) => y));
+const mapScale = Math.min(280 / (east - west), 500 / (north - south));
+const project = ([x, y]) => [
+  20 + (x - west) * mapScale,
+  20 + (north - y) * mapScale,
+];
+const font = readFileSync(
+  new URL('../public/fonts/Brookvale-webfont.woff2', import.meta.url),
+).toString('base64');
+const paths = [],
+  labels = [],
+  regions = [];
+for (const name of ['WEBER', 'DAVIS', 'SALT LAKE', 'UTAH']) {
+  const { geometry } = data.features.find(
+    ({ attributes }) => attributes.NAME === name,
+  );
+  const projected = geometry.rings.map((ring) => ring.map(project));
+  const points = projected.flat();
+  const y =
+    (Math.min(...points.map(([, y]) => y)) +
+      Math.max(...points.map(([, y]) => y))) /
+    2;
+  const path = projected
+    .map(
+      (ring) =>
+        ring
+          .map(
+            ([x, y], index) =>
+              `${index ? 'L' : 'M'}${x.toFixed(2)},${y.toFixed(2)}`,
+          )
+          .join(' ') + 'Z',
+    )
+    .join(' ');
+  const fill = ['WEBER', 'SALT LAKE'].includes(name) ? '#efc24b' : '#b2d34c';
+  const label =
+    name.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) + ' County';
+  regions.push({
+    name: label.replace(' County', ''),
+    path,
+    fill,
+    labelY: Number((y + 10).toFixed(2)),
+  });
+  paths.push(
+    `<path d="${path}" fill="${fill}" fill-rule="evenodd" stroke="#1d1724" stroke-width="2" stroke-linejoin="round"/>`,
+  );
+  labels.push(`<text x="325" y="${(y + 10).toFixed(2)}">${label}</text>`);
+}
+writeFileSync(
+  new URL('service-region.svg', output),
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 ${Math.ceil(40 + (north - south) * mapScale)}"><defs><style>@font-face{font-family:Brookvale;src:url(data:font/woff2;base64,${font}) format('woff2')}text{font:30px Brookvale,serif;fill:#1d1724}</style></defs>${paths.join('')}${labels.join('')}</svg>\n`,
+);
+console.log(
+  'Combined map: all four counties share one projection, scale, and origin.',
+);
+const mapSvg = readFileSync(new URL('service-region.svg', output));
+const mapHash = createHash('sha256').update(mapSvg).digest('hex').slice(0, 10);
+const mapFilename = `service-region-${mapHash}.svg`;
+writeFileSync(new URL(mapFilename, output), mapSvg);
+writeFileSync(
+  new URL('../lib/county-map.ts', import.meta.url),
+  `// Generated by scripts/build-county-shapes.mjs; content-versioned to avoid stale browser images.\nexport const countyMap = ${JSON.stringify({ src: `/counties/${mapFilename}`, width: 550, height: Math.ceil(40 + (north - south) * mapScale) })} as const;\nexport const countyRegions = ${JSON.stringify(regions)} as const;\n`,
+);
