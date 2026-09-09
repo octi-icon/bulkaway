@@ -45,7 +45,7 @@ export function startArcade(
 ): ArcadeRuntime {
   const c = canvas.getContext('2d');
   if (!c) throw new Error('Canvas unavailable');
-  // Fixed 320 x 240 pixels; simulation coordinates and hit areas are unchanged.
+  // Square 320 x 320 pixel world; both axes use the same scale.
   const scale = 0.4;
   canvas.width = W * scale;
   canvas.height = H * scale;

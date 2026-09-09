@@ -116,7 +116,9 @@ function stamp(
 }
 function loadingBay(c: Pen, truck: HTMLCanvasElement) {
   // An open, raised loading platform: the approach stays visible around the truck.
-  // This is scenery only; the existing unloading bounds are unchanged.
+  // Keep the original pixel geometry aligned with the world's lower edge.
+  c.save();
+  c.translate(0, H - 600);
   for (let y = 505; y < 580; y += CELL) {
     const half = 87.5 + (y - 505) * 0.45;
     rect(c, 400 - half, y, half * 2, CELL, palette.D);
@@ -161,6 +163,7 @@ function loadingBay(c: Pen, truck: HTMLCanvasElement) {
   }
   oval(c, 403, 575, 83, 5, palette.K);
   stamp(c, truck, 398, 540);
+  c.restore();
 }
 function backdrop(c: Pen, truck: HTMLCanvasElement) {
   rect(c, 0, 0, W, H, palette.K);
@@ -207,7 +210,7 @@ function backdrop(c: Pen, truck: HTMLCanvasElement) {
       if (y < 110) rect(c, x, y, CELL, 5, palette.S);
     }
   }
-  for (const y of [245, 415]) {
+  for (const y of [245, 415, 605]) {
     rect(c, 0, y - 25, W, 50, '#211c2a');
     rect(c, 0, y - 25, W, CELL, palette.D);
     for (let x = 0; x < W; x += 45) rect(c, x, y, 20, CELL, palette.D);
@@ -305,7 +308,7 @@ export function createArcadePainter(c: Pen, scale: number) {
     }
     for (const t of w.traffic) {
       if (t.warning && t.warning > 0) {
-        for (let y = 85; y < 470; y += 20) {
+        for (let y = 85; y < H - 60; y += 20) {
           rect(c, t.x - 23, y, CELL, 10, palette.R);
           rect(c, t.x + 23, y, CELL, 10, palette.R);
         }

@@ -7,6 +7,8 @@ import {
   CAPACITY,
   beamRange,
   launchCargo,
+  H,
+  W,
 } from './arcade-engine.ts';
 
 void test('beam requires alignment, collects once, and respects capacity', () => {
@@ -140,13 +142,27 @@ void test('a complete run introduces all hazard types and keeps pickups and traf
 });
 void test('truck banks cargo once and rewards a full load', () => {
   const w = createWorld();
-  w.y = 520;
+  w.y = H - 80;
   w.cargo = 5;
   assert.equal(stepWorld(w, 0.01, 0, 0).banked, true);
   assert.equal(w.score, 600);
   assert.equal(w.delivered, 5);
   stepWorld(w, 0.01, 0, 0);
   assert.equal(w.score, 600);
+});
+void test('taller world has usable lower space and unloads only at its bottom', () => {
+  assert.equal(H, W);
+  const w = createWorld(42);
+  assert.ok(w.junk.some((j) => j.y > 500));
+  assert.ok(w.junk.every((j) => j.y < H - 120));
+  w.cargo = 2;
+  w.y = 520;
+  assert.equal(stepWorld(w, 0.01, 0, 0).banked, false);
+  w.y = H - 80;
+  assert.equal(stepWorld(w, 0.01, 0, 0).banked, true);
+  w.shield = 1000;
+  for (let i = 0; i < 100; i++) stepWorld(w, 0.05, 0, 1);
+  assert.equal(w.y, H - 60);
 });
 void test('collision protection prevents repeated damage and completed runs are frozen', () => {
   const w = createWorld();

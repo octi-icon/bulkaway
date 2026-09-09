@@ -2,7 +2,7 @@
 export const ROUND_SECONDS = 75;
 export const CAPACITY = 5;
 export const W = 800;
-export const H = 600;
+export const H = 800;
 export const levels = [
   {
     name: 'Neighborhood Sweep',
@@ -127,7 +127,7 @@ function addJunk(w: World) {
     y = 0;
   for (let attempt = 0; attempt < 40; attempt++) {
     x = 65 + random(w) * 670;
-    y = 170 + random(w) * 285;
+    y = 170 + random(w) * (H - 315);
     if (w.junk.every((item) => Math.hypot(item.x - x, item.y - y) > 58)) break;
   }
   w.junk.push({
@@ -213,7 +213,7 @@ export function stepWorld(
     60,
     Math.min(H - 60, w.y + (dy / Math.max(1, length)) * 235 * dt),
   );
-  if (w.cargo && w.y > 480 && Math.abs(w.x - 400) < 110) {
+  if (w.cargo && w.y > H - 120 && Math.abs(w.x - 400) < 110) {
     bankCargo(w);
     events.banked = true;
   }
@@ -223,7 +223,7 @@ export function stepWorld(
     if (w.powerups.length < 2)
       w.powerups.push({
         x: 100 + random(w) * 600,
-        y: 175 + random(w) * 220,
+        y: 175 + random(w) * (H - 380),
         kind,
         ttl: 14,
       });
@@ -269,7 +269,7 @@ export function stepWorld(
             : 0;
     w.traffic.push({
       x: fromLeft ? -60 : 860,
-      y: 90 + random(w) * 335,
+      y: 90 + random(w) * (H - 265),
       vx: (fromLeft ? 1 : -1) * settings.speed,
       kind,
     });

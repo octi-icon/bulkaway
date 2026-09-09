@@ -4,9 +4,13 @@ The 75-second run now progresses through three 25-second levels: Neighborhood Sw
 
 Fly directly over lettered capsules to collect them. B grants Split Beam for ten seconds, allowing two targets to charge and lift together within a wider range, still respecting the five-item cargo limit. R grants eight seconds of Repulsor: collisions remove the hazard and award 75 points instead of damage. H stores one Cargo Launch, spent with Space or the on-screen button to bank cargo remotely with the existing full-load bonus. Empty holds do not consume the charge. Capsules expire after fourteen seconds; at most two are present. Timers advance only with the simulation, so pause, blur, and hidden-tab handling also stop power-up expiry.
 
-The gameplay display has level lamps, compact B/R/H status cells with countdowns, and a clearly enabled/disabled launch control. Level changes highlight the existing level label; no announcement overlays the playfield. Explanations live in How to play, and status regions reserve consistent space to prevent wrapping from moving the canvas. The embedded mode selector expands to fit both buttons. Pickups use matching B/R/H pixel glyphs; split beams are gold and the repulsor has a larger field. All sound remains opt-in, with new pickup, level, and repulsion cues. Static scenery stays cached and sprite assets remain local. Motion preferences suppress decorative bobbing; warning markers never flash.
+The gameplay display has a compact level label, B/R/H status cells with countdowns, and a clearly enabled/disabled launch control. Level changes highlight the existing level label; no announcement overlays the playfield. Explanations live in How to play, and status regions reserve consistent space to prevent wrapping from moving the canvas. The embedded mode selector expands to fit both buttons. Pickups use matching B/R/H pixel glyphs; split beams are gold and the repulsor has a larger field. All sound remains opt-in, with new pickup, level, and repulsion cues. Static scenery stays cached and sprite assets remain local. Motion preferences suppress decorative bobbing; warning markers never flash.
 
 The crew-applied SPACE5 offer is unchanged. The expanded game uses a separate v2 local best-score key so scores with new bonus mechanics are not mixed with the original edition. The original key is not deleted.
+
+## Taller playfield
+
+The timed playfield now uses an 800 × 800 world rendered at 320 × 320 pixels, giving 33% more vertical play space at the same width. Junk, capsules, traffic, debris warnings, and the truck's unloading bounds use the taller world. Sprites keep their original proportions. The embedded control deck keeps the direction pad and a vertical pair of pause/sound buttons side by side, preserving 44px touch targets.
 
 ## Untimed route
 

@@ -245,11 +245,6 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                   ? `Level ${hud.level} / 3 · ${levels[hud.level - 1].name}`
                   : '3 levels. One out-of-this-world shift.'}
               </strong>
-              <span className="arcade-level-lamps" aria-hidden="true">
-                {levels.map((level, i) => (
-                  <i key={level.name} data-lit={i < hud.level} />
-                ))}
-              </span>
             </div>
             <div className="arcade-power-rack" aria-label="Power-up status">
               <span
