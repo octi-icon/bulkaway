@@ -1,11 +1,17 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { palette, saucerPixels, junkPixels } from '../lib/arcade-sprites.ts';
+import {
+  palette,
+  saucerPixels,
+  junkPixels,
+  truckPixels,
+} from '../lib/arcade-sprites.ts';
 
 // Keep menu artwork identical to the in-game pixel maps, with no raster downloads.
 const dir = new URL('../public/arcade/', import.meta.url);
 await mkdir(dir, { recursive: true });
 for (const [name, rows] of [
   ['saucer', saucerPixels],
+  ['truck', truckPixels],
   ...junkPixels.map((rows, i) => [`junk-${i}`, rows]),
 ]) {
   const width = Math.max(...rows.map((row) => row.length));

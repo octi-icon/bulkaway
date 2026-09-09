@@ -1,4 +1,10 @@
-export type ArcadeSound = 'collect' | 'bank' | 'hit';
+export type ArcadeSound =
+  | 'collect'
+  | 'bank'
+  | 'hit'
+  | 'power'
+  | 'level'
+  | 'repel';
 export type BeamSound = 0 | 1 | 2; // Off, searching, lifting.
 
 // Synthesized locally: no audio files, timers, or sound before an explicit opt-in.
@@ -182,6 +188,15 @@ export function createArcadeAudio(ac: AudioContext) {
         }
         note('square', 440, 310, 0.43, 0.18, 0.07);
         note('triangle', 880, 620, 0.43, 0.22, 0.05);
+      } else if (kind === 'power' || kind === 'level') {
+        const pitches =
+          kind === 'power' ? [440, 660, 880, 1320] : [330, 440, 550, 880];
+        pitches.forEach((pitch, i) =>
+          note('square', pitch, pitch, i * 0.08, 0.13, 0.055),
+        );
+      } else if (kind === 'repel') {
+        note('triangle', 140, 980, 0, 0.22, 0.15);
+        note('square', 700, 350, 0.08, 0.14, 0.04);
       } else {
         note('sawtooth', 180, 48, 0, 0.22, 0.08);
         clatter(0, 0.13, 0.11);

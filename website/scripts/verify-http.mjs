@@ -2,13 +2,30 @@ import assert from 'node:assert/strict';
 const origin = process.env.BASE_URL || 'http://127.0.0.1:8788';
 const homeHtml = await (await fetch(origin)).text();
 assert.match(homeHtml, /Clear the junk\. Unlock the arcade\./);
-assert.doesNotMatch(homeHtml, /<canvas\b/, 'the homepage defers the game until it is unlocked');
+assert.doesNotMatch(
+  homeHtml,
+  /<canvas\b/,
+  'the homepage defers the game until it is unlocked',
+);
 const arcadeResponse = await fetch(origin + '/arcade');
 assert.equal(arcadeResponse.status, 200);
 const arcadeHtml = await arcadeResponse.text();
 assert.match(arcadeHtml, /Start a 75-second shift/);
 assert.match(arcadeHtml, /Play untimed cleanup instead/);
-for (const path of ['/arcade/saucer.svg', ...Array.from({length: 6}, (_, i) => `/arcade/junk-${i}.svg`)]) {
+for (const label of [
+  'Split Beam',
+  'Repulsor',
+  'Launch cargo',
+  'Commercial Chaos',
+  'Orbital Rush',
+]) {
+  assert.ok(arcadeHtml.includes(label), `arcade renders ${label} guidance`);
+}
+for (const path of [
+  '/arcade/saucer.svg',
+  '/arcade/truck.svg',
+  ...Array.from({ length: 6 }, (_, i) => `/arcade/junk-${i}.svg`),
+]) {
   const response = await fetch(origin + path);
   assert.equal(response.status, 200, path);
   assert.match(response.headers.get('content-type') || '', /image\/svg\+xml/);

@@ -5,18 +5,30 @@ import {
   W,
   H,
   CAPACITY,
+  beamTargets,
+  launchCargo,
   type World,
 } from './arcade-engine';
 import type { BeamSound } from './arcade-audio';
 export type ArcadeReadout = Pick<
   World,
-  'score' | 'cargo' | 'lives' | 'time' | 'delivered' | 'notice'
+  | 'score'
+  | 'cargo'
+  | 'lives'
+  | 'time'
+  | 'delivered'
+  | 'notice'
+  | 'level'
+  | 'levelIntro'
+  | 'effects'
+  | 'launchReady'
 >;
 export type ArcadeRuntime = {
   pause: () => void;
   resume: () => void;
   destroy: () => void;
   direction: (key: string, down: boolean) => void;
+  launch: () => void;
 };
 export function startArcade(
   canvas: HTMLCanvasElement,
@@ -24,7 +36,9 @@ export function startArcade(
     update: (value: ArcadeReadout) => void;
     finish: (value: ArcadeReadout) => void;
     pause: () => void;
-    sound: (kind: 'collect' | 'bank' | 'hit') => void;
+    sound: (
+      kind: 'collect' | 'bank' | 'hit' | 'power' | 'level' | 'repel',
+    ) => void;
     beam: (value: BeamSound) => void;
     silence: () => void;
   },
@@ -53,7 +67,16 @@ export function startArcade(
     time: world.time,
     delivered: world.delivered,
     notice: world.notice,
+    level: world.level,
+    levelIntro: world.levelIntro,
+    effects: { ...world.effects },
+    launchReady: world.launchReady,
   });
+  function launch() {
+    if (paused || dead || !launchCargo(world)) return;
+    callbacks.sound('bank');
+    callbacks.update(snapshot());
+  }
   function tick(now: number) {
     if (paused || dead) return;
     const dt = last ? (now - last) / 1000 : 0;
@@ -75,19 +98,16 @@ export function startArcade(
     callbacks.beam(
       world.over || world.cargo === CAPACITY
         ? 0
-        : world.junk.some(
-              (j) =>
-                j.charge > 0 &&
-                Math.abs(j.x - world.x) < 43 &&
-                j.y - world.y > 15 &&
-                j.y - world.y < 115,
-            )
+        : beamTargets(world).some((j) => j.charge > 0)
           ? 2
           : 1,
     );
     if (event.collected) callbacks.sound('collect');
     if (event.banked) callbacks.sound('bank');
     if (event.hit) callbacks.sound('hit');
+    if (event.powerUp) callbacks.sound('power');
+    if (event.levelChanged) callbacks.sound('level');
+    if (event.deflected) callbacks.sound('repel');
     draw(
       world,
       quiet.matches || document.documentElement.dataset.motion === 'paused',
@@ -120,6 +140,10 @@ export function startArcade(
     if (document.hidden) requestPause();
   };
   const keyDown = (e: KeyboardEvent) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (!e.repeat) launch();
+    }
     if (e.key === 'Escape' || e.key.toLowerCase() === 'p') {
       e.preventDefault();
       requestPause();
@@ -173,6 +197,7 @@ export function startArcade(
   frame = requestAnimationFrame(tick);
   return {
     pause,
+    launch,
     resume() {
       if (dead || world.over || !paused) return;
       paused = false;

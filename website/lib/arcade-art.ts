@@ -1,4 +1,4 @@
-import { W, H, CAPACITY, type World } from './arcade-engine';
+import { W, H, CAPACITY, powers, type World } from './arcade-engine';
 import {
   palette,
   saucerPixels,
@@ -236,6 +236,18 @@ export function createArcadePainter(c: Pen, scale: number) {
   const junk = junkPixels.map((rows) => sprite(rows)),
     car = sprite(carPixels),
     truck = sprite(truckPixels);
+  const debris = sprite([
+    '.....OOO......',
+    '...OYYYOO.....',
+    '..OYYCOOOO....',
+    '.OYYCOOSSOO...',
+    'OYYCOOSSSSOO..',
+    'OYYOOSDDSSSO..',
+    '.OOOSDDDDSSO..',
+    '..OOSDDSSSO...',
+    '...OOSSSOO....',
+    '....OOOO......',
+  ]);
   const background = document.createElement('canvas');
   background.width = W * scale;
   background.height = H * scale;
@@ -251,14 +263,31 @@ export function createArcadePainter(c: Pen, scale: number) {
     else backdrop(c, truck);
     const full = w.cargo === CAPACITY;
     if (!full) {
-      for (let dy = 17.5; dy < 115; dy += CELL) {
-        const half = 10 + dy * 0.29;
-        for (let dx = -half; dx < half; dx += CELL) {
-          if ((Math.round(dx / CELL) + dy / CELL) % (dy < 45 ? 2 : 4) === 0)
-            rect(c, w.x + dx, w.y + dy, CELL, CELL, palette.B);
+      for (const offset of w.effects.split > 0 ? [-38, 38] : [0]) {
+        for (let dy = 17.5; dy < 115; dy += CELL) {
+          const half = 10 + dy * 0.29;
+          const center = w.x + (offset * dy) / 115;
+          for (let dx = -half; dx < half; dx += CELL) {
+            if ((Math.round(dx / CELL) + dy / CELL) % (dy < 45 ? 2 : 4) === 0)
+              rect(c, center + dx, w.y + dy, CELL, CELL, palette.B);
+          }
+          rect(
+            c,
+            center - half,
+            w.y + dy,
+            CELL,
+            CELL,
+            w.effects.split > 0 ? palette.Y : palette.G,
+          );
+          rect(
+            c,
+            center + half,
+            w.y + dy,
+            CELL,
+            CELL,
+            w.effects.split > 0 ? palette.Y : palette.G,
+          );
         }
-        rect(c, w.x - half, w.y + dy, CELL, CELL, palette.G);
-        rect(c, w.x + half, w.y + dy, CELL, CELL, palette.G);
       }
       if (!quiet)
         for (let i = 0; i < 3; i++) {
@@ -275,23 +304,51 @@ export function createArcadePainter(c: Pen, scale: number) {
       }
     }
     for (const t of w.traffic) {
+      if (t.warning && t.warning > 0) {
+        for (let y = 85; y < 470; y += 20) {
+          rect(c, t.x - 23, y, CELL, 10, palette.R);
+          rect(c, t.x + 23, y, CELL, 10, palette.R);
+        }
+        label(c, '!', t.x, 62.5, palette.R);
+        continue;
+      }
       oval(c, t.x + 5, t.y + 22, 28, 5, palette.K);
       stamp(
         c,
-        t.kind ? rival : car,
+        t.kind === 2 ? debris : t.kind ? rival : car,
         t.x,
         t.y - (t.kind ? 7.5 : 0),
         !t.kind && t.vx < 0,
       );
       label(c, '!', t.x, t.y - 42.5, palette.R);
     }
-    if (w.shield > 0) {
+    for (const p of w.powerups) {
+      const color =
+        p.kind === 'split'
+          ? palette.Y
+          : p.kind === 'repulsor'
+            ? palette.A
+            : palette.L;
+      const bob = quiet
+        ? 0
+        : Math.round(Math.sin((75 - w.time) * 2) * 2) * CELL;
+      oval(c, p.x + 3, p.y + 23, 17, 4, palette.K);
+      rect(c, p.x - 18, p.y - 19 + bob, 36, 38, palette.K);
+      rect(c, p.x - 15, p.y - 19 + bob, 30, 3, color);
+      rect(c, p.x - 18, p.y - 16 + bob, 3, 30, color);
+      rect(c, p.x + 15, p.y - 16 + bob, 3, 30, color);
+      rect(c, p.x - 15, p.y + 14 + bob, 30, 3, color);
+      label(c, powers[p.kind].glyph, p.x, p.y - 9 + bob, color);
+      // Expiry is a steady shrinking bar, never a flash.
+      rect(c, p.x - 15, p.y + 22, 30 * (p.ttl / 14), CELL, color);
+    }
+    if (w.shield > 0 || w.effects.repulsor > 0) {
       for (let i = 0; i < 30; i++) {
         const a = (i * Math.PI * 2) / 30;
         rect(
           c,
-          w.x + Math.cos(a) * 44,
-          w.y - 5 + Math.sin(a) * 32.5,
+          w.x + Math.cos(a) * (w.effects.repulsor > 0 ? 54 : 44),
+          w.y - 5 + Math.sin(a) * (w.effects.repulsor > 0 ? 42.5 : 32.5),
           CELL,
           CELL,
           palette.A,

@@ -1,0 +1,19 @@
+# Arcade expansion — September 9, 2026
+
+The 75-second run now progresses through three 25-second levels: Neighborhood Sweep (cars), Commercial Chaos (cars plus swooping UFOs), and Orbital Rush (faster traffic plus falling debris). Debris lanes have a static 1.25-second warning before movement or damage. Level changes clear traffic and provide two seconds of protection.
+
+Fly directly over lettered capsules to collect them. B grants Split Beam for ten seconds, allowing two targets to charge and lift together within a wider range, still respecting the five-item cargo limit. R grants eight seconds of Repulsor: collisions remove the hazard and award 75 points instead of damage. H stores one Cargo Launch, spent with Space or the on-screen button to bank cargo remotely with the existing full-load bonus. Empty holds do not consume the charge. Capsules expire after fourteen seconds; at most two are present. Timers advance only with the simulation, so pause, blur, and hidden-tab handling also stop power-up expiry.
+
+The gameplay display has level lamps, compact B/R/H status cells with countdowns, and a clearly enabled/disabled launch control. Level changes highlight the existing level label; no announcement overlays the playfield. Explanations live in How to play, and status regions reserve consistent space to prevent wrapping from moving the canvas. The embedded mode selector expands to fit both buttons. Pickups use matching B/R/H pixel glyphs; split beams are gold and the repulsor has a larger field. All sound remains opt-in, with new pickup, level, and repulsion cues. Static scenery stays cached and sprite assets remain local. Motion preferences suppress decorative bobbing; warning markers never flash.
+
+The crew-applied SPACE5 offer is unchanged. The expanded game uses a separate v2 local best-score key so scores with new bonus mechanics are not mixed with the original edition. The original key is not deleted.
+
+## Untimed route
+
+The former twelve-button list is now a turn-based pixel cleanup across The Courtyard, The Loading Dock, and The Moonlight Lot. Each stop has four items in fixed positions. Select an item to collect it into a three-item hold, then unload into the Bulk Away truck. Only delivered items score. Clear each stop before choosing Next stop; the reward appears after the final delivery. Empty unloading, duplicate pickup, overfilling, early advancement, and actions after completion are rejected by the pure cleanup model. There is no clock, collision, reflex requirement, or separate leaderboard.
+
+Buttons remain in place after pickup, keyboard focus stays stable, status updates are announced, and the next location's heading receives focus on advancement. Sound remains opt-in; the UFO movement respects motion preferences. Restart cleanup creates a fresh route. Choose mode restores the timed arcade entry screen. Inactive flight controls are omitted from untimed play.
+
+Untimed verification completed the full route in the production preview, including keyboard pickup, full-hold blocking, unloading, all three stops, the 1,200-point finish and SPACE5 reward, replay, restarting a partial route, and returning to mode selection. Desktop and 390px mobile layouts were inspected; mobile had no horizontal overflow. The release checks pass with 46 tests, type checking, lint, a production build, and HTTP checks including the truck sprite.
+
+Verification includes engine tests for boundaries, pickup expiry, simultaneous collection at capacity, one-charge remote delivery, collision conversion, meteor warnings, and bounded complete runs. Desktop and 390px mobile checks used a loopback-only fixture with the real runtime and controls: observed dual collection, repulsion points, level transition, keyboard and button launches, and paused timers. The fixture is excluded from Git and the production build.
