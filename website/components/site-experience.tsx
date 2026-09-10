@@ -136,6 +136,7 @@ export function SiteExperience({ children }: { children: ReactNode }) {
       if (hash && target)
         target.scrollIntoView({ behavior: 'instant', block: 'start' });
       else window.scrollTo({ top: 0, behavior: 'instant' });
+      if (hash === 'pickup-request') target?.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
   }, [pathname]);

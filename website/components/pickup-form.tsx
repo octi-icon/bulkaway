@@ -270,7 +270,7 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
     'aria-describedby': errors[name] ? `${name}-error` : undefined,
   });
   return (
-    <div className="pickup-form">
+    <div className="pickup-form" id="pickup-request" tabIndex={-1}>
       {!ready && (
         <output className="form-loading">
           Getting your request form ready. Need a hand?{' '}

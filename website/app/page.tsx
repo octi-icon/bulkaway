@@ -13,7 +13,6 @@ import {
 import { PickupForm } from '@/components/pickup-form';
 import { DraftSafeLink } from '@/components/draft-safe-link';
 import { CursorOptions } from '@/components/site-experience';
-import { RequestDock } from '@/components/request-dock';
 import { ServiceExplorer, SiteHeader } from '@/components/interactive';
 import {
   AtomicSky,
@@ -509,7 +508,6 @@ export default function Home() {
           </DraftSafeLink>
         </section>
       </main>
-      <RequestDock />
       <footer>
         <div className="wrap footer-main">
           <a href="#main" className="wordmark" aria-label="Bulk Away home">

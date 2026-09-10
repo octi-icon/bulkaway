@@ -209,7 +209,81 @@
   margin-top: 4px;
 }
 .request-dock {
-  display: none;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  right: max(20px, env(safe-area-inset-right, 0px));
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  max-width: calc(100% - 32px);
+  z-index: 35;
+  background: var(--gold);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  box-shadow:
+    0 6px 0 #1d172455,
+    0 10px 24px #0003,
+    inset 0 0 0 3px var(--cream);
+}
+.request-dock > a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 12px 10px 20px;
+  color: var(--ink);
+  font:
+    400 26px/1 Brookvale,
+    sans-serif;
+  text-decoration: none;
+  border-radius: 999px;
+}
+.request-dock > a > span {
+  min-width: 0;
+}
+.request-dock small {
+  display: block;
+  font:
+    400 11px/1.5 Geograph,
+    sans-serif;
+  margin-top: 4px;
+}
+.request-dock-orbit {
+  flex-shrink: 0;
+}
+.request-dock > a > svg:last-child {
+  flex-shrink: 0;
+}
+.request-dock > button {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-height: 44px;
+  margin-right: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+}
+.request-dock > button:hover {
+  background: #1d17241a;
+}
+.request-dock:has(> a:hover) {
+  background: var(--lime);
+}
+.request-dock :is(a, button):focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: -5px;
+}
+body:has(
+    dialog[open],
+    [role='dialog'],
+    .arcade-cabinet:focus-within,
+    .arcade-cabinet:hover
+  )
+  .request-dock {
+  visibility: hidden;
 }
 @media (max-width: 960px) {
   .finder-choices {
@@ -218,59 +292,21 @@
 }
 @media (max-width: 760px) {
   .request-dock {
-    position: fixed;
-    display: flex;
-    align-items: stretch;
-    right: 16px;
+    right: max(16px, env(safe-area-inset-right, 0px));
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    max-width: calc(100% - 32px);
-    z-index: 35;
-    background: var(--lime);
-    color: var(--ink);
-    border: 1px solid var(--ink);
-    border-radius: 14px;
-    box-shadow: 0 6px 22px #0003;
   }
   .request-dock > a {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    min-height: 56px;
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    gap: 8px;
+    padding: 10px 8px 10px 14px;
+    font-size: 23px;
+    min-height: 60px;
   }
-  .request-dock small {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 400;
-    margin-top: 2px;
+  .request-dock-orbit {
+    width: 22px;
+    height: 22px;
   }
-  .request-dock > button {
-    align-self: center;
-    display: grid;
-    place-items: center;
-    width: 44px;
-    min-height: 44px;
-    margin-right: 4px;
-    border: 0;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--ink);
-  }
-  .request-dock > button:hover {
-    background: #1d17241a;
-  }
-  body:has(
-      dialog[open],
-      [role='dialog'],
-      input:focus,
-      textarea:focus,
-      select:focus,
-      [role='combobox']:focus
-    )
-    .request-dock,
-  body:has(:focus-visible) .request-dock:not(:focus-within) {
+  body:has(input:focus, textarea:focus, select:focus, [role='combobox']:focus)
+    .request-dock {
     visibility: hidden;
   }
 }

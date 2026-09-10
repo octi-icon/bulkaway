@@ -4,6 +4,7 @@ import { CookiePreferences } from '@/components/cookie-preferences';
 import { ClickSparkles } from '@/components/click-sparkles';
 import { HaulListProvider } from '@/components/haul-list';
 import { SiteExperience } from '@/components/site-experience';
+import { RequestDock } from '@/components/request-dock';
 import './globals.css';
 import './atomic.css';
 import './privacy-controls.css';
@@ -58,6 +59,7 @@ export default function RootLayout({
         <SiteExperience>
           <HaulListProvider>
             {children}
+            <RequestDock />
             <ClickSparkles />
             <CookiePreferences />
           </HaulListProvider>
