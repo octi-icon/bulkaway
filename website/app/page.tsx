@@ -263,9 +263,13 @@ export default function Home() {
                 people, practical solutions, and a shared drive to make everyday
                 spaces work better.
               </p>
-              <a className="text-link" href="#family">
-                Meet the whole family <ArrowDown size={18} />
-              </a>
+              <p>
+                Led by Bill Loftin, our division is backed by the advisory board
+                and support team at Waste Solution Innovators.
+              </p>
+              <DraftSafeLink className="text-link" href="/team">
+                Meet the team <ArrowUpRight size={18} />
+              </DraftSafeLink>
             </div>
           </div>
         </section>

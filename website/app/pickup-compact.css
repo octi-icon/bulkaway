@@ -71,6 +71,60 @@ html:has(.pickup-form:focus-within) {
 .pickup-form .field textarea {
   min-height: 96px;
 }
+.pickup-form .pickup-details-field {
+  background: var(--cream);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: clamp(16px, 3vw, 22px);
+  gap: 10px;
+}
+.pickup-details-field > label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.pickup-details-field .pickup-details-requirement {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #514858;
+}
+.pickup-form .pickup-details-field .service-notes-hint {
+  color: #514858;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+  margin: 0;
+}
+.pickup-form .pickup-details-field textarea {
+  margin-top: 2px;
+  border: 2px solid var(--ink);
+  background: #fffdf5;
+  color: var(--ink);
+  caret-color: var(--ink);
+  color-scheme: light;
+  font-size: 1rem;
+}
+.pickup-form .pickup-details-field textarea::placeholder {
+  color: #62586b;
+  opacity: 1;
+}
+.pickup-form .pickup-details-field textarea:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+.pickup-form .pickup-details-field textarea[aria-invalid='true'] {
+  border-color: #8a1c30;
+}
+.pickup-form .pickup-details-field .field-error {
+  color: #8a1c30;
+  font-size: 0.875rem;
+}
 .pickup-form .compact-review {
   padding: 0;
   margin: 24px 0 0;

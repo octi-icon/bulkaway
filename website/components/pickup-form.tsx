@@ -102,9 +102,24 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
     'idle' | 'sending' | 'error' | 'success'
   >('idle');
   useEffect(() => {
-    if (items.length && itemDisclosure.current)
+    if (items.length && itemDisclosure.current) {
       itemDisclosure.current.open = true;
-  }, [items.length, status]);
+      // Selecting a haul item can satisfy an earlier missing-description error.
+      const details =
+        formRef.current?.querySelector<HTMLTextAreaElement>('#pickup-details');
+      if (
+        !validateHaulItems(items).error &&
+        (details?.value.trim().length ?? 0) <= 4000
+      ) {
+        setErrors((current) => {
+          if (!current.details) return current;
+          const next = { ...current };
+          delete next.details;
+          return next;
+        });
+      }
+    }
+  }, [items, status]);
   const [message, setMessage] = useState('');
   const [reference, setReference] = useState('');
   const [haulMessage, setHaulMessage] = useState('');
@@ -372,7 +387,12 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
           noValidate
           aria-busy={status === 'sending'}
         >
-          <input key={arcadeOffer || 'no-offer'} type="hidden" name="offer" value={arcadeOffer} />
+          <input
+            key={arcadeOffer || 'no-offer'}
+            type="hidden"
+            name="offer"
+            value={arcadeOffer}
+          />
           {arcadeOffer && (
             <p className="arcade-offer-note">
               <strong>SPACE5 · 5% off your next removal</strong>
@@ -474,11 +494,16 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
                     confirms what we can take.
                   </p>
                 </details>
-                <div className="field full">
+                <div className="field full pickup-details-field">
                   <label htmlFor="pickup-details">
-                    {items.length
-                      ? 'Extra details (optional)'
-                      : 'Give us the scoop'}
+                    <span>
+                      {items.length
+                        ? 'Anything else our crew should know?'
+                        : 'What needs clearing?'}
+                    </span>
+                    <span className="pickup-details-requirement">
+                      {items.length ? 'Optional' : 'Required'}
+                    </span>
                   </label>
                   <small className="service-notes-hint" id="service-notes-hint">
                     {serviceNotesHint(service)}
@@ -490,7 +515,7 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
                     minLength={items.length ? undefined : 10}
                     maxLength={4000}
                     rows={3}
-                    placeholder="Anything not on your list? Tell us about the items, stairs, access, or special handling."
+                    placeholder="Write your details here…"
                     {...errorProps('details')}
                     aria-describedby={`service-notes-hint${errors.details ? ' details-error' : ''}`}
                   />

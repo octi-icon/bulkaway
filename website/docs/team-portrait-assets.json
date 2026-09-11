@@ -1,0 +1,57 @@
+{
+  "origin": "User-supplied headshots, September 11 2026. Kris Watson identity confirmed by user.",
+  "treatment": "AI-edited photographic duotone. Bill portrait establishes cream/lime/gold/plum style; subsequent edits preserve each input identity using Bill only as style reference.",
+  "exports": "320px and 640px WebP, quality 85, 4:5 north-aligned crop. Originals available on user request in gallery.",
+  "portraits": [
+    {
+      "person": "bill-loftin",
+      "source": "Bill Loftin, Principal.jpg",
+      "generatedFile": "exec-4017d2dd-3e09-4b78-8c8c-84a74f1a36c8.png"
+    },
+    {
+      "person": "andrea-gray",
+      "source": "Andrea Gray, Principal.jpg",
+      "generatedFile": "exec-4c23456d-04c9-41ff-b440-bd93635d3208.png"
+    },
+    {
+      "person": "robert-watson",
+      "source": "Robert Watson, Principal.jpg",
+      "generatedFile": "exec-3778c694-a4fa-48aa-b4f6-4c0f87d7d76e.png"
+    },
+    {
+      "person": "justin-watson",
+      "source": "Justin Watson, Chairman of the Board, Principal.jpg",
+      "generatedFile": "exec-2c757b63-ef2c-4f51-ac91-50a4c5c01f53.png"
+    },
+    {
+      "person": "shauna-loftin",
+      "source": "Shauna Loftin, Principal.jpg",
+      "generatedFile": "exec-9882e90b-3774-40ab-99f6-ba0fd5f11e46.png"
+    },
+    {
+      "person": "kris-watson",
+      "source": "Kris Watson.jpg",
+      "generatedFile": "exec-898ce956-9e4e-4019-91d7-3ae030fa2d68.png"
+    },
+    {
+      "person": "eddie-carey",
+      "source": "Eddie Carey.jpg",
+      "generatedFile": "exec-03676b7b-1897-4161-884e-bb7bdb28781e.png"
+    },
+    {
+      "person": "regina-enman",
+      "source": "Regina Enman.jpg",
+      "generatedFile": "exec-e3838cab-5cbf-4396-8286-7a6c4e7cdfd7.png"
+    },
+    {
+      "person": "heather-rapallo",
+      "source": "Heather Rapallo.jpg",
+      "generatedFile": "exec-37c26cf1-4147-45ff-a535-28d9f07b4147.png"
+    },
+    {
+      "person": "skylar-clemons",
+      "source": "Skylar Clemons.jpg",
+      "generatedFile": "exec-2de1d33f-84b4-41f2-a050-a3fd6d60472e.png"
+    }
+  ]
+}
