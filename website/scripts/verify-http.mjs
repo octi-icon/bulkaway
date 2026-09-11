@@ -1,6 +1,37 @@
 import assert from 'node:assert/strict';
+import './verify-navigation.mjs';
 const origin = process.env.BASE_URL || 'http://127.0.0.1:8788';
 const homeHtml = await (await fetch(origin)).text();
+const teamResponse = await fetch(origin + '/team');
+assert.equal(teamResponse.status, 200);
+const teamHtml = await teamResponse.text();
+for (const [page, html] of [
+  ['home', homeHtml],
+  ['team', teamHtml],
+]) {
+  assert.match(
+    html,
+    /aria-label="Open menu"/,
+    `${page} provides a mobile menu`,
+  );
+  assert.match(
+    html,
+    /aria-label="Main navigation"/,
+    `${page} provides main navigation`,
+  );
+}
+for (const destination of [
+  '/services',
+  '/team',
+  '/#how-it-works',
+  '/#about',
+  '/#pickup-request',
+]) {
+  assert.ok(
+    teamHtml.includes(`href="${destination}"`),
+    `team navigation reaches ${destination}`,
+  );
+}
 assert.match(homeHtml, /Clear the junk\. Unlock the arcade\./);
 assert.doesNotMatch(
   homeHtml,
@@ -171,7 +202,7 @@ assert.match(
 );
 assert.match(
   missingHtml,
-  /href="\/#request"/,
+  /href="\/#pickup-request"/,
   'missing pages provide pickup recovery',
 );
 console.log('PASS branded 404 status and recovery links');

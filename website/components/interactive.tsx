@@ -1,17 +1,15 @@
 'use client';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   ArrowUpRight,
   Building2,
   CalendarDays,
-  Menu,
   Orbit,
   Recycle,
   Sofa,
   Sparkles,
   Truck,
-  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ServiceFinder } from '@/components/service-finder';
@@ -79,90 +77,6 @@ export const services = [
     cta: 'Ask about my items',
   },
 ];
-export function SiteHeader() {
-  const [open, setOpen] = useState(false);
-  const menuButton = useRef<HTMLButtonElement>(null);
-  const header = useRef<HTMLElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpen(false);
-        menuButton.current?.focus();
-      }
-    };
-    const closeOutside = (event: Event) => {
-      if (
-        event.target instanceof Node &&
-        !header.current?.contains(event.target)
-      )
-        setOpen(false);
-    };
-    const desktop = window.matchMedia('(min-width: 901px)');
-    const closeOnDesktop = () => {
-      if (desktop.matches) setOpen(false);
-    };
-    document.addEventListener('keydown', closeOnEscape);
-    document.addEventListener('focusin', closeOutside);
-    document.addEventListener('pointerdown', closeOutside);
-    desktop.addEventListener('change', closeOnDesktop);
-    return () => {
-      document.removeEventListener('keydown', closeOnEscape);
-      document.removeEventListener('focusin', closeOutside);
-      document.removeEventListener('pointerdown', closeOutside);
-      desktop.removeEventListener('change', closeOnDesktop);
-    };
-  }, [open]);
-  return (
-    <header ref={header} className="site-header">
-      <div className="wrap header-inner">
-        <a
-          className="wordmark"
-          href="#main"
-          aria-label="Bulk Away home"
-          onClick={() => setOpen(false)}
-        >
-          Bulk Away
-        </a>
-        <button
-          ref={menuButton}
-          className="menu-toggle"
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          aria-controls="navigation"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X /> : <Menu />}
-        </button>
-        <nav
-          id="navigation"
-          className={open ? 'is-open' : ''}
-          aria-label="Main navigation"
-        >
-          <DraftSafeLink onClick={() => setOpen(false)} href="/services">
-            Services & rates
-          </DraftSafeLink>
-          <a onClick={() => setOpen(false)} href="#how-it-works">
-            How it works
-          </a>
-          <a onClick={() => setOpen(false)} href="#about">
-            Our story
-          </a>
-          <DraftSafeLink onClick={() => setOpen(false)} href="/team">
-            Meet the team
-          </DraftSafeLink>
-          <a
-            onClick={() => setOpen(false)}
-            className="button button-small"
-            href="#request"
-          >
-            Request a pickup <ArrowUpRight size={18} />
-          </a>
-        </nav>
-      </div>
-    </header>
-  );
-}
 export function LaunchPad() {
   const [launches, setLaunches] = useState(0);
   return (

@@ -15,29 +15,11 @@
   color: var(--ink);
   border-color: #655c4d;
 }
-.service-guide .space-comparison figcaption {
-  color: #514858;
-}
 .service-guide .comparison-stage:focus-within {
   outline-color: var(--ink);
 }
 .services-page .wrap {
   width: min(1280px, 90%);
-}
-.services-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding-block: 24px;
-}
-.services-header nav {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-.services-header nav > a:not(.button) {
-  text-decoration: underline;
 }
 .services-intro {
   display: grid;
@@ -45,6 +27,12 @@
   align-items: center;
   gap: 48px;
   padding-block: 44px 60px;
+}
+.services-intro-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
 }
 .services-page h1,
 .services-page h2,
@@ -212,13 +200,6 @@
 }
 .comparison-tools button:hover {
   border-color: var(--cream);
-}
-.space-comparison figcaption {
-  font-size: 0.78rem;
-  color: #d8d0df;
-  line-height: 1.55;
-  margin-top: 12px;
-  max-width: 65ch;
 }
 .service-guide {
   background: var(--cream);
@@ -505,20 +486,6 @@
   text-decoration: underline;
 }
 @media (max-width: 800px) {
-  .services-header {
-    padding-block: 18px;
-    gap: 14px;
-  }
-  .services-header nav {
-    gap: 16px;
-  }
-  .services-header nav .button {
-    font-size: 0.8rem;
-    padding: 10px 13px;
-  }
-  .services-header nav > a:not(.button) {
-    font-size: 0.85rem;
-  }
   .services-intro {
     grid-template-columns: 1fr;
     gap: 30px;
@@ -568,17 +535,6 @@
   }
 }
 @media (max-width: 600px) {
-  .services-header {
-    align-items: flex-start;
-  }
-  .services-header .wordmark {
-    font-size: 1.8rem;
-  }
-  .services-header nav {
-    flex-direction: column-reverse;
-    align-items: flex-end;
-    gap: 10px;
-  }
   .service-jump-nav {
     gap: 4px 18px;
     padding-block: 18px;

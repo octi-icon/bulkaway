@@ -2,7 +2,6 @@
   background: var(--ink);
   color: var(--cream);
 }
-.crew-page-nav,
 .crew-page-footer {
   display: flex;
   align-items: center;
@@ -10,16 +9,6 @@
   flex-wrap: wrap;
   gap: 20px;
   padding-block: 24px;
-}
-.crew-page-nav {
-  border-bottom: 1px solid #776c7c;
-}
-.crew-page-nav .wordmark {
-  color: var(--gold);
-  font-size: clamp(2rem, 4vw, 3rem);
-}
-.crew-page-nav .text-link {
-  color: var(--cream);
 }
 .crew-page-footer {
   border-top: 1px solid #776c7c;

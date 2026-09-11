@@ -176,8 +176,7 @@ export function TeamGallery() {
           </fieldset>
         </div>
         <p className="crew-directory-note">
-          The roles listed below are with Waste Solution Innovators. Tap a
-          portrait’s camera button to meet the original.
+          Roles shown are with Waste Solution Innovators.
         </p>
         <output className="sr-only">
           {group === 'all'

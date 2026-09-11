@@ -24,10 +24,6 @@ export function ServiceFinder({
         <ChevronDown size={21} aria-hidden="true" />
       </summary>
       <div className="finder-body">
-        <p>
-          A quick steer in the right direction. You can also explore every
-          service below.
-        </p>
         <fieldset className="finder-choices">
           <legend>What needs a fresh start?</legend>
           {freshStartChoices.map((choice) => (
@@ -64,12 +60,8 @@ export function ServiceFinder({
             ))}
           </fieldset>
         )}
-        <output className="finder-status">
-          {suggestion
-            ? `A good place to start: ${suggestion.service}.`
-            : goal === 'community'
-              ? 'Choose the kind of shared-space cleanup above.'
-              : 'Choose a situation to see a suggested service.'}
+        <output className={suggestion ? 'finder-status' : 'sr-only'}>
+          {suggestion ? `A good place to start: ${suggestion.service}.` : ''}
         </output>
         {suggestion && (
           <div className="finder-result">

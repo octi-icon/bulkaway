@@ -13,7 +13,7 @@ import {
 import { PickupForm } from '@/components/pickup-form';
 import { DraftSafeLink } from '@/components/draft-safe-link';
 import { CursorOptions } from '@/components/site-experience';
-import { ServiceExplorer, SiteHeader } from '@/components/interactive';
+import { ServiceExplorer } from '@/components/interactive';
 import {
   AtomicSky,
   SpaceSign,
@@ -46,10 +46,6 @@ const marqueeMessages = [
 export default function Home() {
   return (
     <>
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
-      <SiteHeader />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

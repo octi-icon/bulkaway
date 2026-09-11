@@ -18,9 +18,6 @@ export default function Privacy() {
   return (
     <main id="main" tabIndex={-1} className="privacy-page legal-page">
       <div className="wrap">
-        <Link href="/" className="wordmark">
-          Bulk Away
-        </Link>
         <h1>
           Your information.
           <br />

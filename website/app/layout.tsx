@@ -5,6 +5,7 @@ import { ClickSparkles } from '@/components/click-sparkles';
 import { HaulListProvider } from '@/components/haul-list';
 import { SiteExperience } from '@/components/site-experience';
 import { RequestDock } from '@/components/request-dock';
+import { SiteHeader } from '@/components/site-header';
 import './globals.css';
 import './atomic.css';
 import './privacy-controls.css';
@@ -19,6 +20,7 @@ import './engagement-round2.css';
 import './pickup-compact.css';
 import './refinement.css';
 import './address-selector.css';
+import './navigation-motion.css';
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL || 'https://bulkaway.com'),
   title: 'Bulk Away | Utah Junk Removal & Trash Outs',
@@ -58,6 +60,10 @@ export default function RootLayout({
       <body>
         <SiteExperience>
           <HaulListProvider>
+            <a className="skip-link" href="#main">
+              Skip to content
+            </a>
+            <SiteHeader />
             {children}
             <RequestDock />
             <ClickSparkles />

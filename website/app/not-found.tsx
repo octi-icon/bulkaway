@@ -12,9 +12,6 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <main id="main" className="missing-page wrap" tabIndex={-1}>
-      <Link href="/" className="wordmark" aria-label="Bulk Away home">
-        Bulk Away
-      </Link>
       <Orbit size={60} strokeWidth={1.5} aria-hidden="true" />
       <h1>
         This page has
@@ -29,7 +26,7 @@ export default function NotFound() {
         <Link className="button" href="/">
           Back to Bulk Away <ArrowUpRight aria-hidden="true" />
         </Link>
-        <Link className="text-link" href="/#request">
+        <Link className="text-link" href="/#pickup-request">
           Request a pickup <ArrowUpRight size={18} aria-hidden="true" />
         </Link>
       </div>

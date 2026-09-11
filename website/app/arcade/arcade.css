@@ -1,28 +1,8 @@
 .arcade-page {
   background: #19151f;
   color: var(--cream);
-  padding: 0 24px 64px;
+  padding: 32px 24px 64px;
   min-height: 100vh;
-}
-.arcade-nav {
-  max-width: 1120px;
-  margin: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 24px;
-  padding: 28px 0 40px;
-}
-.arcade-nav .wordmark {
-  color: var(--gold);
-  font-size: 42px;
-}
-.arcade-nav > a:last-child {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  text-decoration: underline;
 }
 .arcade-cabinet {
   max-width: 890px;
@@ -516,16 +496,7 @@
 }
 @media (max-width: 600px) {
   .arcade-page {
-    padding: 0 10px 36px;
-  }
-  .arcade-nav {
-    padding: 20px 8px 24px;
-  }
-  .arcade-nav .wordmark {
-    font-size: 32px;
-  }
-  .arcade-nav > a:last-child {
-    font-size: 12px;
+    padding: 24px 10px 36px;
   }
   .arcade-cabinet {
     border-width: 4px;

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ArrowLeft, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { TeamGallery } from '@/components/team-gallery';
 import { socialMetadata } from '@/lib/social-metadata';
 import '../team.css';
@@ -20,17 +20,6 @@ export const metadata: Metadata = {
 export default function TeamPage() {
   return (
     <div className="crew-page">
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
-      <header className="crew-page-nav wrap">
-        <Link className="wordmark" href="/" aria-label="Bulk Away home">
-          Bulk Away
-        </Link>
-        <Link className="text-link" href="/#pickup-request">
-          Request a pickup <ArrowUpRight size={18} aria-hidden="true" />
-        </Link>
-      </header>
       <main id="main" tabIndex={-1}>
         <TeamGallery />
       </main>

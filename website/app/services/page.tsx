@@ -29,20 +29,6 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <div className="services-page">
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
-      <header className="services-header wrap">
-        <Link className="wordmark" href="/" aria-label="Bulk Away home">
-          Bulk Away
-        </Link>
-        <nav aria-label="Services page navigation">
-          <a href="#rates">2026 rates</a>
-          <Link className="button button-small" href="/#pickup-request">
-            Request a pickup <ArrowUpRight size={18} aria-hidden="true" />
-          </Link>
-        </nav>
-      </header>
       <main id="main" tabIndex={-1}>
         <section
           className="services-intro wrap"
@@ -62,9 +48,14 @@ export default function ServicesPage() {
               Junk removal and trash outs in Salt Lake, Utah, Weber, and Davis
               counties.
             </p>
-            <a href="#service-guide" className="text-link">
-              Find your service <ArrowDown size={19} aria-hidden="true" />
-            </a>
+            <div className="services-intro-links">
+              <a href="#service-guide" className="text-link">
+                Find your service <ArrowDown size={19} aria-hidden="true" />
+              </a>
+              <a href="#rates" className="text-link">
+                2026 rates <ArrowDown size={19} aria-hidden="true" />
+              </a>
+            </div>
           </div>
           <BeforeAfter eager />
         </section>

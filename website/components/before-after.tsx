@@ -79,7 +79,6 @@ export function BeforeAfter({
           value={position}
           aria-label={`Reveal after: ${label}`}
           aria-valuetext={`${position}% of the after illustration revealed`}
-          aria-describedby={`${id}-hint`}
           onChange={(event) => setPosition(Number(event.target.value))}
         />
       </div>
@@ -107,9 +106,6 @@ export function BeforeAfter({
           After
         </button>
       </fieldset>
-      <figcaption id={`${id}-hint`}>
-        Slide to compare, or choose a view above.
-      </figcaption>
     </figure>
   );
 }

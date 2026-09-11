@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { usePathname } from 'next/navigation';
 import { Pause, Play, MousePointer2, ChevronDown } from 'lucide-react';
+import { NavigationMotion } from '@/components/navigation-motion';
 
 const MotionContext = createContext({
   paused: true,
@@ -158,6 +159,10 @@ export function SiteExperience({ children }: { children: ReactNode }) {
         }}
       >
         {children}
+        <NavigationMotion
+          enabled={!paused}
+          ready={cursorPreferences !== null}
+        />
       </CursorContext.Provider>
     </MotionContext.Provider>
   );

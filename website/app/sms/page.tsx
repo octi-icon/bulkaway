@@ -18,9 +18,6 @@ export default function SmsTerms() {
   return (
     <main id="main" tabIndex={-1} className="privacy-page legal-page">
       <div className="wrap">
-        <Link className="wordmark" href="/">
-          Bulk Away
-        </Link>
         <h1>
           Less wondering.
           <br />

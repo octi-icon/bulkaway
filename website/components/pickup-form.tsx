@@ -446,13 +446,11 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
             <span className="sr-only">Step {step + 1} of 3: </span>
             {stepTitles[step]}
           </h3>
-          <p className="form-intro">
-            {step === 0
-              ? 'Describe the job, or choose items and quantities.'
-              : step === 1
-                ? 'Where should the crew head? Leave the date blank if you’re flexible.'
-                : 'All three contact fields are required. We’ll use them to respond to your request.'}
-          </p>
+          {step === 1 && (
+            <p className="form-intro">
+              Leave the date blank if you’re flexible.
+            </p>
+          )}
           <div className="honeypot" aria-hidden="true">
             <label>
               Website
@@ -493,10 +491,6 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
                     </span>
                     <ChevronDown size={19} aria-hidden="true" />
                   </summary>
-                  <p>
-                    Select what you have, then adjust the quantities. You can
-                    add notes below.
-                  </p>
                   <HaulItemPicker inForm />
                   {fieldError('items')}
                   <p className="item-review-note">
@@ -525,7 +519,6 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
                     minLength={items.length ? undefined : 10}
                     maxLength={4000}
                     rows={3}
-                    placeholder="Write your details here…"
                     {...errorProps('details')}
                     aria-describedby={`service-notes-hint${errors.details ? ' details-error' : ''}`}
                   />

@@ -17,16 +17,11 @@ export function HaulBuilder() {
     <div className="haul-builder" id="haul-list">
       <div className="haul-intro">
         <h3>What’s taking up space?</h3>
-        <p>
-          Pick the usual suspects and tell us how many. You can adjust your list
-          right here or in the request form.
-        </p>
       </div>
       <div>
         <HaulItemPicker />
         <p className="haul-guidance">
-          This is a starting list, not a quote. Our crew reviews your items,
-          including any special handling, before confirming the pickup.
+          Our crew confirms pricing and any special handling before pickup.
         </p>
         <div className="haul-actions">
           <output>
@@ -79,11 +74,7 @@ export function CountyExplorer({ children }: { children: ReactNode }) {
     >
       <div className="county-copy">
         <h2>Your Utah hauling crew.</h2>
-        <p>
-          Four counties. A whole lot of fresh starts.
-          <br />
-          Pick yours to find your crew.
-        </p>
+        <p>Four counties. A whole lot of fresh starts.</p>
         <fieldset
           className="county-options"
           aria-label="Explore our service counties"
@@ -114,7 +105,7 @@ export function CountyExplorer({ children }: { children: ReactNode }) {
       <div className="county-map-art">
         {children}
         <p className="county-map-note">
-          North up · Shared map scale. Boundaries:{' '}
+          Map boundaries:{' '}
           <DraftSafeLink href="https://gis.utah.gov/products/sgid/boundaries/county/">
             State of Utah, SGID
           </DraftSafeLink>
@@ -247,8 +238,8 @@ export function FamilyFinder({ children }: { children: ReactNode }) {
             </button>
           ))}
         </fieldset>
-        <output>
-          {match?.match || 'Pick a need. Meet your match in the family below.'}
+        <output className={match ? undefined : 'sr-only'}>
+          {match?.match || ''}
         </output>
         {match && (
           <DraftSafeLink
