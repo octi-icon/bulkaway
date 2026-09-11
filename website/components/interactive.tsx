@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ServiceFinder } from '@/components/service-finder';
+import { DraftSafeLink } from '@/components/draft-safe-link';
+import { serviceRouteIds } from '@/lib/service-links';
 export const services = [
   {
     title: 'Bulk item removal',
@@ -137,15 +139,18 @@ export function SiteHeader() {
           className={open ? 'is-open' : ''}
           aria-label="Main navigation"
         >
-          <a onClick={() => setOpen(false)} href="#services">
-            What we haul
-          </a>
+          <DraftSafeLink onClick={() => setOpen(false)} href="/services">
+            Services & rates
+          </DraftSafeLink>
           <a onClick={() => setOpen(false)} href="#how-it-works">
             How it works
           </a>
           <a onClick={() => setOpen(false)} href="#about">
             Our story
           </a>
+          <DraftSafeLink onClick={() => setOpen(false)} href="/team">
+            Meet the team
+          </DraftSafeLink>
           <a
             onClick={() => setOpen(false)}
             className="button button-small"
@@ -294,6 +299,13 @@ export function ServiceExplorer() {
               {service.cta}
               <ArrowUpRight size={18} />
             </a>
+            <DraftSafeLink
+              className="text-link service-details-link"
+              href={`/services#${serviceRouteIds[service.title]}`}
+            >
+              Service details & rates{' '}
+              <ArrowUpRight size={18} aria-hidden="true" />
+            </DraftSafeLink>
           </div>
         ))}
       </div>

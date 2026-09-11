@@ -6,7 +6,7 @@ After reviewing the full homepage, the owner found the roster made it too long. 
 
 ## Recommendation
 
-Extend the established atomic-era identity with photographic duotone portraits, restrained halftone texture, cream paper, lime circles, and gold starbursts. Feature Bill Loftin first as Bulk Away Division Leader. Present the five advisory board members and four WSI support members beneath him with clear group filters. Keep every name and role outside the photograph, readable without interaction. Give visitors an explicit button to compare each stylized portrait with its original photograph.
+Extend the established atomic-era identity with photographic duotone portraits, restrained halftone texture, cream paper, lime circles, and gold starbursts. Feature Bill Loftin first as Bulk Away Division Leader. Present the five advisory board members and four WSI business and operations professionals beneath him with clear group filters. Keep every name and role outside the photograph, readable without interaction. Give visitors an explicit button to compare each stylized portrait with its original photograph.
 
 This is an application of the existing brand, rather than a historical reconstruction or a claim that one visual style improves search rankings. The logo, supplied photographs, existing fonts, and confirmed organizational roles are the primary project evidence. The design recommendations below combine that evidence with photography, usability, accessibility, and browser-performance guidance.
 
@@ -30,7 +30,7 @@ The homepage's existing About section links directly to the new people section. 
 
 ## Interaction choices
 
-Group filtering offers three explicit choices: Everyone, Advisory board, and WSI support. Native buttons expose their pressed state; a short status message announces the filtered count. Filtering does not move keyboard focus to a new location. It changes which people are shown, without rotating a carousel or imposing a timer.
+Group filtering offers three explicit choices: Everyone, Advisory board, and Business & operations. Native buttons expose their pressed state; a short status message announces the filtered count. Filtering does not move keyboard focus to a new location. It changes which people are shown, without rotating a carousel or imposing a timer.
 
 Each portrait has a visible camera button that toggles between the atomic treatment and the original. Its accessible label identifies the person and changes with the visible action, from showing the original to returning to the atomic portrait. Keyboard users can activate it with standard button keys. Names and titles stay visible in either state. No biography, title, or required action relies on hover. [W3C WAI, Button Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/).
 

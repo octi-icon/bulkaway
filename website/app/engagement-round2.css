@@ -333,3 +333,9 @@ html[data-motion='paused'] .service-finder summary > svg:last-child {
     outline-offset: -4px;
   }
 }
+.service-panel .service-details-link {
+  display: flex;
+  width: fit-content;
+  margin-top: 20px;
+  font-size: 0.95rem;
+}

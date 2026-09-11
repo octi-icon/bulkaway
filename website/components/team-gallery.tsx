@@ -8,7 +8,7 @@ type Person = {
   slug: string;
   name: string;
   role: string;
-  group: 'advisory' | 'support';
+  group: 'advisory' | 'operations';
 };
 const people: Person[] = [
   {
@@ -45,25 +45,25 @@ const people: Person[] = [
     slug: 'eddie-carey',
     name: 'Eddie Carey',
     role: 'Director of Business Development',
-    group: 'support',
+    group: 'operations',
   },
   {
     slug: 'regina-enman',
     name: 'Regina Enman',
     role: 'HR Manager',
-    group: 'support',
+    group: 'operations',
   },
   {
     slug: 'heather-rapallo',
     name: 'Heather Rapallo',
     role: 'Recruiting & Training Manager',
-    group: 'support',
+    group: 'operations',
   },
   {
     slug: 'skylar-clemons',
     name: 'Skylar Clemons',
     role: 'Project Manager',
-    group: 'support',
+    group: 'operations',
   },
 ];
 
@@ -113,7 +113,7 @@ function Portrait({
 }
 
 export function TeamGallery() {
-  const [group, setGroup] = useState<'all' | 'advisory' | 'support'>('all');
+  const [group, setGroup] = useState<'all' | 'advisory' | 'operations'>('all');
   return (
     <section
       className="crew-section section-pad"
@@ -160,7 +160,7 @@ export function TeamGallery() {
               [
                 ['all', 'Everyone'],
                 ['advisory', 'Advisory board'],
-                ['support', 'WSI support'],
+                ['operations', 'Business & operations'],
               ] as const
             ).map(([value, label]) => (
               <button
@@ -176,15 +176,15 @@ export function TeamGallery() {
           </fieldset>
         </div>
         <p className="crew-directory-note">
-          Advisory and support roles below are with Waste Solution Innovators.
-          Tap a portrait’s camera button to meet the original.
+          The roles listed below are with Waste Solution Innovators. Tap a
+          portrait’s camera button to meet the original.
         </p>
         <output className="sr-only">
           {group === 'all'
-            ? 'Showing all 9 advisory and support team members.'
+            ? 'Showing all 9 team members.'
             : group === 'advisory'
               ? 'Showing 5 advisory board members.'
-              : 'Showing 4 WSI support team members.'}
+              : 'Showing 4 business and operations team members.'}
         </output>
         <div id="crew-directory" className="crew-directory">
           {people.map((person) => (
@@ -197,11 +197,7 @@ export function TeamGallery() {
               <div className="crew-person-copy">
                 <h3>{person.name}</h3>
                 <p>{person.role}</p>
-                <span>
-                  {person.group === 'advisory'
-                    ? 'Advisory board'
-                    : 'WSI support'}
-                </span>
+                {person.group === 'advisory' && <span>Advisory board</span>}
               </div>
             </article>
           ))}

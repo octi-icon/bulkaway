@@ -9,7 +9,7 @@
     "dev": "vinext dev",
     "build": "vinext build --precompress",
     "start": "node dist/standalone/server.js",
-    "lint": "oxlint app lib components/interactive.tsx components/atomic-experience.tsx components/pickup-form.tsx components/photo-upload.tsx components/pickup-selectors.tsx components/cookie-preferences.tsx components/ui/button.tsx components/ui/select.tsx components/ui/popover.tsx components/engagement.tsx components/haul-list.tsx components/service-finder.tsx components/request-dock.tsx components/site-experience.tsx components/draft-safe-link.tsx components/click-sparkles.tsx components/sparkle-rays.tsx components/address-selector.tsx components/bulk-arcade.tsx components/calm-arcade.tsx components/team-gallery.tsx",
+    "lint": "oxlint app lib components/interactive.tsx components/atomic-experience.tsx components/pickup-form.tsx components/photo-upload.tsx components/pickup-selectors.tsx components/cookie-preferences.tsx components/ui/button.tsx components/ui/select.tsx components/ui/popover.tsx components/engagement.tsx components/haul-list.tsx components/service-finder.tsx components/request-dock.tsx components/site-experience.tsx components/draft-safe-link.tsx components/click-sparkles.tsx components/sparkle-rays.tsx components/address-selector.tsx components/bulk-arcade.tsx components/calm-arcade.tsx components/team-gallery.tsx components/before-after.tsx",
     "test": "node --experimental-strip-types --test lib/pickup.test.ts lib/read-json.test.ts lib/photos.test.ts lib/haul-quantities.test.ts lib/service-guide.test.ts lib/pickup-feedback.test.ts lib/google-address.test.ts lib/arcade-engine.test.ts lib/arcade-audio.test.ts lib/arcade-calm.test.ts",
     "test:http": "node scripts/verify-http.mjs",
     "format": "oxfmt",

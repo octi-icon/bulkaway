@@ -17,6 +17,7 @@ import { formatPickupAddress } from '@/lib/pickup-address';
 import { formatHaulItems, validateHaulItems } from '@/lib/haul-guide';
 import { HaulItemPicker, useHaulList } from '@/components/haul-list';
 import { serviceNotesHint } from '@/lib/service-guide';
+import { serviceNameFromId } from '@/lib/service-links';
 import {
   createPickupReceipt,
   readPickupResponse,
@@ -59,6 +60,15 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
   const { items, setItems, setLocked, setRequestStarted, setRequestComplete } =
     useHaulList();
   const [service, setService] = useState('');
+  useEffect(() => {
+    const requested = serviceNameFromId(
+      new URL(window.location.href).searchParams.get('service') || '',
+    );
+    const frame = requestAnimationFrame(() => {
+      if (requested) setService(requested);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
   const [addressResolving, setAddressResolving] = useState(false);
   const [step, setStep] = useState(0);
   const [reviewEdit, setReviewEdit] = useState(false);

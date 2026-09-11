@@ -8,7 +8,7 @@ import '../team.css';
 export const metadata: Metadata = {
   title: 'Meet the Team | Bulk Away',
   description:
-    'Meet Bulk Away Division Leader Bill Loftin and the Waste Solution Innovators advisory board and support team behind our Utah junk removal services.',
+    'Meet Bulk Away Division Leader Bill Loftin and the Waste Solution Innovators professionals in business development, HR, recruiting, training, project management, and our advisory board.',
   alternates: { canonical: '/team' },
   ...socialMetadata(
     'Meet the Team | Bulk Away',

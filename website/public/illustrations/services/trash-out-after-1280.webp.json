@@ -1,0 +1,4 @@
+{
+  "prompt": "Use case: precise-object-edit. This is the AFTER layer for a before/after image slider. Edit this exact image, keep the exact 1536x1024 canvas, exact camera perspective, crop, architecture, window panes, exterior mountain scene, sunlight and wall/floor texture, gold parquet pattern and colors and vintage illustration style unchanged. Remove all the left-behind furniture and rubbish: remove sofa, mattress, boxes, black bags, books, loose paper, lamp and side table, plant and pot and clock, and the table and chairs in the rear room. Reconstruct only previously occluded walls and floor naturally. Leave an empty cleared apartment, not renovated; no new objects, no people, no decoration, no text, no sparkles. Absolutely preserve room/window/door outlines and scene alignment pixel for pixel outside removed objects for the comparison slider. Same warm cream, lime, gold and dark plum screenprint style.",
+  "createdAt": "2026-09-11T16:03:27.275Z"
+}

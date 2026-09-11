@@ -265,7 +265,8 @@ export default function Home() {
               </p>
               <p>
                 Led by Bill Loftin, our division is backed by the advisory board
-                and support team at Waste Solution Innovators.
+                and business and operations professionals at Waste Solution
+                Innovators.
               </p>
               <DraftSafeLink className="text-link" href="/team">
                 Meet the team <ArrowUpRight size={18} />
@@ -349,6 +350,10 @@ export default function Home() {
                   may apply. We’ll confirm the details with you before
                   scheduling.
                 </p>
+                <DraftSafeLink className="text-link" href="/services#rates">
+                  See 2026 community rates{' '}
+                  <ArrowUpRight size={18} aria-hidden="true" />
+                </DraftSafeLink>
               </details>
               <details>
                 <summary>
@@ -530,7 +535,7 @@ export default function Home() {
           className="wrap footer-utility"
           aria-label="Bulk Away contacts and information"
         >
-          <a href="#services">What we haul</a>
+          <DraftSafeLink href="/services">Services & rates</DraftSafeLink>
           <a href="#service-area">Utah service area</a>
           <a href="#faq">Pickup questions</a>
           <DraftSafeLink href="/arcade" prefetch={false}>
