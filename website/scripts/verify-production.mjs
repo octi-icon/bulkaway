@@ -3,8 +3,8 @@ import { setTimeout as delay } from 'node:timers/promises';
 
 // Exercise the actual standalone server; never load local credentials or send mail.
 const origin = 'http://127.0.0.1:8791';
-const env = { ...process.env, PORT: '8791', HOST: '127.0.0.1', NODE_ENV: 'production', PUBLIC_LAUNCH: 'false', SITE_URL: origin, SMTP_PASS: '', GOOGLE_MAPS_BROWSER_KEY: '' };
-const server = spawn(process.execPath, ['dist/standalone/server.js'], { env, stdio: 'inherit' });
+const env = { ...process.env, PORT: '8791', HOST: '127.0.0.1', NODE_ENV: 'production', PUBLIC_LAUNCH: 'false', SITE_URL: origin, SMTP_PASS: '', GOOGLE_MAPS_BROWSER_KEY: '', GOOGLE_MAPS_SERVER_KEY: '', VERIFY_UNCONFIGURED_COVERAGE: 'true' };
+const server = spawn(process.execPath, ['server.mjs'], { env, stdio: 'inherit' });
 let exited = false;
 server.once('exit', () => { exited = true; });
 server.once('error', () => { exited = true; });

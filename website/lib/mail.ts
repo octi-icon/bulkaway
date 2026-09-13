@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { connect, type TLSSocket } from 'node:tls';
-import { buildPickupMail, type Pickup } from './pickup';
+import type { Pickup } from './pickup';
+import { deliverPickupMessages, type PickupMessage } from './pickup-delivery';
 import type { PhotoAttachment } from './photos';
 export type MailConfig = {
   SMTP_HOST?: string;
@@ -15,6 +16,19 @@ export async function sendPickup(
   reference: string,
   config: MailConfig,
   photos: PhotoAttachment[] = [],
+) {
+  return deliverPickupMessages(
+    pickup,
+    reference,
+    photos,
+    (message, timeoutMs) => sendMessage(message, config, timeoutMs),
+  );
+}
+
+async function sendMessage(
+  message: PickupMessage,
+  config: MailConfig,
+  timeoutMs: number,
 ) {
   const host = config.SMTP_HOST || 'smtp.gmail.com';
   const port = Number(config.SMTP_PORT || 465);
@@ -53,22 +67,16 @@ export async function sendPickup(
   let timeout: ReturnType<typeof setTimeout> | undefined;
   try {
     const result = await Promise.race([
-      transport.sendMail({
-        ...buildPickupMail(pickup, reference, photos.length),
-        attachments: photos,
-      }),
+      transport.sendMail(message),
       new Promise<never>((_, reject) => {
         timeout = setTimeout(() => {
           socket?.destroy();
           transport.close();
           reject(new Error('Delivery timeout'));
-        }, 25000);
+        }, timeoutMs);
       }),
     ]);
-    if (
-      !result.accepted?.includes('service@bulkaway.com') ||
-      result.rejected?.length
-    )
+    if (!result.accepted?.includes(message.to) || result.rejected?.length)
       throw new Error('Delivery rejected');
   } finally {
     clearTimeout(timeout);

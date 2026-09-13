@@ -13,9 +13,26 @@ void test('address searches reuse a session until selection and request only the
   const fields: string[][] = [];
   const prediction = {
     placeId: 'example',
+    types: ['street_address'],
     text: { toString: () => 'Example address' },
     toPlace: () => ({
       formattedAddress: '123 Main St, Salt Lake City, UT 84101, USA',
+      addressComponents: [
+        { longText: '123', shortText: '123', types: ['street_number'] },
+        { longText: 'Main Street', shortText: 'Main St', types: ['route'] },
+        { longText: '84101', shortText: '84101', types: ['postal_code'] },
+        {
+          longText: 'Salt Lake County',
+          shortText: 'Salt Lake County',
+          types: ['administrative_area_level_2'],
+        },
+        {
+          longText: 'Utah',
+          shortText: 'UT',
+          types: ['administrative_area_level_1'],
+        },
+        { longText: 'United States', shortText: 'US', types: ['country'] },
+      ],
       fetchFields: async (options: { fields: string[] }) => {
         fields.push(options.fields);
       },
@@ -26,7 +43,19 @@ void test('address searches reuse a session until selection and request only the
     AutocompleteSuggestion: {
       fetchAutocompleteSuggestions: async (request) => {
         requests.push(request);
-        return { suggestions: [{}, { placePrediction: prediction }] };
+        return {
+          suggestions: [
+            {},
+            {
+              placePrediction: {
+                ...prediction,
+                placeId: 'state',
+                types: ['administrative_area_level_1', 'political'],
+              },
+            },
+            { placePrediction: prediction },
+          ],
+        };
       },
     },
   });
@@ -34,13 +63,94 @@ void test('address searches reuse a session until selection and request only the
   await session.search('123 Main');
   assert.equal(requests[0].sessionToken, requests[1].sessionToken);
   assert.deepEqual(requests[0].includedRegionCodes, ['us']);
+  assert.deepEqual(requests[0].includedPrimaryTypes, [
+    'street_address',
+    'premise',
+    'subpremise',
+  ]);
+  assert.ok('locationRestriction' in requests[0]);
+  assert.ok(!('locationBias' in requests[0]));
   assert.equal(
     await session.select(prediction),
     '123 Main St, Salt Lake City, UT 84101, USA',
   );
-  assert.deepEqual(fields, [['formattedAddress']]);
+  assert.deepEqual(fields, [['formattedAddress', 'addressComponents']]);
   await session.search('456');
   assert.notEqual(requests[1].sessionToken, requests[2].sessionToken);
+});
+
+void test('a county match alone cannot turn a city or incomplete place into a selected address', async () => {
+  const session = createAddressSession({
+    AutocompleteSessionToken: class {},
+    AutocompleteSuggestion: {
+      fetchAutocompleteSuggestions: async () => ({ suggestions: [] }),
+    },
+  });
+  await assert.rejects(
+    session.select({
+      placeId: 'city',
+      types: ['locality'],
+      text: { toString: () => 'Salt Lake City, UT' },
+      toPlace: () => ({
+        formattedAddress: 'Salt Lake City, UT, USA',
+        addressComponents: [
+          {
+            longText: 'Salt Lake County',
+            shortText: 'Salt Lake County',
+            types: ['administrative_area_level_2'],
+          },
+          {
+            longText: 'Utah',
+            shortText: 'UT',
+            types: ['administrative_area_level_1'],
+          },
+          { longText: 'United States', shortText: 'US', types: ['country'] },
+        ],
+        fetchFields: async () => {},
+      }),
+    }),
+    /full street address/,
+  );
+});
+
+void test('selection rejects neighboring counties and same-named counties outside Utah', async () => {
+  const session = createAddressSession({
+    AutocompleteSessionToken: class {},
+    AutocompleteSuggestion: {
+      fetchAutocompleteSuggestions: async () => ({ suggestions: [] }),
+    },
+  });
+  for (const [county, state, country] of [
+    ['Tooele County', 'UT', 'US'],
+    ['Morgan County', 'UT', 'US'],
+    ['Davis County', 'IA', 'US'],
+    ['Utah County', 'UT', 'CA'],
+  ]) {
+    await assert.rejects(
+      session.select({
+        placeId: 'outside',
+        text: { toString: () => 'Outside address' },
+        toPlace: () => ({
+          formattedAddress: '123 Example Street',
+          addressComponents: [
+            {
+              longText: county,
+              shortText: county,
+              types: ['administrative_area_level_2'],
+            },
+            {
+              longText: state,
+              shortText: state,
+              types: ['administrative_area_level_1'],
+            },
+            { longText: country, shortText: country, types: ['country'] },
+          ],
+          fetchFields: async () => {},
+        }),
+      }),
+      /Salt Lake, Utah, Davis and Weber/,
+    );
+  }
 });
 
 void test('address lookup failures remain failures rather than fabricated matches', async () => {

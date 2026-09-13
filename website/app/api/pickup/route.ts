@@ -1,5 +1,6 @@
 import { validatePickup } from '@/lib/pickup';
 import { sendPickup, type MailConfig } from '@/lib/mail';
+import type { PickupDelivery } from '@/lib/pickup-delivery';
 import { PayloadTooLarge } from '@/lib/read-json';
 import {
   readPickupRequest,
@@ -8,10 +9,15 @@ import {
   type PhotoAttachment,
 } from '@/lib/photos';
 import { createHash } from 'node:crypto';
-const requests = new Map<string, { time: number; attempts: number }>();
+import { verifyServiceAddress, CoverageError } from '@/lib/service-coverage';
+import { admitPickupRequest, pickupRateLimitMessage } from '@/lib/pickup-admission';
 const deliveries = new Map<
   string,
-  { time: number; payload: string; result: Promise<string> }
+  {
+    time: number;
+    payload: string;
+    result: Promise<PickupDelivery & { reference: string }>;
+  }
 >();
 const json = (data: unknown, status = 200) =>
   Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -33,26 +39,16 @@ export async function POST(request: Request) {
     )
   )
     return json({ error: 'Unsupported request format.' }, 415);
+  if (!admitPickupRequest(request))
+    return json({ error: pickupRateLimitMessage }, 429);
+  return processAdmittedPickup(request);
+}
+
+/** Internal processing after the HTTP adapter's origin, method and rate checks. */
+export async function processAdmittedPickup(request: Request) {
   const now = Date.now();
-  for (const [key, value] of requests)
-    if (now - value.time > 900000) requests.delete(key);
   for (const [key, value] of deliveries)
     if (now - value.time > 3600000) deliveries.delete(key);
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim() ||
-    'local';
-  const count = requests.get(ip) || { time: now, attempts: 0 };
-  if (count.attempts >= 5)
-    return json(
-      {
-        error:
-          'A few requests have come through already. Please wait 15 minutes or contact the crew directly.',
-      },
-      429,
-    );
-  count.attempts++;
-  requests.set(ip, count);
-  if (requests.size > 10000) requests.delete(requests.keys().next().value!);
   let input: unknown;
   let files: File[];
   try {
@@ -125,18 +121,42 @@ export async function POST(request: Request) {
     deliveries.set(key, {
       time: now,
       payload,
-      result: sendPickup(
-        validation.data,
-        reference,
-        process.env as MailConfig,
-        photos,
-      ).then(() => reference),
+      result: verifyServiceAddress(
+        validation.data.address,
+        process.env.GOOGLE_MAPS_SERVER_KEY,
+      )
+        .then(() =>
+          sendPickup(
+            validation.data,
+            reference,
+            process.env as MailConfig,
+            photos,
+          ),
+        )
+        .then((delivery) => {
+          if (delivery.confirmation === 'unconfirmed')
+            console.warn(
+              'Pickup accepted; customer confirmation delivery unconfirmed.',
+              { reference },
+            );
+          return { reference, ...delivery };
+        }),
     });
   }
+  const pending = deliveries.get(key)!;
   try {
-    const reference = await deliveries.get(key)!.result;
-    return json({ reference });
-  } catch {
+    const delivery = await pending.result;
+    return json(delivery);
+  } catch (error) {
+    if (error instanceof CoverageError) {
+      // No email was attempted. Allow a corrected address or a safe retry after an outage.
+      // Keep a newer retry intact when concurrent callers finish the same failed promise.
+      if (deliveries.get(key) === pending) deliveries.delete(key);
+      return json(
+        { error: error.message, errors: { address: error.message } },
+        error.status,
+      );
+    }
     return json(
       {
         error:

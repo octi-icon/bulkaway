@@ -20,8 +20,17 @@ window.google = { maps: { importLibrary: async () => ({
     if (input.includes('nomatch')) return {suggestions: []};
     return { suggestions: [1, 2, 3, 4, 5].map(index => ({ placePrediction: {
       placeId: 'fixture-' + index,
+      types: ['street_address'],
       text: {toString: () => index + ' QA Test Street, Salt Lake City, UT, USA'},
       toPlace: () => ({formattedAddress: index + ' QA Test Street, Salt Lake City, UT 84101, USA',
+        addressComponents: [
+          { longText: String(index), shortText: String(index), types: ['street_number'] },
+          { longText: 'QA Test Street', shortText: 'QA Test St', types: ['route'] },
+          { longText: '84101', shortText: '84101', types: ['postal_code'] },
+          { longText: input.includes('outside') ? 'Tooele County' : 'Salt Lake County', shortText: 'County', types: ['administrative_area_level_2'] },
+          { longText: 'Utah', shortText: 'UT', types: ['administrative_area_level_1'] },
+          { longText: 'United States', shortText: 'US', types: ['country'] }
+        ],
         fetchFields: async () => { await new Promise(resolve => setTimeout(resolve, 2000)); }})
     }})) };
   }}

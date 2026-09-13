@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, Orbit, X } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from '@/components/site-link';
+import { usePathname } from '@/lib/navigation';
 import { useHaulList } from '@/components/haul-list';
 
 export function RequestDock() {

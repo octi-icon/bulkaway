@@ -8,16 +8,6 @@
 .services-page .service-guide :is(a, button, summary):focus-visible {
   outline-color: var(--ink);
 }
-.service-guide .comparison-stage {
-  border-color: var(--ink);
-}
-.service-guide .comparison-tools button {
-  color: var(--ink);
-  border-color: #655c4d;
-}
-.service-guide .comparison-stage:focus-within {
-  outline-color: var(--ink);
-}
 .services-page .wrap {
   width: min(1280px, 90%);
 }
@@ -69,137 +59,6 @@
 .services-intro .text-link {
   margin-top: 8px;
   color: var(--lime);
-}
-.space-comparison {
-  min-width: 0;
-  margin: 0;
-}
-.comparison-stage {
-  position: relative;
-  isolation: isolate;
-  aspect-ratio: 3/2;
-  overflow: hidden;
-  border: 2px solid var(--cream);
-  border-radius: 14px;
-  background: var(--cream);
-}
-.comparison-stage > img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.comparison-stage > .comparison-after {
-  position: absolute;
-  inset: 0;
-  clip-path: inset(0 calc(100% - var(--reveal)) 0 0);
-}
-.comparison-label {
-  position: absolute;
-  top: 14px;
-  padding: 3px 10px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  background: var(--ink);
-  color: var(--cream);
-  border-radius: 4px;
-  pointer-events: none;
-}
-.comparison-label-after {
-  left: 14px;
-}
-.comparison-label-before {
-  right: 14px;
-}
-.comparison-divider {
-  position: absolute;
-  left: var(--reveal);
-  top: 0;
-  height: 100%;
-  width: 3px;
-  background: var(--cream);
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-.comparison-divider svg {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  box-sizing: content-box;
-  padding: 10px;
-  border-radius: 50%;
-  background: var(--ink);
-  border: 2px solid var(--cream);
-  color: var(--cream);
-}
-.comparison-stage .comparison-range {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  appearance: none;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  cursor: ew-resize;
-  color-scheme: dark;
-  touch-action: pan-y;
-}
-.comparison-range::-webkit-slider-runnable-track {
-  background: transparent;
-  height: 100%;
-}
-.comparison-range::-moz-range-track {
-  background: transparent;
-  height: 100%;
-}
-.comparison-range::-webkit-slider-thumb {
-  appearance: none;
-  width: 1px;
-  height: 100%;
-  background: transparent;
-  border: 0;
-}
-.comparison-range::-moz-range-thumb {
-  width: 1px;
-  height: 100%;
-  background: transparent;
-  border: 0;
-}
-.comparison-stage:focus-within {
-  outline: 3px solid var(--lime);
-  outline-offset: 5px;
-}
-.comparison-stage .comparison-range:focus-visible {
-  outline: 0;
-}
-.comparison-tools {
-  display: flex;
-  gap: 6px;
-  margin: 16px 0 0;
-  padding: 0;
-  border: 0;
-  min-width: 0;
-}
-.comparison-tools button {
-  min-height: 44px;
-  padding: 7px 16px;
-  border: 1px solid #9c92a5;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--cream);
-  font-size: 0.9rem;
-}
-.comparison-tools button[aria-pressed='true'] {
-  background: var(--lime);
-  border-color: var(--lime);
-  color: var(--ink);
-}
-.comparison-tools button:hover {
-  border-color: var(--cream);
 }
 .service-guide {
   background: var(--cream);
@@ -582,34 +441,5 @@
   }
   .service-rate-table small {
     font-size: 0.8rem;
-  }
-  .comparison-label {
-    top: 10px;
-    font-size: 0.75rem;
-  }
-  .comparison-label-after {
-    left: 10px;
-  }
-  .comparison-label-before {
-    right: 10px;
-  }
-  .comparison-tools button {
-    flex: 1;
-    padding-inline: 8px;
-  }
-}
-@media (forced-colors: active) {
-  .comparison-divider,
-  .comparison-divider svg {
-    background: Canvas;
-    color: CanvasText;
-    border-color: CanvasText;
-  }
-  .comparison-stage .comparison-range {
-    appearance: auto;
-    opacity: 1;
-  }
-  .comparison-tools button[aria-pressed='true'] {
-    outline: 2px solid Highlight;
   }
 }

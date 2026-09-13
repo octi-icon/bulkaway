@@ -1,8 +1,8 @@
 'use client';
-/* oxlint-disable next/no-img-element -- Prebuilt responsive WebP assets avoid a runtime image service. */
 
 import { useId, useState, type CSSProperties } from 'react';
 import { ChevronsLeftRight } from 'lucide-react';
+import styles from './before-after.module.css';
 
 type ComparisonProps = {
   before?: string;
@@ -25,11 +25,11 @@ export function BeforeAfter({
   const id = useId();
   return (
     <figure
-      className="space-comparison"
+      className={styles['space-comparison']}
       aria-label={`${label} before and after`}
     >
       <div
-        className="comparison-stage"
+        className={styles['comparison-stage']}
         style={{ '--reveal': `${position}%` } as CSSProperties}
       >
         <img
@@ -43,7 +43,7 @@ export function BeforeAfter({
           fetchPriority={eager ? 'high' : 'auto'}
         />
         <img
-          className="comparison-after"
+          className={styles['comparison-after']}
           src={`/illustrations/services/${after}-1280.webp`}
           srcSet={`/illustrations/services/${after}-640.webp 640w, /illustrations/services/${after}-1280.webp 1280w`}
           sizes="(max-width: 800px) 90vw, 55vw"
@@ -53,25 +53,25 @@ export function BeforeAfter({
           loading={eager ? 'eager' : 'lazy'}
         />
         <span
-          className="comparison-label comparison-label-after"
+          className={`${styles['comparison-label']} ${styles['comparison-label-after']}`}
           aria-hidden="true"
           hidden={position === 0}
         >
           After
         </span>
         <span
-          className="comparison-label comparison-label-before"
+          className={`${styles['comparison-label']} ${styles['comparison-label-before']}`}
           aria-hidden="true"
           hidden={position === 100}
         >
           Before
         </span>
-        <span className="comparison-divider" aria-hidden="true">
+        <span className={styles['comparison-divider']} aria-hidden="true">
           <ChevronsLeftRight size={25} />
         </span>
         <input
           id={id}
-          className="comparison-range"
+          className={styles['comparison-range']}
           type="range"
           min={0}
           max={100}
@@ -82,7 +82,7 @@ export function BeforeAfter({
           onChange={(event) => setPosition(Number(event.target.value))}
         />
       </div>
-      <fieldset className="comparison-tools">
+      <fieldset className={styles['comparison-tools']}>
         <legend className="sr-only">Choose a view: {label}</legend>
         <button
           type="button"

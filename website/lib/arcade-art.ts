@@ -1,7 +1,17 @@
-import { W, H, CAPACITY, powers, type World } from './arcade-engine';
+import {
+  W,
+  H,
+  ROAD_LANES,
+  capacity,
+  powers,
+  junkTypes,
+  type World,
+  type Chassis,
+} from './arcade-engine';
 import {
   palette,
   saucerPixels,
+  chassisPixels,
   junkPixels,
   carPixels,
   truckPixels,
@@ -45,6 +55,16 @@ function sparkle(c: Pen, x: number, y: number, color: string, size = 7.5) {
 }
 // A tiny bitmap alphabet keeps in-game labels as crisp as the sprites.
 const glyphs: Record<string, string> = {
+  '0': '111101101101111',
+  '1': '010110010010111',
+  '2': '110001010100111',
+  '3': '110001010001110',
+  '4': '101101111001001',
+  '5': '111100110001110',
+  '6': '011100111101111',
+  '7': '111001010010010',
+  '8': '111101111101111',
+  '9': '111101111001110',
   A: '010101111101101',
   B: '110101110101110',
   D: '110101101101110',
@@ -165,7 +185,8 @@ function loadingBay(c: Pen, truck: HTMLCanvasElement) {
   stamp(c, truck, 398, 540);
   c.restore();
 }
-function backdrop(c: Pen, truck: HTMLCanvasElement) {
+function backdrop(c: Pen, truck: HTMLCanvasElement, district = 0) {
+  rect(c, 0, 0, W, H, ['#17131f', '#142026', '#20172b'][district]);
   rect(c, 0, 0, W, H, palette.K);
   // Flat color bands and checker dithering replace all smooth gradients.
   for (let y = 300; y < H; y += CELL)
@@ -210,10 +231,22 @@ function backdrop(c: Pen, truck: HTMLCanvasElement) {
       if (y < 110) rect(c, x, y, CELL, 5, palette.S);
     }
   }
-  for (const y of [245, 415, 605]) {
+  for (const y of ROAD_LANES) {
     rect(c, 0, y - 25, W, 50, '#211c2a');
     rect(c, 0, y - 25, W, CELL, palette.D);
     for (let x = 0; x < W; x += 45) rect(c, x, y, 20, CELL, palette.D);
+  }
+  if (district > 0) {
+    // Raised storage bays: lit top, shaded side and a cast ground shadow.
+    for (const x of [15, 720]) {
+      const y = district === 1 ? 320 : 470;
+      rect(c, x + 10, y + 20, 60, 55, palette.K);
+      rect(c, x, y, 55, 55, district === 1 ? '#354b49' : '#443447');
+      rect(c, x, y, 55, 7.5, palette.S);
+      rect(c, x + 45, y + 7.5, 10, 47.5, palette.D);
+      for (let row = 0; row < 3; row++)
+        rect(c, x + 7.5, y + 17.5 + row * 10, 30, CELL, palette.K);
+    }
   }
   for (let i = 0; i < 10; i++) {
     const x = i * 88 - 14,
@@ -229,8 +262,19 @@ function backdrop(c: Pen, truck: HTMLCanvasElement) {
 }
 
 export function createArcadePainter(c: Pen, scale: number) {
-  const player = sprite(saucerPixels),
-    fullPlayer = sprite(saucerPixels, { L: palette.Y, G: palette.O });
+  const players = Object.fromEntries(
+    (Object.keys(chassisPixels) as Chassis[]).map((id) => [
+      id,
+      {
+        normal: sprite(chassisPixels[id]),
+        full: sprite(chassisPixels[id], {
+          L: palette.Y,
+          G: palette.O,
+          A: palette.Y,
+        }),
+      },
+    ]),
+  ) as Record<Chassis, { normal: HTMLCanvasElement; full: HTMLCanvasElement }>;
   const rival = sprite(saucerPixels, {
     L: palette.R,
     G: palette.O,
@@ -251,22 +295,61 @@ export function createArcadePainter(c: Pen, scale: number) {
     '...OOSSSOO....',
     '....OOOO......',
   ]);
-  const background = document.createElement('canvas');
-  background.width = W * scale;
-  background.height = H * scale;
-  const b = background.getContext('2d');
-  if (b) {
-    b.scale(scale, scale);
-    b.imageSmoothingEnabled = false;
-    backdrop(b, truck);
-  }
+  const drone = sprite([
+    '..TTTTT...........TTTTT..',
+    '.TAAAAAT.........TAAAAAT.',
+    '..TTKTT....CCC....TTKTT..',
+    '....K....CCAAACC....K....',
+    '....KKKKCAATTTAACKKKK....',
+    '........CATCKTAC........',
+    '........CTTKKTTC........',
+    '....KKKKCTTRRTTCKKKK....',
+    '....K....CTTTTC....K....',
+    '..TTKTT...CCCCC...TTKTT..',
+    '.TAAAAAT.........TAAAAAT.',
+    '..TTTTT...........TTTTT..',
+  ]);
+  const hauler = sprite([
+    '....CCCCCCCCCCCCCCCCCCCCCCC................',
+    '...CRRRRRRRRRRRRRRRRRRRRRRRC...RRRRRRR....',
+    '..CRROOOOOOOOOOOOOOOOOOOOOORC.RRCCCCCRR...',
+    '..CROORRROORRROORRROORRROOORC.RCAAAATCRR..',
+    '..CROORRROORRROORRROORRROOORC.RCAAAATTTCR.',
+    '..CROORRROORRROORRROORRROOORC.RCAAAATTTCR.',
+    '..CROOOOOOOOOOOOOOOOOOOOOOOORC.RCCCCCCCCR.',
+    '..COOOOOOOOOOOOOOOOOOOOOOOOOOC.RRRRRRRRRR.',
+    '..COOOOOOOOOOOOOOOOOOOOOOOOOOC.RRRRCKRRRR.',
+    '..CCCCCCCCCCCCCCCCCCCCCCCCCCC.RRRRRRRRRC.',
+    '..OOOOOOOOOOOOOOOOOOOOOOOOOOOKOOOOOOOOOC.',
+    '...KKSSSKKKKKKSSSKKKKKKKKKKKKKKKSSSKKKK..',
+    '....KSCSK.....KSCSK..............KSCSK.....',
+    '.....KKK.......KKK...............KKK......',
+  ]);
+  const backgrounds = [0, 1, 2].map((district) => {
+    const background = document.createElement('canvas');
+    background.width = W * scale;
+    background.height = H * scale;
+    const b = background.getContext('2d');
+    if (b) {
+      b.scale(scale, scale);
+      b.imageSmoothingEnabled = false;
+      backdrop(b, truck, district);
+    }
+    return background;
+  });
   c.imageSmoothingEnabled = false;
   return (w: World, quiet: boolean) => {
-    if (b) c.drawImage(background, 0, 0, W, H);
-    else backdrop(c, truck);
-    const full = w.cargo === CAPACITY;
+    c.drawImage(backgrounds[(w.level - 1) % 3], 0, 0, W, H);
+    const full = w.cargo === capacity(w);
+    oval(c, w.x + 12, w.y + 38, 30, 7.5, palette.K);
     if (!full) {
-      for (const offset of w.effects.split > 0 ? [-38, 38] : [0]) {
+      const beams =
+        w.effects.split > 0 && w.upgrades.includes('beam')
+          ? [-38, 0, 38]
+          : w.effects.split > 0 || w.upgrades.includes('beam')
+            ? [-30, 30]
+            : [0];
+      for (const offset of beams) {
         for (let dy = 17.5; dy < 115; dy += CELL) {
           const half = 10 + dy * 0.29;
           const center = w.x + (offset * dy) / 115;
@@ -294,14 +377,21 @@ export function createArcadePainter(c: Pen, scale: number) {
       }
       if (!quiet)
         for (let i = 0; i < 3; i++) {
-          const d = ((75 - w.time) * 45 + i * 34) % 100;
+          const d = (w.elapsed * 45 + i * 34) % 100;
           sparkle(c, w.x + (i - 1) * 10, w.y + 112 - d, palette.L, 2.5);
         }
     }
     for (const j of w.junk) {
       oval(c, j.x + 5, j.y + 22, 23, 5, palette.K);
-      stamp(c, junk[j.kind], j.x, j.y - (quiet ? 0 : j.charge * 10));
+      const lift = quiet ? 0 : j.charge;
+      stamp(
+        c,
+        junk[j.kind],
+        j.x + (w.x - j.x) * lift * 0.45,
+        j.y - lift * Math.max(15, (j.y - w.y) * 0.65),
+      );
       if (j.charge > 0) {
+        label(c, String(junkTypes[j.kind].points), j.x, j.y + 39, palette.Y);
         rect(c, j.x - 25, j.y + 28, 50, 5, palette.D);
         rect(c, j.x - 25, j.y + 28, 50 * j.charge, 5, palette.L);
       }
@@ -315,13 +405,21 @@ export function createArcadePainter(c: Pen, scale: number) {
         label(c, '!', t.x, 62.5, palette.R);
         continue;
       }
-      oval(c, t.x + 5, t.y + 22, 28, 5, palette.K);
+      oval(c, t.x + 5, t.y + 22, t.kind === 4 ? 48 : 28, 5, palette.K);
       stamp(
         c,
-        t.kind === 2 ? debris : t.kind ? rival : car,
+        t.kind === 4
+          ? hauler
+          : t.kind === 3
+            ? drone
+            : t.kind === 2
+              ? debris
+              : t.kind
+                ? rival
+                : car,
         t.x,
-        t.y - (t.kind ? 7.5 : 0),
-        !t.kind && t.vx < 0,
+        t.y - (t.kind === 1 || t.kind === 3 ? 7.5 : 0),
+        (t.kind === 0 || t.kind === 4) && t.vx < 0,
       );
       label(c, '!', t.x, t.y - 42.5, palette.R);
     }
@@ -332,9 +430,7 @@ export function createArcadePainter(c: Pen, scale: number) {
           : p.kind === 'repulsor'
             ? palette.A
             : palette.L;
-      const bob = quiet
-        ? 0
-        : Math.round(Math.sin((75 - w.time) * 2) * 2) * CELL;
+      const bob = quiet ? 0 : Math.round(Math.sin(w.elapsed * 2) * 2) * CELL;
       oval(c, p.x + 3, p.y + 23, 17, 4, palette.K);
       rect(c, p.x - 18, p.y - 19 + bob, 36, 38, palette.K);
       rect(c, p.x - 15, p.y - 19 + bob, 30, 3, color);
@@ -358,13 +454,36 @@ export function createArcadePainter(c: Pen, scale: number) {
         );
       }
     }
-    stamp(c, full ? fullPlayer : player, w.x, w.y - 7.5);
-    for (let i = 0; i < CAPACITY; i++)
+    if (w.dash > 0 && !quiet) {
+      for (let i = 0; i < 5; i++)
+        rect(c, w.x - 25 + i * 12.5, w.y + 15, 5, 15 + (i % 2) * 10, palette.A);
+    }
+    if (w.deliveryFlash > 0 && !quiet) {
+      for (let i = 0; i < 8; i++) {
+        const t = 1 - w.deliveryFlash / 0.7;
+        rect(
+          c,
+          400 + (i - 3.5) * t * 15,
+          H - 90 - Math.sin(t * Math.PI) * (20 + i * 3),
+          5,
+          5,
+          i % 2 ? palette.Y : palette.L,
+        );
+      }
+    }
+    stamp(
+      c,
+      full ? players[w.chassis].full : players[w.chassis].normal,
+      w.x,
+      w.y - 7.5,
+    );
+    const slotStep = Math.min(10, 60 / capacity(w));
+    for (let i = 0; i < capacity(w); i++)
       rect(
         c,
-        w.x - 22.5 + i * 10,
+        w.x - ((capacity(w) - 1) * slotStep) / 2 + i * slotStep,
         w.y - 40,
-        7.5,
+        slotStep - 2.5,
         5,
         i < w.cargo ? palette.Y : palette.S,
       );

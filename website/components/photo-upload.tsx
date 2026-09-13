@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import Image from '@/components/site-image';
 import { Camera, X } from 'lucide-react';
 import { photoSelectionError } from '@/lib/photo-limits';
 

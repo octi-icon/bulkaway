@@ -13,7 +13,9 @@ export class PickupDeliveryError extends Error {
   }
 }
 
-export async function readPickupResponse(response: Response): Promise<string> {
+export async function readPickupResponse(
+  response: Response,
+): Promise<{ reference: string; confirmation: 'sent' | 'unconfirmed' }> {
   let data: unknown;
   try {
     data = await response.json();
@@ -45,7 +47,10 @@ export async function readPickupResponse(response: Response): Promise<string> {
     !/^BA-[A-F0-9]{8}$/.test(result.reference)
   )
     throw new PickupDeliveryError(uncertainDeliveryMessage);
-  return result.reference;
+  return {
+    reference: result.reference,
+    confirmation: result.confirmation === 'sent' ? 'sent' : 'unconfirmed',
+  };
 }
 
 export function pickupFailureMessage(error: unknown): string {

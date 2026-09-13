@@ -4,16 +4,22 @@ import {
   stepWorld,
   W,
   H,
-  CAPACITY,
+  capacity,
+  dash,
+  extendShift,
+  finishWorld,
+  type Upgrade,
+  type Chassis,
   beamTargets,
   launchCargo,
   type World,
 } from './arcade-engine';
-import type { BeamSound } from './arcade-audio';
+import type { BeamSound, ArcadeSound } from './arcade-audio';
 export type ArcadeReadout = Pick<
   World,
   | 'score'
   | 'cargo'
+  | 'chassis'
   | 'lives'
   | 'time'
   | 'delivered'
@@ -22,6 +28,9 @@ export type ArcadeReadout = Pick<
   | 'levelIntro'
   | 'effects'
   | 'launchReady'
+  | 'leg'
+  | 'upgrades'
+  | 'dashCooldown'
 >;
 export type ArcadeRuntime = {
   pause: () => void;
@@ -29,6 +38,9 @@ export type ArcadeRuntime = {
   destroy: () => void;
   direction: (key: string, down: boolean) => void;
   launch: () => void;
+  dash: () => void;
+  upgrade: (choice: Upgrade) => boolean;
+  finish: () => void;
 };
 export function startArcade(
   canvas: HTMLCanvasElement,
@@ -36,12 +48,12 @@ export function startArcade(
     update: (value: ArcadeReadout) => void;
     finish: (value: ArcadeReadout) => void;
     pause: () => void;
-    sound: (
-      kind: 'collect' | 'bank' | 'hit' | 'power' | 'level' | 'repel',
-    ) => void;
+    dock: (value: ArcadeReadout) => void;
+    sound: (kind: ArcadeSound) => void;
     beam: (value: BeamSound) => void;
     silence: () => void;
   },
+  chassis: Chassis = 'lifter',
 ): ArcadeRuntime {
   const c = canvas.getContext('2d');
   if (!c) throw new Error('Canvas unavailable');
@@ -51,7 +63,7 @@ export function startArcade(
   canvas.height = H * scale;
   c.scale(scale, scale);
   const draw = createArcadePainter(c, scale);
-  const world = createWorld(Math.floor(Math.random() * 0xffffffff));
+  const world = createWorld(Math.floor(Math.random() * 0xffffffff), chassis);
   const keys = new Set<string>();
   let frame = 0,
     last = 0,
@@ -63,6 +75,7 @@ export function startArcade(
   const snapshot = (): ArcadeReadout => ({
     score: world.score,
     cargo: world.cargo,
+    chassis: world.chassis,
     lives: world.lives,
     time: world.time,
     delivered: world.delivered,
@@ -71,10 +84,18 @@ export function startArcade(
     levelIntro: world.levelIntro,
     effects: { ...world.effects },
     launchReady: world.launchReady,
+    leg: world.leg,
+    upgrades: [...world.upgrades],
+    dashCooldown: world.dashCooldown,
   });
   function launch() {
     if (paused || dead || !launchCargo(world)) return;
-    callbacks.sound('bank');
+    callbacks.sound('launch');
+    callbacks.update(snapshot());
+  }
+  function activateDash() {
+    if (paused || dead || !dash(world)) return;
+    callbacks.sound('dash');
     callbacks.update(snapshot());
   }
   function tick(now: number) {
@@ -96,7 +117,7 @@ export function startArcade(
     }
     const event = stepWorld(world, dt, dx, dy);
     callbacks.beam(
-      world.over || world.cargo === CAPACITY
+      world.over || world.docked || world.cargo === capacity(world)
         ? 0
         : beamTargets(world).some((j) => j.charge > 0)
           ? 2
@@ -108,6 +129,7 @@ export function startArcade(
     if (event.powerUp) callbacks.sound('power');
     if (event.levelChanged) callbacks.sound('level');
     if (event.deflected) callbacks.sound('repel');
+    if (event.warning) callbacks.sound('warning');
     draw(
       world,
       quiet.matches || document.documentElement.dataset.motion === 'paused',
@@ -117,8 +139,14 @@ export function startArcade(
       ui = now;
     }
     if (world.over) {
-      paused = true;
+      pause();
+      callbacks.sound('finish');
       callbacks.finish(snapshot());
+      return;
+    }
+    if (world.docked) {
+      pause();
+      callbacks.dock(snapshot());
       return;
     }
     frame = requestAnimationFrame(tick);
@@ -140,6 +168,11 @@ export function startArcade(
     if (document.hidden) requestPause();
   };
   const keyDown = (e: KeyboardEvent) => {
+    if (paused || dead) return;
+    if (e.key === 'Shift') {
+      e.preventDefault();
+      if (!e.repeat) activateDash();
+    }
     if (e.code === 'Space') {
       e.preventDefault();
       if (!e.repeat) launch();
@@ -191,6 +224,7 @@ export function startArcade(
   canvas.addEventListener('pointermove', drag);
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('lostpointercapture', up);
   canvas.addEventListener('blur', requestPause);
   window.addEventListener('blur', requestPause);
   document.addEventListener('visibilitychange', visibility);
@@ -198,13 +232,31 @@ export function startArcade(
   return {
     pause,
     launch,
+    dash: activateDash,
+    upgrade(choice) {
+      if (dead || !extendShift(world, choice)) return false;
+      callbacks.update(snapshot());
+      callbacks.sound('upgrade');
+      paused = false;
+      last = 0;
+      frame = requestAnimationFrame(tick);
+      return true;
+    },
+    finish() {
+      if (dead || world.over) return;
+      pause();
+      finishWorld(world);
+      callbacks.sound('finish');
+      callbacks.finish(snapshot());
+    },
     resume() {
-      if (dead || world.over || !paused) return;
+      if (dead || world.over || world.docked || !paused) return;
       paused = false;
       last = 0;
       frame = requestAnimationFrame(tick);
     },
     direction(key, pressed) {
+      if (paused || dead) return;
       pointer = null;
       if (pressed) keys.add(key);
       else keys.delete(key);
@@ -218,6 +270,7 @@ export function startArcade(
       canvas.removeEventListener('pointermove', drag);
       canvas.removeEventListener('pointerup', up);
       canvas.removeEventListener('pointercancel', up);
+      canvas.removeEventListener('lostpointercapture', up);
       canvas.removeEventListener('blur', requestPause);
       window.removeEventListener('blur', requestPause);
       document.removeEventListener('visibilitychange', visibility);

@@ -1,6 +1,5 @@
-/* oxlint-disable next/no-img-element -- Prebuilt responsive WebP assets avoid a runtime image service. */
-import Link from 'next/link';
-import type { Metadata } from 'next';
+import Link from '@/components/site-link';
+import type { PageMetadata as Metadata } from '@/lib/page-metadata';
 import {
   ArrowDown,
   ArrowLeft,
@@ -15,13 +14,13 @@ import { socialMetadata } from '@/lib/social-metadata';
 import '../services.css';
 
 export const metadata: Metadata = {
-  title: 'Services & 2026 Rates | Bulk Away',
+  title: 'Services & Multifamily Rates | Bulk Away',
   description:
-    'Explore Utah bulk item removal, trash outs, weekly bulk service, chute room clear outs, and donation pickup. Compare Bulk Away’s 2026 service rates.',
+    'Explore Utah junk removal and trash outs. View 2026 multifamily community rates or request a separate quote for single-family homes and other properties.',
   alternates: { canonical: '/services' },
   ...socialMetadata(
-    'Bulk Away Services & 2026 Rates',
-    'Find the right fresh start for your home, business, or community. Explore all five services and pricing.',
+    'Bulk Away Services & Multifamily Rates',
+    'Junk removal for homes, businesses, and communities. Published rates apply to multifamily communities; other properties are quoted separately.',
     '/services',
   ),
 };
@@ -53,7 +52,7 @@ export default function ServicesPage() {
                 Find your service <ArrowDown size={19} aria-hidden="true" />
               </a>
               <a href="#rates" className="text-link">
-                2026 rates <ArrowDown size={19} aria-hidden="true" />
+                Multifamily rates <ArrowDown size={19} aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -116,7 +115,7 @@ export default function ServicesPage() {
                       className="service-rate-link"
                       href={`#rate-${service.id}`}
                     >
-                      See rates
+                      Multifamily rates
                     </a>
                   </div>
                 </div>
@@ -134,37 +133,41 @@ export default function ServicesPage() {
             <div className="service-pricing-heading">
               <div>
                 <h2 id="rates-title">
-                  A little clarity.
+                  2026 multifamily rates.
                   <br />
-                  <em>Before the clear-out.</em>
+                  <em>Made clear.</em>
                 </h2>
                 <p>
-                  2026 service pricing, straight from our rate sheet. Compare
-                  the two columns, then tell us about your job for a confirmed
-                  quote.
+                  These rates and the PDF apply to multifamily communities.
+                  Single-family homes and other properties are quoted
+                  separately.{' '}
+                  <Link className="text-link" href="/#pickup-request">
+                    Request a quote{' '}
+                    <ArrowUpRight size={18} aria-hidden="true" />
+                  </Link>
                 </p>
               </div>
               <a
                 className="rates-download"
                 href="/downloads/bulk-away-rates-2026.pdf"
-                download
+                download="bulk-away-multifamily-rates-2026.pdf"
               >
                 <Download size={22} aria-hidden="true" />
-                Download the 2026 rate sheet <span>PDF</span>
+                Download multifamily rates <span>2026 PDF</span>
               </a>
             </div>
             <p className="rate-audience" id="rate-audience">
-              Already use Pet Waste Pals or another Waste Solution Innovators
-              company? Ask about bundle pricing for your property or business.
-              Standard pricing applies when you use Bulk Away on its own. Our
-              crew confirms the applicable rate and your job’s final quote.
+              Multifamily communities using Pet Waste Pals or another Waste
+              Solution Innovators service can ask about bundle pricing. Standard
+              pricing applies to multifamily communities using Bulk Away on its
+              own. Our crew confirms the final quote.
             </p>
             <table
               className="service-rate-table"
               aria-describedby="rate-audience rate-conditions"
             >
               <caption className="sr-only">
-                Bulk Away 2026 service rates
+                Bulk Away 2026 multifamily community rates
               </caption>
               <thead>
                 <tr>

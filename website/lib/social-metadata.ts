@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { PageMetadata as Metadata } from '@/lib/page-metadata';
 
 export function socialMetadata(
   title: string,

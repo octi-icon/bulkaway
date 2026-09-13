@@ -9,9 +9,9 @@ import {
 } from './pickup-feedback.ts';
 
 void test('accepts only a confirmed receipt reference', async () => {
-  assert.equal(
+  assert.deepEqual(
     await readPickupResponse(Response.json({ reference: 'BA-12ABC456' })),
-    'BA-12ABC456',
+    { reference: 'BA-12ABC456', confirmation: 'unconfirmed' },
   );
   for (const data of [null, {}, { reference: '' }, { reference: 'booked' }]) {
     await assert.rejects(readPickupResponse(Response.json(data)), {
@@ -21,6 +21,22 @@ void test('accepts only a confirmed receipt reference', async () => {
   await assert.rejects(
     readPickupResponse(new Response('<html>Service unavailable</html>')),
     { message: uncertainDeliveryMessage },
+  );
+});
+void test('confirmation email problems do not turn an accepted pickup into a failed request', async () => {
+  for (const confirmation of ['unconfirmed', undefined, 'delivered']) {
+    assert.deepEqual(
+      await readPickupResponse(
+        Response.json({ reference: 'BA-12ABC456', confirmation }),
+      ),
+      { reference: 'BA-12ABC456', confirmation: 'unconfirmed' },
+    );
+  }
+  assert.deepEqual(
+    await readPickupResponse(
+      Response.json({ reference: 'BA-12ABC456', confirmation: 'sent' }),
+    ),
+    { reference: 'BA-12ABC456', confirmation: 'sent' },
   );
 });
 

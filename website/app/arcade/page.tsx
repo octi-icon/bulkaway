@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { PageMetadata as Metadata } from '@/lib/page-metadata';
 import { BulkArcade } from '@/components/bulk-arcade';
 import { socialMetadata } from '@/lib/social-metadata';
 

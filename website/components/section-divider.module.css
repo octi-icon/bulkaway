@@ -1,0 +1,22 @@
+.divider { position: relative; display: grid; place-items: center; height: 208px; overflow: hidden; isolation: isolate; background: var(--cream); pointer-events: none; }
+.sweep { position: absolute; width: min(1400px, calc(100% - 64px)); height: 140px; fill: none; stroke: var(--ink); stroke-width: 1; opacity: .22; }
+.sweep path + path { stroke: var(--gold); stroke-width: 2; }
+.vehicle { position: relative; width: 380px; height: auto; max-width: 80%; }
+.spark { position: absolute; left: calc(50% + 236px); top: 90px; fill: var(--gold); }
+.star .spark { left: calc(50% - 264px); top: 36px; fill: var(--ink); }
+.star .sweep { transform: scaleY(-1); }
+.divider[data-arrived='true'] .vehicle { animation: haul-arrival 1400ms cubic-bezier(.16,1,.3,1) both; }
+.divider[data-arrived='true'] .spark { animation: star-settle 1000ms 150ms cubic-bezier(.16,1,.3,1) both; }
+@keyframes haul-arrival { from { transform: translateX(-100px) rotate(-4deg); } to { transform: translateX(0) rotate(0); } }
+@keyframes star-settle { from { transform: scale(.45) rotate(-35deg); opacity: .25; } to { transform: scale(1) rotate(0); opacity: 1; } }
+:global(html[data-motion='paused']) .divider .vehicle,
+:global(html[data-motion='paused']) .divider .spark { animation: none !important; }
+@media (max-width: 760px) {
+  .divider { height: 160px; }
+  .vehicle { width: 310px; max-width: 86%; }
+  .sweep { width: calc(100% - 24px); height: 100px; }
+  .spark { left: auto; right: 10px; top: 95px; width: 16px; height: 28px; }
+  .star .spark { left: 10px; top: 28px; }
+  @keyframes haul-arrival { from { transform: translateX(-36px) rotate(-4deg); } to { transform: translateX(0) rotate(0); } }
+}
+@media (prefers-reduced-motion: reduce) { .divider .vehicle, .divider .spark { animation: none !important; } }

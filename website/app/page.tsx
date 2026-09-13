@@ -1,4 +1,6 @@
-import Image from 'next/image';
+import { socialMetadata } from '@/lib/social-metadata';
+import { useRouteLoaderData } from 'react-router';
+import Image from '@/components/site-image';
 import {
   ArrowDown,
   ArrowUpRight,
@@ -13,6 +15,8 @@ import {
 import { PickupForm } from '@/components/pickup-form';
 import { DraftSafeLink } from '@/components/draft-safe-link';
 import { CursorOptions } from '@/components/site-experience';
+import { SectionDivider } from '@/components/section-divider';
+import spacing from './home-spacing.module.css';
 import { ServiceExplorer } from '@/components/interactive';
 import {
   AtomicSky,
@@ -28,7 +32,7 @@ import {
   PreflightCheck,
   FamilyFinder,
 } from '@/components/engagement';
-export const metadata = { alternates: { canonical: '/' } };
+export const metadata = { alternates: { canonical: '/' }, ...socialMetadata('Bulk Away — Clearing the Way for What’s Next', 'Utah junk removal and trash outs for homes, apartment communities, and commercial properties.') };
 
 const marqueeMessages = [
   'LESS JUNK',
@@ -44,6 +48,7 @@ const marqueeMessages = [
 ];
 
 export default function Home() {
+  const { googleMapsKey } = useRouteLoaderData<{ googleMapsKey: string }>('root')!;
   return (
     <>
       <script
@@ -52,7 +57,7 @@ export default function Home() {
           __html: JSON.stringify(searchData).replace(/</g, '\\u003c'),
         }}
       />
-      <main id="main" tabIndex={-1}>
+      <main id="main" tabIndex={-1} className={spacing.home}>
         <section className="hero" aria-labelledby="hero-title">
           <AtomicSky />
           <div className="wrap hero-grid">
@@ -168,6 +173,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <SectionDivider variant="truck" />
         <section className="how section-pad" id="how-it-works">
           <div className="wrap">
             <div className="how-heading">
@@ -270,6 +276,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <SectionDivider variant="star" />
         <section id="request" className="request section-pad">
           <div className="wrap request-grid">
             <div className="request-copy">
@@ -306,7 +313,7 @@ export default function Home() {
               </div>
             </div>
             <PickupForm
-              googleMapsKey={process.env.GOOGLE_MAPS_BROWSER_KEY || ''}
+              googleMapsKey={googleMapsKey}
             />
           </div>
         </section>
@@ -340,14 +347,13 @@ export default function Home() {
               <details>
                 <summary>How much will my pickup cost?</summary>
                 <p>
-                  We quote based on the items, volume, access, and disposal
-                  requirements. Mattresses, refrigerators, electronics, and
-                  tires are quoted per item. Landfill fees and special handling
-                  may apply. We’ll confirm the details with you before
-                  scheduling.
+                  Single-family homes are quoted individually based on the
+                  items, volume, access, and disposal requirements. Published
+                  rates apply to multifamily communities. We confirm your quote
+                  before scheduling.
                 </p>
                 <DraftSafeLink className="text-link" href="/services#rates">
-                  See 2026 community rates{' '}
+                  See 2026 multifamily rates{' '}
                   <ArrowUpRight size={18} aria-hidden="true" />
                 </DraftSafeLink>
               </details>
@@ -516,7 +522,12 @@ export default function Home() {
       <footer>
         <div className="wrap footer-main">
           <a href="#main" className="wordmark" aria-label="Bulk Away home">
-            Bulk Away
+            <Image
+              src="/brand/bulk-away-wordmark.svg"
+              width={1194}
+              height={277}
+              alt=""
+            />
           </a>
           <p>
             Clearing the Way

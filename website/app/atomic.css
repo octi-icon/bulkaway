@@ -770,6 +770,7 @@ html[data-motion='paused'] .about-artwork.has-arrived {
 footer {
   border-top: 9px solid var(--lime);
 }
+html[data-motion='paused'],
 html[data-motion='paused'] *,
 html[data-motion='paused'] *:before,
 html[data-motion='paused'] *:after {

@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/lib/navigation';
 import { Pause, Play, MousePointer2, ChevronDown } from 'lucide-react';
 import { NavigationMotion } from '@/components/navigation-motion';
 

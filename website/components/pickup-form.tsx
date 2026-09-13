@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { ArrowUpRight, LoaderCircle, ChevronDown, Camera } from 'lucide-react';
 import { SubmissionSparkle } from '@/components/atomic-experience';
-import Link from 'next/link';
+import Link from '@/components/site-link';
 import { Button } from '@/components/ui/button';
 import { PhotoUpload } from '@/components/photo-upload';
 import { AddressSelector } from '@/components/address-selector';
@@ -215,6 +215,12 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
       smsDisclosureVersion,
     };
     const stepErrors = validatePickupStep(input, step);
+    if (step >= 1) {
+      const addressInput =
+        formRef.current?.querySelector<HTMLInputElement>('#pickup-address');
+      if (addressInput?.validity.customError)
+        stepErrors.address = addressInput.validationMessage;
+    }
     if (Object.keys(stepErrors).length) {
       setErrors(stepErrors);
       setStep(pickupErrorStep(stepErrors));
@@ -257,10 +263,15 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
           'Idempotency-Key': requestId.current,
         },
         body,
-        signal: AbortSignal.timeout(35000),
+        signal: AbortSignal.timeout(45000),
       });
-      const confirmedReference = await readPickupResponse(response);
-      setReference(confirmedReference);
+      const delivery = await readPickupResponse(response);
+      setReference(delivery.reference);
+      setMessage(
+        delivery.confirmation === 'sent'
+          ? 'A confirmation email is on its way. If it doesn’t appear, check your spam folder.'
+          : 'The crew has your request, but we couldn’t confirm your email copy. Save your reference below; there’s no need to submit again.',
+      );
       setReceipt(submittedReceipt);
       setStatus('success');
       // The receipt owns its submitted snapshot. The shared list is now free
@@ -298,7 +309,7 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
     <div className="pickup-form" id="pickup-request" tabIndex={-1}>
       {!ready && (
         <output className="form-loading">
-          Getting your request form ready. Need a hand?{' '}
+          Getting your request form ready. <a href="/request">Open the pickup form</a> or{' '}
           <a href="tel:+18016027705">Call the crew</a> or{' '}
           <a href="mailto:service@bulkaway.com">email us</a>.
         </output>
@@ -306,9 +317,7 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
       <noscript>
         <style>{`.pickup-form form, .pickup-form .form-loading { display: none; }`}</style>
         <p>
-          The interactive request form needs JavaScript. You can still arrange a
-          pickup: <a href="tel:+18016027705">call (801) 602-7705</a> or{' '}
-          <a href="mailto:service@bulkaway.com">email service@bulkaway.com</a>.
+          <a className="button" href="/request">Request a pickup</a>
         </p>
       </noscript>
       {status === 'success' ? (
@@ -328,6 +337,7 @@ export function PickupForm({ googleMapsKey = '' }: { googleMapsKey?: string }) {
           <p className="reference">
             Your reference: <strong>{reference}</strong>
           </p>
+          <p>{message}</p>
           {receipt && (
             <dl className="pickup-receipt">
               <div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/site-link';
 import { X } from 'lucide-react';
 import { MotionToggle, CursorOptions } from '@/components/site-experience';
 import { DraftSafeLink } from '@/components/draft-safe-link';

@@ -4,7 +4,12 @@ export type ArcadeSound =
   | 'hit'
   | 'power'
   | 'level'
-  | 'repel';
+  | 'repel'
+  | 'launch'
+  | 'dash'
+  | 'warning'
+  | 'upgrade'
+  | 'finish';
 export type BeamSound = 0 | 1 | 2; // Off, searching, lifting.
 
 // Synthesized locally: no audio files, timers, or sound before an explicit opt-in.
@@ -58,8 +63,8 @@ export function createArcadeAudio(ac: AudioContext) {
       carrier.type = 'triangle';
       harmonic.type = 'square';
       lfo.type = 'sine';
-      modulation.gain.value = 24;
-      tint.gain.value = 0.12;
+      modulation.gain.value = 18;
+      tint.gain.value = 0.075;
       gain.gain.value = 0;
       lfo.connect(modulation);
       modulation.connect(carrier.frequency);
@@ -85,7 +90,7 @@ export function createArcadeAudio(ac: AudioContext) {
     );
     beam.lfo.frequency.setTargetAtTime(lifting ? 14 : 6, ac.currentTime, 0.07);
     beam.gain.gain.setTargetAtTime(
-      lifting ? 0.1 : 0.045,
+      lifting ? 0.08 : 0.03,
       ac.currentTime,
       0.035,
     );
@@ -143,7 +148,13 @@ export function createArcadeAudio(ac: AudioContext) {
     source.frequency.exponentialRampToValueAtTime(to, when + duration);
     envelope(source, when, duration, volume);
   }
-  function clatter(delay: number, duration: number, volume: number) {
+  function clatter(
+    delay: number,
+    duration: number,
+    volume: number,
+    from = 1800,
+    to = 180,
+  ) {
     if (voices.size >= 24) return;
     const source = ac.createBufferSource(),
       filter = ac.createBiquadFilter(),
@@ -151,8 +162,8 @@ export function createArcadeAudio(ac: AudioContext) {
     source.buffer = noise;
     filter.type = 'lowpass';
     filter.Q.value = 0.7;
-    filter.frequency.setValueAtTime(1800, when);
-    filter.frequency.exponentialRampToValueAtTime(180, when + duration);
+    filter.frequency.setValueAtTime(from, when);
+    filter.frequency.exponentialRampToValueAtTime(to, when + duration);
     envelope(source, when, duration, volume, filter);
   }
   function silence() {
@@ -178,28 +189,71 @@ export function createArcadeAudio(ac: AudioContext) {
     play(kind: ArcadeSound) {
       if (!enabled || disposed || ac.state !== 'running') return;
       if (kind === 'collect') {
-        for (const [i, pitch] of [660, 880, 1320].entries())
-          note('square', pitch, pitch * 1.025, i * 0.045, 0.085, 0.065);
+        // A quick, soft two-note pickup; the longer phrase belongs to unloading.
+        note('triangle', 784, 784, 0, 0.09, 0.09);
+        note('square', 1047, 1047, 0.045, 0.1, 0.025);
       } else if (kind === 'bank') {
-        // Falling cargo: three weighted impacts, a rattling bed, then a latch clang.
+        // Cargo settles into the bed, followed by a rising C-major reward.
+        // Keep the high notes steady: descending electronic tones signal damage.
         for (let i = 0; i < 3; i++) {
-          note('triangle', 125 - i * 16, 38, i * 0.13, 0.24, 0.35 - i * 0.06);
-          clatter(i * 0.13, 0.2, 0.16 - i * 0.025);
+          note('triangle', 105 - i * 12, 55, i * 0.075, 0.13, 0.16 - i * 0.025);
+          clatter(i * 0.075, 0.09, 0.065 - i * 0.012, 1100, 260);
         }
-        note('square', 440, 310, 0.43, 0.18, 0.07);
-        note('triangle', 880, 620, 0.43, 0.22, 0.05);
+        [523.25, 659.25, 783.99, 1046.5].forEach((pitch, i) => {
+          const delay = 0.2 + i * 0.075;
+          const duration = i === 3 ? 0.26 : 0.14;
+          note('triangle', pitch, pitch, delay, duration, 0.11);
+          note('square', pitch, pitch, delay, duration, 0.025);
+        });
+      } else if (kind === 'launch') {
+        // Pneumatic lift-off and a bright delivery confirmation, never a crash.
+        note('triangle', 130, 1047, 0, 0.24, 0.12);
+        clatter(0, 0.18, 0.07, 350, 2400);
+        note('square', 784, 784, 0.25, 0.14, 0.035);
+        note('triangle', 1047, 1047, 0.34, 0.24, 0.11);
+      } else if (kind === 'dash') {
+        clatter(0, 0.18, 0.09, 450, 3400);
+        note('triangle', 180, 1400, 0, 0.16, 0.075);
+        note('square', 360, 1800, 0.025, 0.12, 0.02);
+      } else if (kind === 'warning') {
+        // Radar pips warn about entry; no descending damage-like interval.
+        note('triangle', 740, 740, 0, 0.07, 0.055);
+        note('triangle', 740, 740, 0.14, 0.07, 0.055);
+      } else if (kind === 'upgrade' || kind === 'finish') {
+        const melody =
+          kind === 'upgrade'
+            ? [262, 330, 392, 523, 784]
+            : [523, 392, 440, 659, 784];
+        melody.forEach((pitch, i) => {
+          note('square', pitch, pitch, i * 0.1, 0.17, 0.045);
+          note('triangle', pitch / 2, pitch / 2, i * 0.1, 0.2, 0.07);
+        });
       } else if (kind === 'power' || kind === 'level') {
         const pitches =
-          kind === 'power' ? [440, 660, 880, 1320] : [330, 440, 550, 880];
+          kind === 'power'
+            ? [392, 523.25, 659.25, 1046.5]
+            : [392, 493.88, 587.33];
         pitches.forEach((pitch, i) =>
-          note('square', pitch, pitch, i * 0.08, 0.13, 0.055),
+          note(
+            'triangle',
+            pitch,
+            pitch,
+            i * 0.075,
+            0.17,
+            kind === 'power' ? 0.12 : 0.07,
+          ),
         );
+        if (kind === 'power')
+          note('square', 1046.5, 1046.5, 0.225, 0.18, 0.025);
       } else if (kind === 'repel') {
-        note('triangle', 140, 980, 0, 0.22, 0.15);
-        note('square', 700, 350, 0.08, 0.14, 0.04);
-      } else {
-        note('sawtooth', 180, 48, 0, 0.22, 0.08);
-        clatter(0, 0.13, 0.11);
+        note('triangle', 196, 784, 0, 0.14, 0.13);
+        note('square', 784, 784, 0.1, 0.1, 0.03);
+        note('triangle', 1175, 1175, 0.15, 0.16, 0.07);
+      } else if (kind === 'hit') {
+        // A rough, low double buzz is reserved for losing a shield.
+        note('sawtooth', 190, 46, 0, 0.2, 0.1);
+        note('square', 145, 38, 0.055, 0.16, 0.045);
+        clatter(0, 0.1, 0.1, 2400, 120);
       }
     },
     silence,

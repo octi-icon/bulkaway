@@ -33,6 +33,9 @@ yarn-error.log*
 .vercel
 next-env.d.ts
 /dist/
+/.react-router/
+/playwright-report/
+/test-results/
 /.wrangler/
 /outputs/
 /work/

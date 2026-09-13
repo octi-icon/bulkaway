@@ -1237,3 +1237,510 @@
     min-height: 1.5em;
   }
 }
+
+/* Shared cabinet proportions: stable viewport sizing, never a scaled UI. */
+.arcade-cabinet {
+  width: 100%;
+  max-width: clamp(320px, calc(100svh - 285px), 610px);
+  border-width: 5px;
+  border-radius: 54px 54px 22px 22px;
+}
+.arcade-cabinet .cabinet-marquee {
+  padding: 9px 14px;
+  border-bottom-width: 3px;
+}
+.arcade-cabinet .cabinet-brand {
+  display: none;
+}
+.arcade-cabinet .cabinet-marquee :is(h1, h2) {
+  font-size: clamp(28px, 4vw, 38px);
+  margin: 0;
+}
+.arcade-cabinet .cabinet-freeplay {
+  display: none;
+}
+.arcade-cabinet .cabinet-screen-frame {
+  padding: 7px 8px 5px;
+}
+.arcade-cabinet .arcade-hud {
+  padding: 6px 10px;
+  gap: 8px;
+  font-size: 10px;
+  line-height: 1.25;
+}
+.arcade-cabinet .arcade-hud strong {
+  font-size: 19px;
+  line-height: 1.2;
+}
+.arcade-cabinet .arcade-mission {
+  position: relative;
+  padding: 4px 8px;
+}
+.arcade-cabinet .arcade-level-line {
+  font-size: 11px;
+  margin: 0;
+}
+.arcade-cabinet .arcade-power-rack {
+  gap: 5px;
+}
+.arcade-cabinet .arcade-power-rack > :is(span, button) {
+  padding: 2px 4px;
+  gap: 5px;
+  font-size: 11px;
+}
+.arcade-cabinet .arcade-power-rack small {
+  display: inline;
+  margin-left: 5px;
+}
+.arcade-cabinet .arcade-power-rack b {
+  font-size: 20px;
+}
+.arcade-cabinet .arcade-playfield {
+  min-height: 0;
+  aspect-ratio: auto;
+}
+.arcade-cabinet .arcade-canvas {
+  width: 100%;
+  max-height: max(260px, calc(100svh - 290px));
+  object-fit: contain;
+}
+.arcade-cabinet .arcade-status {
+  min-height: 2.8em;
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.arcade-cabinet .cabinet-control-deck {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding: 7px 10px;
+  gap: 10px;
+  border-top-width: 3px;
+}
+.arcade-cabinet .arcade-dpad {
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(2, 44px);
+}
+.arcade-cabinet .arcade-deck-actions {
+  grid-template-columns: repeat(2, 44px);
+  gap: 6px;
+}
+.arcade-cabinet .arcade-round-button {
+  width: 44px;
+  height: 44px;
+}
+.arcade-cabinet .arcade-deck-actions > span {
+  font-size: 9px;
+  display: block;
+}
+.arcade-cabinet .arcade-best {
+  display: none;
+}
+.arcade-cabinet .cabinet-base {
+  padding: 4px 12px;
+}
+.arcade-cabinet .cabinet-base > summary {
+  min-height: 44px;
+  padding: 10px 0;
+  font-size: 12px;
+  cursor: pointer;
+}
+.arcade-cabinet .arcade-title-screen {
+  min-height: 0;
+  padding: 20px 16px;
+  gap: 6px;
+}
+.arcade-cabinet .arcade-title-screen h2 {
+  font-size: 34px;
+  margin: 0;
+}
+.arcade-cabinet .arcade-title-screen p {
+  font-size: 13px;
+  margin: 4px 0 8px;
+}
+.arcade-cabinet .arcade-saucer {
+  width: 90px;
+  height: 53px;
+  margin: 0 0 6px;
+}
+.arcade-cabinet .arcade-title-screen .arcade-screen-note {
+  display: block;
+  font-size: 11px;
+}
+.arcade-cabinet .arcade-finish-screen {
+  min-height: 0;
+  padding: 24px 16px;
+}
+.arcade-cabinet .arcade-finish-screen h2 {
+  font-size: 38px;
+}
+.arcade-cabinet .arcade-finish-screen > p {
+  font-size: 13px;
+}
+.arcade-cabinet .arcade-instructions {
+  display: block;
+  margin-top: 14px;
+}
+.arcade-cabinet .arcade-instructions p {
+  margin: 0 0 12px;
+}
+.arcade-cabinet .arcade-instructions strong {
+  display: inline;
+  font-size: 23px;
+}
+.arcade-cabinet .arcade-dash {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 5px 10px;
+  background: var(--lime);
+  color: var(--ink);
+  border: 0;
+  border-radius: 4px;
+  font-size: 12px;
+  margin: 2px 0;
+}
+.arcade-cabinet .arcade-dash:disabled {
+  background: #302935;
+  color: #c7c0ca;
+}
+.arcade-upgrade-screen {
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+  background: #17131ff0;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+}
+.arcade-upgrade-screen h2 {
+  font:
+    400 32px/1.1 Brookvale,
+    sans-serif;
+  margin: 0 0 6px;
+  color: var(--gold);
+}
+.arcade-upgrade-screen > p {
+  font-size: 12px;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+.arcade-upgrade-options {
+  display: grid;
+  gap: 6px;
+}
+.arcade-upgrade-options button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  min-height: 54px;
+  border: 1px solid #7b7284;
+  border-radius: 6px;
+  color: var(--cream);
+  background: #302935;
+  text-align: left;
+}
+.arcade-upgrade-options button > span {
+  flex: 1;
+}
+.arcade-upgrade-options strong {
+  display: block;
+  font-size: 14px;
+  color: var(--lime);
+}
+.arcade-upgrade-options small {
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.arcade-upgrade-options button:hover {
+  background: #42364c;
+  border-color: var(--lime);
+}
+.arcade-cabinet :is(button, summary):focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+.arcade-cabinet .cabinet-control-deck button:focus-visible {
+  outline-color: var(--ink);
+}
+@media (max-height: 560px) and (min-width: 650px) {
+  .arcade-cabinet {
+    max-width: 680px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 170px;
+  }
+  .arcade-cabinet .cabinet-marquee {
+    grid-column: 1 / -1;
+  }
+  .arcade-cabinet .cabinet-control-deck {
+    flex-direction: column;
+    justify-content: center;
+    padding: 12px;
+    border-top: 0;
+  }
+  .arcade-cabinet .cabinet-base {
+    grid-column: 1 / -1;
+  }
+  .arcade-cabinet .arcade-canvas {
+    max-height: none;
+    width: min(100%, 280px);
+    margin: auto;
+  }
+  .arcade-cabinet .arcade-playfield {
+    background: #17131f;
+  }
+}
+@media (max-width: 380px) {
+  .arcade-cabinet .arcade-power-rack small {
+    display: block;
+    margin: 0;
+  }
+  .arcade-upgrade-screen {
+    padding: 10px;
+  }
+  .arcade-upgrade-screen h2 {
+    font-size: 26px;
+  }
+}
+/* Keep the game and primary controls together on ordinary laptop screens. */
+.arcade-cabinet {
+  max-width: clamp(300px, calc(100svh - 370px), 580px);
+}
+.arcade-cabinet .cabinet-marquee :is(h1, h2) {
+  font-size: 30px;
+  line-height: 1;
+}
+.arcade-cabinet .cabinet-marquee :is(h1, h2) em {
+  font-size: 1em;
+  line-height: 1;
+}
+.arcade-cabinet .arcade-dpad {
+  grid-template-columns: repeat(4, 44px);
+  grid-template-rows: 44px;
+}
+.arcade-cabinet .arcade-direction.arrowleft {
+  grid-column: 1;
+  grid-row: 1;
+}
+.arcade-cabinet .arcade-direction.arrowdown {
+  grid-column: 2;
+  grid-row: 1;
+}
+.arcade-cabinet .arcade-direction.arrowup {
+  grid-column: 3;
+  grid-row: 1;
+}
+.arcade-cabinet .arcade-direction.arrowright {
+  grid-column: 4;
+  grid-row: 1;
+}
+.arcade-cabinet .arcade-deck-actions > span {
+  display: none;
+}
+.arcade-cabinet .arcade-canvas {
+  max-height: none;
+}
+@media (max-width: 360px) {
+  .arcade-cabinet .cabinet-control-deck {
+    padding: 6px;
+    gap: 5px;
+  }
+  .arcade-cabinet .arcade-deck-actions {
+    grid-template-columns: 44px;
+    gap: 4px;
+  }
+}
+@media (max-height: 560px) and (min-width: 650px) {
+  .arcade-cabinet {
+    max-width: 680px;
+    grid-template-columns: minmax(0, 1fr) 200px;
+  }
+}
+.arcade-upgrade-screen {
+  overflow: visible;
+  padding: 12px;
+  justify-content: flex-start;
+}
+.arcade-upgrade-screen h2 {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.arcade-upgrade-screen > p {
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+.arcade-upgrade-options {
+  flex-shrink: 0;
+}
+.arcade-upgrade-options button {
+  padding: 6px 8px;
+  line-height: 1.2;
+}
+.arcade-upgrade-options button > svg {
+  flex-shrink: 0;
+}
+.arcade-upgrade-options strong {
+  line-height: 1.2;
+}
+.arcade-upgrade-screen > .arcade-text-button {
+  flex-shrink: 0;
+  padding: 8px 0;
+  margin-top: 4px;
+}
+.arcade-cabinet[data-phase='docked'] .arcade-canvas {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  object-fit: cover;
+}
+.arcade-cabinet[data-phase='docked'] .arcade-mission,
+.arcade-cabinet[data-phase='docked'] .arcade-status {
+  display: none;
+}
+.arcade-cabinet[data-phase='docked'] .arcade-playfield {
+  aspect-ratio: auto;
+}
+
+/* A compact hangar replaces the title illustration; play remains one click away. */
+.arcade-cabinet:is([data-phase='ready'], [data-phase='loading']) .arcade-hud,
+.arcade-cabinet:is([data-phase='ready'], [data-phase='loading']) .arcade-status,
+.arcade-cabinet:is([data-phase='ready'], [data-phase='loading']) .arcade-dpad,
+.arcade-cabinet:is([data-phase='ready'], [data-phase='loading'])
+  .arcade-pause-button {
+  display: none;
+}
+.arcade-cabinet .arcade-title-screen {
+  padding: 14px 12px;
+}
+.arcade-chassis {
+  border: 0;
+  padding: 0;
+  margin: 6px 0;
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+}
+.arcade-cabinet:is([data-phase='ready'], [data-phase='loading'])
+  .arcade-deck-actions {
+  grid-template-columns: 44px;
+}
+.arcade-chassis label {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 6px 9px;
+  border: 1px solid #80768b;
+  border-radius: 6px;
+  color: var(--cream);
+  background: #2b2533;
+  cursor: pointer;
+}
+.arcade-chassis label[data-selected='true'] {
+  border-color: var(--lime);
+  background: #37402a;
+}
+.arcade-chassis label:has(input:focus-visible) {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.arcade-chassis label:hover {
+  border-color: var(--cream);
+}
+.arcade-chassis strong {
+  display: block;
+  font-size: 15px;
+  line-height: 1.25;
+}
+.arcade-chassis small {
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.arcade-chassis img {
+  width: 60px;
+  height: 38px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.arcade-chassis input {
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  margin: 0;
+  accent-color: var(--lime);
+}
+.arcade-chassis:disabled label {
+  cursor: wait;
+  opacity: 0.65;
+}
+.arcade-item-values {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 12px 0;
+}
+.arcade-item-values caption {
+  text-align: left;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.arcade-item-values :is(th, td) {
+  padding: 6px 4px;
+  border-bottom: 1px solid currentColor;
+  text-align: right;
+}
+.arcade-item-values th:first-child {
+  text-align: left;
+}
+.arcade-item-values th[scope='row'] {
+  font-weight: 400;
+}
+.arcade-cabinet .arcade-item-footnote {
+  font-size: 11px;
+}
+.arcade-cabinet .arcade-power-rack:has(.arcade-dash) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.arcade-cabinet .arcade-power-rack:has(.arcade-dash) small {
+  display: block;
+  margin: 0;
+}
+.arcade-cabinet .arcade-power-rack .arcade-dash {
+  margin: 0;
+  padding: 2px 4px;
+  font-size: 11px;
+  gap: 3px;
+}
+.arcade-cabinet .arcade-power-rack .arcade-dash > svg {
+  display: none;
+}
+.arcade-cabinet {
+  container-type: inline-size;
+  scroll-margin-top: 8px;
+}
+@container (max-width: 330px) {
+  .arcade-cabinet .cabinet-control-deck {
+    padding: 6px;
+    gap: 4px;
+  }
+  .arcade-cabinet .arcade-dpad {
+    gap: 2px;
+  }
+  .arcade-cabinet .arcade-deck-actions {
+    gap: 2px;
+  }
+}
+@container (max-width: 285px) {
+  .arcade-cabinet .arcade-deck-actions {
+    grid-template-columns: 44px;
+  }
+}

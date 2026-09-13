@@ -32,6 +32,42 @@ export const saucerPixels = [
   '..........GLLLLLG...........',
   '...........CCCCC............',
 ];
+// Each chassis has its own silhouette, not just a palette swap.
+export const chassisPixels = {
+  lifter: saucerPixels,
+  scout: [
+    '............CCCC............',
+    '...........CAATTC...........',
+    '..........CAAAATTC..........',
+    '.........CCAAAATTCC.........',
+    '..CC....CCAAAAATTTCC....CC..',
+    '..CACCCCCCCCCCCCCCCCCCCCAC..',
+    '.CAAAAAAAAAAAAAAAAAAAAAAAAC.',
+    'CAACAAAAACAAAAAAAACAAAAACAAC',
+    '.CTTTTTTTTTTTTTTTTTTTTTTTTC.',
+    '..CCSSSSSSSSSSSSSSSSSSSSCC..',
+    '...CKKKKKCCKKKKKKCCKKKKKC...',
+    '....CCC....CCCCCC....CCC....',
+  ],
+  hauler: [
+    '............CCCCCCCC............',
+    '...........CAAAAAATTCC..........',
+    '..........CAACAAAATTTTC.........',
+    '..........CAAAAAATTTTTC.........',
+    '.....CCCCCCCCCCCCCCCCCCCCCC.....',
+    '...CCYYYYYYYYYYYYYYYYYYYYYYCC...',
+    '..CYYYYCCYYYYCCYYYYCCYYYYCCYYYC..',
+    '.CYYYYYYYYYYYYYYYYYYYYYYYYYYYYC.',
+    'CYYYYCCCCYYYYCCCCYYYYCCCCYYYYYC',
+    'COOOOKKKKOOOOKKKKOOOOKKKKOOOOOC',
+    '.COOOOOOOOOOOOOOOOOOOOOOOOOOOC.',
+    '..CCOOOOOOOOOOOOOOOOOOOOOOCC..',
+    '....CCBBBBBBBBBBBBBBBBBBCC....',
+    '.....CCCCCCCCCCCCCCCCCCCC.....',
+    '.......CYOC........CYOC.......',
+    '.......CCC..........CCC.......',
+  ],
+};
 export const junkPixels = [
   [
     '...CCCCCCCCCCCCCCCC...',

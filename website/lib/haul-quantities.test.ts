@@ -57,7 +57,7 @@ void test('validated quantities and separate notes reach the crew email', () => 
     email: 'test@example.com',
     phone: '8015550100',
     service: 'Bulk item removal',
-    address: 'Test pickup location',
+    address: '123 Example Street, Salt Lake City, UT 84101',
     date: '',
     consent: true,
     details: 'Use the side gate.',
@@ -75,5 +75,6 @@ void test('validated quantities and separate notes reach the crew email', () => 
   const mail = buildPickupMail(result.data, 'BA-TEST');
   assert.match(mail.text, /3 × Furniture\n4 × Tires/);
   assert.match(mail.text, /ADDITIONAL DETAILS\nUse the side gate\./);
-  assert.match(mail.html, /3 × Furniture/);
+  assert.match(mail.html, /Furniture<\/td><td[^>]*>3<\/td>/);
+  assert.match(mail.html, /Tires<\/td><td[^>]*>4<\/td>/);
 });

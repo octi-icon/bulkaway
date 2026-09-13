@@ -7,6 +7,7 @@ import { MapPin } from 'lucide-react';
 import {
   createAddressSession,
   loadAddressLibrary,
+  AddressCoverageError,
   type AddressPrediction,
 } from '@/lib/google-address';
 
@@ -28,6 +29,7 @@ export function AddressSelector({
   const [highlighted, setHighlighted] = useState(-1);
   const [message, setMessage] = useState('');
   const [chosen, setChosen] = useState('');
+  const [coverageError, setCoverageError] = useState('');
   const input = useRef<HTMLInputElement>(null);
   const generation = useRef(0);
   const selection = useRef(0);
@@ -35,6 +37,10 @@ export function AddressSelector({
   const session = useRef<ReturnType<typeof createAddressSession> | null>(null);
   const enabled = !!apiKey && !manual;
   const open = enabled && active && focused && predictions.length > 0;
+
+  useEffect(() => {
+    input.current?.setCustomValidity(coverageError);
+  }, [coverageError]);
 
   useEffect(() => {
     const cancelSelection = () => {
@@ -111,6 +117,7 @@ export function AddressSelector({
     setPredictions([]);
     setHighlighted(-1);
     setMessage('Getting the full address…');
+    setCoverageError('');
     const timeout = window.setTimeout(() => {
       if (current !== selection.current) return;
       ++selection.current;
@@ -127,12 +134,17 @@ export function AddressSelector({
       setChosen(fullAddress);
       setAddress(fullAddress);
       setMessage('Address selected. Add a unit or building below if needed.');
-    } catch {
+    } catch (failure) {
       if (current === selection.current) {
-        setManual(true);
-        setMessage(
-          'Couldn’t load that address. Please enter the full address manually.',
-        );
+        if (failure instanceof AddressCoverageError) {
+          setCoverageError(failure.message);
+          setMessage('');
+        } else {
+          setManual(true);
+          setMessage(
+            'Couldn’t load that address. Please enter the full address manually.',
+          );
+        }
       }
     } finally {
       window.clearTimeout(timeout);
@@ -159,6 +171,7 @@ export function AddressSelector({
           setPredictions([]);
           setHighlighted(-1);
           setMessage('');
+          setCoverageError('');
           setAddress(event.target.value);
           setFocused(true);
         }}
@@ -180,8 +193,8 @@ export function AddressSelector({
         aria-activedescendant={
           open && highlighted >= 0 ? `address-option-${highlighted}` : undefined
         }
-        aria-invalid={!!error}
-        aria-describedby={`address-help${enabled ? ' address-provider' : ''}${error ? ' address-error' : ''}`}
+        aria-invalid={!!error || !!coverageError}
+        aria-describedby={`address-help${error || coverageError ? ' address-error' : ''}`}
         placeholder={
           enabled ? 'Start typing your address' : 'Street, city, state & ZIP'
         }
@@ -245,30 +258,17 @@ export function AddressSelector({
           </span>
         </div>
       )}
-      {error && (
-        <span id="address-error" className="field-error">
-          {error}
+      {(coverageError || error) && (
+        <span id="address-error" className="field-error" role="alert">
+          {coverageError || error}
         </span>
       )}
       <small id="address-help">
-        Include street, city, state &amp; ZIP so we can confirm service
-        availability.
+        Serving Salt Lake, Utah, Davis &amp; Weber counties. Include the street,
+        city, state &amp; ZIP.
       </small>
       {apiKey && (
         <>
-          {enabled && (
-            <small id="address-provider">
-              Address searches are sent to Google. Suggestions prioritize our
-              Utah service area.{' '}
-              <a
-                href="/privacy#address-search"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Search terms &amp; privacy (new tab)
-              </a>
-            </small>
-          )}
           <button
             type="button"
             className="address-mode"

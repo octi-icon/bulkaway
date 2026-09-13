@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/site-link';
 import { ArrowUpRight, Camera, Orbit, Sparkles } from 'lucide-react';
+import styles from './team-gallery.module.css';
 
 type Person = {
   slug: string;
@@ -78,9 +79,8 @@ function Portrait({
 }) {
   const [original, setOriginal] = useState(false);
   return (
-    <div className="crew-portrait" data-original={original}>
+    <div className={styles['crew-portrait']} data-original={original}>
       {/* Pre-sized local WebP variants avoid runtime image processing. */}
-      {/* oxlint-disable-next-line next/no-img-element */}
       <img
         src={`/team/${slug}${original ? '-original' : ''}-640.webp`}
         srcSet={`/team/${slug}${original ? '-original' : ''}-320.webp 320w, /team/${slug}${original ? '-original' : ''}-640.webp 640w`}
@@ -93,7 +93,7 @@ function Portrait({
       />
       <button
         type="button"
-        className="crew-photo-toggle"
+        className={styles['crew-photo-toggle']}
         aria-label={
           original
             ? `Back to atomic portrait of ${name}`
@@ -116,12 +116,12 @@ export function TeamGallery() {
   const [group, setGroup] = useState<'all' | 'advisory' | 'operations'>('all');
   return (
     <section
-      className="crew-section section-pad"
+      className={`${styles['crew-section']} section-pad`}
       id="team"
       aria-labelledby="crew-heading"
     >
       <div className="wrap">
-        <div className="crew-heading">
+        <div className={styles['crew-heading']}>
           <h1 id="crew-heading">
             Real people.<em>Big lift-off energy.</em>
           </h1>
@@ -130,15 +130,15 @@ export function TeamGallery() {
             team in our corner.
           </p>
         </div>
-        <article className="crew-leader" aria-labelledby="bill-name">
+        <article className={styles['crew-leader']} aria-labelledby="bill-name">
           <Portrait slug="bill-loftin" name="Bill Loftin" eager />
-          <div className="crew-leader-copy">
-            <div className="crew-leader-title">
+          <div className={styles['crew-leader-copy']}>
+            <div className={styles['crew-leader-title']}>
               <Orbit aria-hidden="true" />
               <span>Bulk Away Division Leader</span>
             </div>
             <h2 id="bill-name">Bill Loftin</h2>
-            <p className="crew-leader-role">
+            <p className={styles['crew-leader-role']}>
               Principal &amp; CMRO
               <br />
               Waste Solution Innovators
@@ -152,9 +152,9 @@ export function TeamGallery() {
             </Link>
           </div>
         </article>
-        <div className="crew-directory-heading">
+        <div className={styles['crew-directory-heading']}>
           <h2>A whole team in your corner.</h2>
-          <fieldset className="crew-filters">
+          <fieldset className={styles['crew-filters']}>
             <legend className="sr-only">Choose a team group</legend>
             {(
               [
@@ -175,7 +175,7 @@ export function TeamGallery() {
             ))}
           </fieldset>
         </div>
-        <p className="crew-directory-note">
+        <p className={styles['crew-directory-note']}>
           Roles shown are with Waste Solution Innovators.
         </p>
         <output className="sr-only">
@@ -185,15 +185,15 @@ export function TeamGallery() {
               ? 'Showing 5 advisory board members.'
               : 'Showing 4 business and operations team members.'}
         </output>
-        <div id="crew-directory" className="crew-directory">
+        <div id="crew-directory" className={styles['crew-directory']}>
           {people.map((person) => (
             <article
               key={person.slug}
-              className="crew-person"
+              className={styles['crew-person']}
               hidden={group !== 'all' && group !== person.group}
             >
               <Portrait slug={person.slug} name={person.name} />
-              <div className="crew-person-copy">
+              <div className={styles['crew-person-copy']}>
                 <h3>{person.name}</h3>
                 <p>{person.role}</p>
                 {person.group === 'advisory' && <span>Advisory board</span>}

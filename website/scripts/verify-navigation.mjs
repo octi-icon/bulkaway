@@ -8,6 +8,7 @@ const routes = [
   '/privacy',
   '/sms',
   '/arcade',
+  '/request',
   '/navigation-check-not-found',
 ];
 const pages = new Map();
@@ -64,5 +65,5 @@ for (const [route, html] of pages) {
   }
 }
 console.log(
-  'PASS shared desktop/mobile navigation and internal section links on all six pages and the 404',
+  'PASS shared desktop/mobile navigation and internal section links on all public pages, the request fallback, and the 404',
 );

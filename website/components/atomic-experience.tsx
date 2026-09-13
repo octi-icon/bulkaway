@@ -1,6 +1,6 @@
 'use client';
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from '@/components/site-image';
+import Link from '@/components/site-link';
 import { SparkleRays } from '@/components/sparkle-rays';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import {
@@ -179,7 +179,6 @@ export function SpaceSign() {
       ref={stage}
       className={`space-sign ${cleared.length ? 'has-cleared' : ''} ${allClear ? 'all-clear' : ''}`}
     >
-      <p className="demo-instruction">Clear the junk. Unlock the arcade.</p>
       <div className="space-artwork">
         <div className="sign-fin" aria-hidden="true" />
         <div className="sign-surface">

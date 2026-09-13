@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import type { Metadata } from 'next';
+import Link from '@/components/site-link';
+import type { PageMetadata as Metadata } from '@/lib/page-metadata';
 import { ArrowLeft } from 'lucide-react';
 import { TeamGallery } from '@/components/team-gallery';
 import { socialMetadata } from '@/lib/social-metadata';

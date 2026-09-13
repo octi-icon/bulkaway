@@ -1,4 +1,5 @@
 // Service scope and prices supplied in Bulk Removal Rates - 2026 (1).pdf.
+// Published prices apply only to multifamily communities, not single-family homes.
 // Owner clarified bundle eligibility includes customers of other WSI companies.
 // The crew confirms the applicable rate and final job quote.
 export const serviceCatalog = [
@@ -14,7 +15,7 @@ export const serviceCatalog = [
     description:
       'That sofa, old chair, or oversized item does not have to become a permanent fixture. Our on-demand bulk pickup helps homes, apartment communities, and commercial properties clear furniture and other bulky items without arranging a whole-property trash out.',
     detail:
-      'Tell us what needs to go and where it is. We review the load, access, and any special handling, then confirm the quote and pickup arrangements with you. The 2026 rate sheet lists a 24–72-hour turnaround for on-demand removal; our crew confirms availability when scheduling.',
+      'Tell us what needs to go and where it is. We review the load, access, and any special handling, then confirm the quote and pickup arrangements with you.',
     includes: [
       'Pickup requests for one item or a larger group',
       'Furniture and other bulky household items',
@@ -22,7 +23,7 @@ export const serviceCatalog = [
     ],
     prepare:
       'List each item and quantity. Add photos, approximate sizes, stairs or elevators, and whether items are inside a unit or in a shared pickup area.',
-    note: 'Mattresses, refrigerators, electronics, and tires are charged per item. Tell us about them before pickup so they can be included in the quote.',
+    note: 'Tell us about mattresses, refrigerators, electronics, and tires before pickup so any special handling can be included in your quote.',
     cta: 'Request a bulk pickup',
     bundle: '$75',
     standard: '$150',
@@ -66,7 +67,7 @@ export const serviceCatalog = [
     description:
       'When bulky items keep returning to a community’s waste areas, a recurring plan gives the work a regular place on the calendar. Our bulk removal subscription combines weekly bulk item removal, dumpster-enclosure sweeping, and removal of recyclable materials.',
     detail:
-      'The listed subscription includes service once a week. Tell us about your property’s enclosures, usual buildup, and access arrangements so we can discuss a schedule that fits. Customers using other Waste Solution Innovators companies can ask about the bundle rate shown below.',
+      'The listed subscription includes service once a week. Tell us about your property’s enclosures, usual buildup, and access arrangements so we can discuss a schedule that fits. Multifamily communities using other Waste Solution Innovators companies can ask about the bundle rate shown below.',
     includes: [
       'Service once a week',
       'Removal of bulk items and recyclable materials',
@@ -126,7 +127,7 @@ export const serviceCatalog = [
     ],
     prepare:
       'List materials, quantities, and condition. Note damaged or mixed items and add photos so we can review what you have.',
-    note: 'The bundle column lists an estimated $25–$50 fuel surcharge. The standard column lists a $100 minimum. The crew confirms the applicable charge.',
+    note: 'For multifamily communities, the rate sheet lists an estimated $25–$50 bundle fuel surcharge and a $100 standard minimum. Other properties are quoted separately.',
     cta: 'Ask about donation & recycling pickup',
     bundle: '$25–$50',
     standard: '$100',

@@ -2,7 +2,7 @@ import http from 'node:http';
 import { gunzipSync } from 'node:zlib';
 
 // Measure actual loopback HTTP payloads, not field Core Web Vitals.
-const origin = 'http://127.0.0.1:8788';
+const origin = process.env.BASE_URL || 'http://127.0.0.1:8788';
 function read(path) {
   return new Promise((resolve, reject) => {
     http
@@ -47,7 +47,7 @@ for (const route of ['/', '/privacy', '/sms', '/delivery-review-missing']) {
     ...new Set(
       [
         ...body.matchAll(
-          /(?:src|href)="([^" ]+\/_next\/static\/chunks\/[^" ]+\.js|\/_next\/static\/chunks\/[^" ]+\.js)"/g,
+          /(?:src|href)="([^" ]*\/assets\/[^" ]+\.js)"/g,
         ),
       ].map((m) => m[1]),
     ),

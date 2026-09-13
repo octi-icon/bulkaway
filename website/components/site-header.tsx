@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import Image from '@/components/site-image';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import { DraftSafeLink } from '@/components/draft-safe-link';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/lib/navigation';
 const mobileQuery = '(max-width: 900px)';
 const subscribeMobile = (callback: () => void) => {
   const media = window.matchMedia(mobileQuery);
@@ -63,7 +64,12 @@ export function SiteHeader() {
           aria-label="Bulk Away home"
           onClick={() => setOpen(false)}
         >
-          Bulk Away
+          <Image
+            src="/brand/bulk-away-wordmark.svg"
+            width={1194}
+            height={277}
+            alt=""
+          />
         </a>
         <button
           ref={menuButton}

@@ -32,7 +32,7 @@ for (const destination of [
     `team navigation reaches ${destination}`,
   );
 }
-assert.match(homeHtml, /Clear the junk\. Unlock the arcade\./);
+assert.doesNotMatch(homeHtml, /Clear the junk\. Unlock the arcade\./);
 assert.doesNotMatch(
   homeHtml,
   /<canvas\b/,
@@ -41,7 +41,7 @@ assert.doesNotMatch(
 const arcadeResponse = await fetch(origin + '/arcade');
 assert.equal(arcadeResponse.status, 200);
 const arcadeHtml = await arcadeResponse.text();
-assert.match(arcadeHtml, /Start a 75-second shift/);
+assert.match(arcadeHtml, /Start a 1-minute shift/);
 assert.match(arcadeHtml, /Play untimed cleanup instead/);
 for (const label of [
   'Split Beam',
@@ -132,7 +132,7 @@ for (const [index, panel] of servicePanels.entries()) {
 }
 const stylesheet = homeHtml.match(/href="([^" ]+\.css)"/)?.[1];
 const framework = homeHtml.match(
-  /(?:src|href)="([^" ]+\/framework-[^" ]+\.js)"/,
+  /(?:src|href)="([^" ]+\/entry.client-[^" ]+\.js)"/,
 )?.[1];
 assert.ok(stylesheet, 'homepage declares its stylesheet');
 assert.ok(framework, 'homepage declares its framework script');
@@ -206,6 +206,11 @@ assert.match(
   'missing pages provide pickup recovery',
 );
 console.log('PASS branded 404 status and recovery links');
+for (const method of ['GET', 'PUT', 'PATCH', 'DELETE']) {
+  const rejected = await fetch(origin + '/api/pickup', { method, headers: { Origin: origin } });
+  assert.equal(rejected.status, 405, `${method} cannot submit a pickup`);
+  assert.equal(rejected.headers.get('allow'), 'POST');
+}
 const post = (body, extra = {}) =>
   fetch(origin + '/api/pickup', {
     method: 'POST',
@@ -267,3 +272,15 @@ assert.ok((await rejectedPhoto.json()).errors.photos);
 console.log(
   'PASS multipart requests and invalid-image rejection before email delivery',
 );
+
+// Only the isolated credential-free production runner enables this valid payload.
+if (process.env.VERIFY_UNCONFIGURED_COVERAGE === 'true') {
+  const unverified = await post({
+    name: 'Coverage Test', phone: '8015550100', email: 'test@example.com',
+    service: 'Trash outs', address: '123 Example Street, Test City, UT 84101',
+    details: 'Synthetic coverage check. No email.', consent: true, smsConsent: false,
+  });
+  assert.equal(unverified.status, 503);
+  assert.ok((await unverified.json()).errors.address);
+  console.log('PASS missing server key blocks an unverified request before email');
+}

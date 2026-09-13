@@ -1,5 +1,5 @@
 export const siteOrigin = (
-  process.env.SITE_URL || 'https://bulkaway.com'
+  import.meta.env.VITE_SITE_URL || 'https://bulkaway.com'
 ).replace(/\/$/, '');
 export const serviceCounties = [
   'Salt Lake County',

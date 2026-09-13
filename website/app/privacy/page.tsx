@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import type { Metadata } from 'next';
+import Link from '@/components/site-link';
+import type { PageMetadata as Metadata } from '@/lib/page-metadata';
 import { socialMetadata } from '@/lib/social-metadata';
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default function Privacy() {
           <br />
           <em>Handled with care.</em>
         </h1>
-        <p>Privacy &amp; Cookie Notice · Updated September 8, 2026</p>
+        <p>Privacy &amp; Cookie Notice · Updated September 12, 2026</p>
         <p>
           This notice describes how Bulk Away, part of the Waste Solution
           Innovators family, handles information through this website and its
@@ -57,7 +57,9 @@ export default function Privacy() {
           <p>
             We use your request to respond, prepare a quote, confirm
             availability, and coordinate service. Requests are emailed to
-            service@bulkaway.com through our Google mail setup. Submitting a
+            service@bulkaway.com through our Google mail setup. We also send a
+            confirmation with your request details to the email address you
+            provide. Photos are attached only to the crew’s email. Submitting a
             request does not confirm a booking or sign you up for marketing.
           </p>
           <p>
@@ -90,9 +92,9 @@ export default function Privacy() {
             Google Maps Platform. When you type at least three characters in
             address-search mode, your search text and technical information such
             as your IP address are sent to Google to provide suggestions.
-            Selecting a suggestion retrieves its formatted address. Suggestions
-            prioritize our Utah service area; they do not confirm service
-            coverage, access, or a booking.
+            Selecting a suggestion retrieves its formatted address and county to
+            check our Utah service area. This does not confirm access,
+            availability, or a booking.
           </p>
           <p>
             Use of Google address search is subject to the{' '}
@@ -105,6 +107,13 @@ export default function Privacy() {
             can choose <strong>Enter address manually</strong> before typing to
             avoid sending address searches to Google, or continue manually if
             suggestions are unavailable.
+          </p>
+          <p>
+            When you submit a request, we send the pickup address to Google’s
+            Geocoding service to check that it is in Salt Lake, Utah, Davis or
+            Weber County, Utah. This check applies to both searched and manually
+            entered addresses. We do not send your name, contact details, photos
+            or separately entered unit details to Google for this check.
           </p>
           <p>
             We use the address you select or enter, plus any separately entered
@@ -157,13 +166,12 @@ export default function Privacy() {
         <section id="cookies">
           <h2>Cookies &amp; browser storage</h2>
           <p>
-            The optional arcade saves your best timed-game score on this device
-            using local storage under <code>bulk-away-arcade-best-v1</code>. It
-            contains only a score, has no automatic expiration, and is not a
-            public leaderboard. Use “Clear personal best” in the arcade or clear
-            your browser storage to remove it. If storage is blocked, you can
-            still play. The arcade has no account, analytics, or automatic
-            messaging signup.
+            The optional arcade saves separate one-minute and extended-run best
+            scores on this device using local storage. It contains only a score,
+            has no automatic expiration, and is not a public leaderboard. Use
+            “Clear personal best” in the arcade or clear your browser storage to
+            remove it. If storage is blocked, you can still play. The arcade has
+            no account, analytics, or automatic messaging signup.
           </p>
           <p>
             If you use the arcade’s SPACE5 offer, its code is included in your
@@ -180,7 +188,8 @@ export default function Privacy() {
             Google address search is a separate optional lookup feature, loaded
             only when you begin an address search. Google may process technical
             information as described in its Privacy Policy. You can use manual
-            address entry regardless of your cookie preference.
+            address entry regardless of your cookie preference. Submitted pickup
+            addresses are still checked with Google for service coverage.
           </p>
           <p>
             When you choose necessary only or dismiss the popup, we save that

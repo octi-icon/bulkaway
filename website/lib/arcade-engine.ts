@@ -1,18 +1,45 @@
 // The simulation has no DOM, clock, storage, or rendering dependencies.
-export const ROUND_SECONDS = 75;
+export const ROUND_SECONDS = 60;
+export const MAX_LEGS = 3;
 export const CAPACITY = 5;
+export const chassis = {
+  scout: {
+    name: 'Scout',
+    tip: 'Fast flight · 4 slots',
+    speed: 280,
+    capacity: 4,
+    liftTime: 1,
+  },
+  lifter: {
+    name: 'Lifter',
+    tip: 'Quick lift · 5 slots',
+    speed: 225,
+    capacity: CAPACITY,
+    liftTime: 0.8,
+  },
+  hauler: {
+    name: 'Hauler',
+    tip: 'Slow & roomy · 7 slots',
+    speed: 205,
+    capacity: 7,
+    liftTime: 1,
+  },
+} as const;
+export type Chassis = keyof typeof chassis;
 export const W = 800;
 export const H = 800;
+// Shared by traffic spawning and the painted roads. Flying hazards use the sky.
+export const ROAD_LANES = [245, 415, 605] as const;
 export const levels = [
   {
     name: 'Neighborhood Sweep',
-    tip: 'Dodge passing cars. Collect the glowing capsules.',
+    tip: 'Dodge cars and wide haulers. Grab the capsules.',
     interval: 3.4,
     speed: 95,
   },
   {
     name: 'Commercial Chaos',
-    tip: 'Rival UFOs swoop across your route.',
+    tip: 'Rival UFOs sweep across. Patrol drones weave down.',
     interval: 2.4,
     speed: 140,
   },
@@ -22,7 +49,58 @@ export const levels = [
     interval: 1.7,
     speed: 170,
   },
+  {
+    name: 'Convoy Crossing',
+    tip: 'Paired cars cross the loading yard.',
+    interval: 2.6,
+    speed: 150,
+  },
+  {
+    name: 'Saucer Slalom',
+    tip: 'Rivals weave wider. Leave yourself an exit.',
+    interval: 2.1,
+    speed: 165,
+  },
+  {
+    name: 'Salvage Storm',
+    tip: 'Debris targets your last position. Watch the markers.',
+    interval: 1.8,
+    speed: 175,
+  },
+  {
+    name: 'Night Delivery',
+    tip: 'Convoys and rivals share the night shift.',
+    interval: 2.1,
+    speed: 175,
+  },
+  {
+    name: 'Deep Orbit',
+    tip: 'Wide-sweeping rivals patrol the salvage field.',
+    interval: 1.7,
+    speed: 185,
+  },
+  {
+    name: 'The Final Haul',
+    tip: 'One last storm. Make every load count.',
+    interval: 1.5,
+    speed: 195,
+  },
 ] as const;
+export const upgrades = {
+  beam: {
+    name: 'Twin Beam',
+    tip: 'Keep two beams. B capsules lift three items.',
+  },
+  hold: {
+    name: 'Cargo Bay',
+    tip: 'Add 3 cargo slots. Make fewer trips to the truck.',
+  },
+  drive: {
+    name: 'Ion Dash',
+    tip: 'Burst through danger. Shift / Dash; recharges in 6s.',
+  },
+} as const;
+export type Upgrade = keyof typeof upgrades;
 export type PowerKind = 'split' | 'repulsor' | 'haul';
 export const powers: Record<
   PowerKind,
@@ -48,14 +126,15 @@ export const powers: Record<
   },
 };
 export type Powerup = { x: number; y: number; kind: PowerKind; ttl: number };
-export const junkNames = [
-  'Sofa',
-  'Mattress',
-  'Boxes',
-  'Refrigerator',
-  'Tire',
-  'Television',
-];
+export const junkTypes = [
+  { name: 'Sofa', seconds: 1.4, points: 300 },
+  { name: 'Mattress', seconds: 1.1, points: 225 },
+  { name: 'Boxes', seconds: 0.45, points: 100 },
+  { name: 'Refrigerator', seconds: 1.65, points: 350 },
+  { name: 'Tire', seconds: 0.6, points: 125 },
+  { name: 'Television', seconds: 0.85, points: 175 },
+] as const;
+export const junkNames = junkTypes.map((item) => item.name);
 export type Junk = { x: number; y: number; kind: number; charge: number };
 export type Traffic = {
   x: number;
@@ -66,6 +145,7 @@ export type Traffic = {
   warning?: number;
   originY?: number;
   phase?: number;
+  originX?: number;
 };
 export type World = {
   x: number;
@@ -74,6 +154,8 @@ export type World = {
   score: number;
   delivered: number;
   cargo: number;
+  cargoValue: number;
+  chassis: Chassis;
   lives: number;
   shield: number;
   spawn: number;
@@ -89,12 +171,67 @@ export type World = {
   powerIndex: number;
   effects: { split: number; repulsor: number };
   launchReady: boolean;
+  elapsed: number;
+  leg: number;
+  docked: boolean;
+  upgrades: Upgrade[];
+  dash: number;
+  dashCooldown: number;
+  deliveryFlash: number;
+  hazardIndex: number;
 };
+export function capacity(w: Pick<World, 'chassis' | 'upgrades'>) {
+  return chassis[w.chassis].capacity + (w.upgrades.includes('hold') ? 3 : 0);
+}
+export function dash(w: World) {
+  if (w.over || w.docked || !w.upgrades.includes('drive') || w.dashCooldown > 0)
+    return false;
+  w.dash = 0.65;
+  w.dashCooldown = 6;
+  w.shield = Math.max(w.shield, 0.85);
+  w.notice = 'Ion Dash! Fly through danger.';
+  return true;
+}
+export function finishWorld(w: World) {
+  if (w.over) return;
+  w.over = true;
+  w.docked = false;
+  w.score += w.cargoValue;
+  w.delivered += w.cargo;
+  w.cargo = 0;
+  w.cargoValue = 0;
+  w.notice = 'Shift complete. Hello, space!';
+}
+export function extendShift(w: World, upgrade: Upgrade) {
+  if (
+    !w.docked ||
+    w.over ||
+    w.leg >= MAX_LEGS ||
+    !(upgrade in upgrades) ||
+    w.upgrades.includes(upgrade)
+  )
+    return false;
+  w.upgrades.push(upgrade);
+  w.leg++;
+  w.time = ROUND_SECONDS;
+  w.docked = false;
+  w.traffic = [];
+  w.powerups = [];
+  w.spawn = 3;
+  w.powerSpawn = 2;
+  w.shield = 3;
+  w.lives = Math.min(3, w.lives + 1);
+  w.notice = `${upgrades[upgrade].name} installed. Shield repaired. Let's haul!`;
+  return true;
+}
 export function beamRange(w: World) {
-  return { width: w.effects.split > 0 ? 82 : 43, depth: 115 };
+  return {
+    width: w.effects.split > 0 ? 82 : w.upgrades.includes('beam') ? 65 : 43,
+    depth: 115,
+  };
 }
 export function beamTargets(w: World) {
-  if (w.over || w.cargo >= CAPACITY) return [];
+  if (w.over || w.docked || w.cargo >= capacity(w)) return [];
   const range = beamRange(w);
   return w.junk
     .filter(
@@ -103,16 +240,25 @@ export function beamTargets(w: World) {
         j.y - w.y > 15 &&
         j.y - w.y < range.depth,
     )
-    .slice(0, Math.min(CAPACITY - w.cargo, w.effects.split > 0 ? 2 : 1));
+    .slice(
+      0,
+      Math.min(
+        capacity(w) - w.cargo,
+        1 + Number(w.effects.split > 0) + Number(w.upgrades.includes('beam')),
+      ),
+    );
 }
 function bankCargo(w: World) {
-  w.score += w.cargo * 100 + (w.cargo === CAPACITY ? 100 : 0);
+  const points = w.cargoValue + (w.cargo === capacity(w) ? 100 : 0);
+  w.score += points;
+  w.deliveryFlash = 0.7;
   w.delivered += w.cargo;
   w.cargo = 0;
-  w.notice = 'POOF, GONE! Load delivered.';
+  w.cargoValue = 0;
+  w.notice = `POOF, GONE! +${points} points delivered.`;
 }
 export function launchCargo(w: World) {
-  if (w.over || !w.launchReady || !w.cargo) return false;
+  if (w.over || w.docked || !w.launchReady || !w.cargo) return false;
   bankCargo(w);
   w.launchReady = false;
   w.notice = 'Special delivery! Cargo launched straight to the truck.';
@@ -137,7 +283,7 @@ function addJunk(w: World) {
     charge: 0,
   });
 }
-export function createWorld(seed = 42): World {
+export function createWorld(seed = 42, build: Chassis = 'lifter'): World {
   const w: World = {
     x: 400,
     y: 105,
@@ -145,6 +291,8 @@ export function createWorld(seed = 42): World {
     score: 0,
     delivered: 0,
     cargo: 0,
+    cargoValue: 0,
+    chassis: build,
     lives: 3,
     shield: 2,
     spawn: 4,
@@ -160,6 +308,14 @@ export function createWorld(seed = 42): World {
     powerIndex: 0,
     effects: { split: 0, repulsor: 0 },
     launchReady: false,
+    elapsed: 0,
+    leg: 1,
+    docked: false,
+    upgrades: [],
+    dash: 0,
+    dashCooldown: 0,
+    deliveryFlash: 0,
+    hazardIndex: 0,
   };
   for (let i = 0; i < 10; i++) addJunk(w);
   return w;
@@ -171,6 +327,7 @@ export type StepEvents = {
   levelChanged: boolean;
   powerUp: PowerKind | null;
   deflected: boolean;
+  warning: boolean;
 };
 export function stepWorld(
   w: World,
@@ -185,15 +342,23 @@ export function stepWorld(
     levelChanged: false,
     powerUp: null,
     deflected: false,
+    warning: false,
   };
-  if (w.over) return events;
+  if (w.over || w.docked) return events;
   const dt = Math.min(Math.max(seconds, 0), 0.05, w.time);
   w.time = Math.max(0, w.time - dt);
+  w.elapsed += dt;
+  w.dash = Math.max(0, w.dash - dt);
+  w.dashCooldown = Math.max(0, w.dashCooldown - dt);
+  w.deliveryFlash = Math.max(0, w.deliveryFlash - dt);
   w.shield = Math.max(0, w.shield - dt);
   w.levelIntro = Math.max(0, w.levelIntro - dt);
   for (const key of ['split', 'repulsor'] as const)
     w.effects[key] = Math.max(0, w.effects[key] - dt);
-  const level = Math.min(3, 1 + Math.floor((ROUND_SECONDS - w.time) / 25));
+  const level = Math.min(
+    w.leg * 3,
+    1 + Math.floor((w.elapsed + 0.000001) / 20),
+  );
   if (level !== w.level) {
     w.level = level;
     w.levelIntro = 3;
@@ -205,13 +370,14 @@ export function stepWorld(
     events.levelChanged = true;
   }
   const length = Math.hypot(dx, dy) || 1;
+  const speed = w.dash > 0 ? 540 : chassis[w.chassis].speed;
   w.x = Math.max(
     35,
-    Math.min(W - 35, w.x + (dx / Math.max(1, length)) * 235 * dt),
+    Math.min(W - 35, w.x + (dx / Math.max(1, length)) * speed * dt),
   );
   w.y = Math.max(
     60,
-    Math.min(H - 60, w.y + (dy / Math.max(1, length)) * 235 * dt),
+    Math.min(H - 60, w.y + (dy / Math.max(1, length)) * speed * dt),
   );
   if (w.cargo && w.y > H - 120 && Math.abs(w.x - 400) < 110) {
     bankCargo(w);
@@ -241,16 +407,18 @@ export function stepWorld(
   });
   const targets = beamTargets(w);
   for (const j of w.junk) {
-    if (targets.includes(j) && w.cargo < CAPACITY) {
-      j.charge += dt / (j.kind === 0 || j.kind === 3 ? 0.8 : 0.48);
+    if (targets.includes(j) && w.cargo < capacity(w)) {
+      const item = junkTypes[j.kind];
+      j.charge += dt / (item.seconds * chassis[w.chassis].liftTime);
       if (j.charge >= 1) {
         w.cargo++;
+        w.cargoValue += item.points;
         w.junk = w.junk.filter((item) => item !== j);
         addJunk(w);
         w.notice =
-          w.cargo === CAPACITY
+          w.cargo === capacity(w)
             ? 'Full load! Head to the truck below.'
-            : `${junkNames[j.kind]} aboard. Keep clearing!`;
+            : `${item.name} aboard. ${item.points} pts at unload.`;
         events.collected = true;
       }
     } else j.charge = Math.max(0, j.charge - dt);
@@ -259,17 +427,15 @@ export function stepWorld(
   if (w.spawn <= 0) {
     const fromLeft = random(w) > 0.5;
     const settings = levels[w.level - 1];
-    const kind =
-      w.level === 1
-        ? 0
-        : w.level === 3 && random(w) > 0.55
-          ? 2
-          : random(w) > 0.45
-            ? 1
-            : 0;
+    const area = (w.level - 1) % 3;
+    const roster =
+      area === 0 ? [0, 0, 4] : area === 1 ? [1, 3, 0, 1] : [2, 1, 3, 4];
+    const kind = roster[w.hazardIndex++ % roster.length];
+    const position = random(w);
+    const lane = Math.floor(position * ROAD_LANES.length);
     w.traffic.push({
       x: fromLeft ? -60 : 860,
-      y: 90 + random(w) * (H - 265),
+      y: kind === 0 || kind === 4 ? ROAD_LANES[lane] : 90 + position * (H - 265),
       vx: (fromLeft ? 1 : -1) * settings.speed,
       kind,
     });
@@ -280,12 +446,32 @@ export function stepWorld(
     }
     if (kind === 2)
       Object.assign(hazard, {
-        x: 65 + random(w) * 670,
+        x:
+          w.leg > 1
+            ? Math.max(65, Math.min(W - 65, w.x))
+            : 65 + random(w) * 670,
         y: 60,
         vx: 0,
         vy: 195,
         warning: 1.25,
       });
+    if (kind === 2) events.warning = true;
+    if (kind === 3) {
+      const x = 120 + random(w) * (W - 240);
+      Object.assign(hazard, {
+        x,
+        originX: x,
+        y: 60,
+        vx: 0,
+        vy: 110 + w.leg * 12,
+        phase: 0,
+        warning: 0.9,
+      });
+      events.warning = true;
+    }
+    if (kind === 4) hazard.vx *= 0.65;
+    if (area === 0 && w.leg > 1 && kind === 0)
+      w.traffic.push({ ...hazard, y: ROAD_LANES[(lane + 1) % ROAD_LANES.length] });
     w.spawn = settings.interval;
   }
   for (const t of w.traffic) {
@@ -296,11 +482,16 @@ export function stepWorld(
     t.x += t.vx * dt;
     if (t.kind === 1 && t.originY !== undefined) {
       t.phase = (t.phase || 0) + dt * 2.4;
-      t.y = t.originY + Math.sin(t.phase) * 38;
+      t.y = t.originY + Math.sin(t.phase) * (w.leg > 1 ? 75 : 38);
     }
     if (t.vy) t.y += t.vy * dt;
+    if (t.kind === 3 && t.originX !== undefined) {
+      t.phase = (t.phase || 0) + dt * 2;
+      t.x = t.originX + Math.sin(t.phase) * 70;
+    }
+    const collisionWidth = t.kind === 4 ? 70 : t.kind === 3 ? 38 : 48;
     if (
-      Math.abs(t.x - w.x) < 48 &&
+      Math.abs(t.x - w.x) < collisionWidth &&
       Math.abs(t.y - w.y) < 28 &&
       w.effects.repulsor > 0
     ) {
@@ -310,7 +501,7 @@ export function stepWorld(
       events.deflected = true;
     } else if (
       !w.shield &&
-      Math.abs(t.x - w.x) < 48 &&
+      Math.abs(t.x - w.x) < collisionWidth &&
       Math.abs(t.y - w.y) < 28
     ) {
       w.lives--;
@@ -320,13 +511,10 @@ export function stepWorld(
     }
   }
   w.traffic = w.traffic.filter((t) => t.x > -100 && t.x < 900 && t.y < H + 60);
-  if (w.time <= 0 || w.lives <= 0) {
-    w.over = true;
-    // Picked-up items still count at the end; delivering full loads earns bonuses.
-    w.score += w.cargo * 100;
-    w.delivered += w.cargo;
-    w.cargo = 0;
-    w.notice = 'Shift complete. Hello, space!';
+  if (w.lives <= 0 || (w.time <= 0 && w.leg >= MAX_LEGS)) finishWorld(w);
+  else if (w.time <= 0) {
+    w.docked = true;
+    w.notice = 'Shift complete. Finish here or upgrade for another minute.';
   }
   return events;
 }

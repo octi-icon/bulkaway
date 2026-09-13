@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import Link from '@/components/site-link';
+import Image from '@/components/site-image';
 import {
   ArrowDown,
   ArrowLeft,
@@ -17,8 +17,20 @@ import {
   Trophy,
   Volume2,
   VolumeX,
+  Zap,
+  Package,
+  ScanLine,
 } from 'lucide-react';
-import { readBest, levels } from '@/lib/arcade-engine';
+import {
+  readBest,
+  levels,
+  upgrades,
+  chassis,
+  capacity,
+  junkTypes,
+  type Chassis,
+  type Upgrade,
+} from '@/lib/arcade-engine';
 import {
   createArcadeAudio,
   type ArcadeAudio,
@@ -29,27 +41,40 @@ import { CalmArcade } from '@/components/calm-arcade';
 import type { Cleanup } from '@/lib/arcade-calm';
 import '@/app/arcade/arcade.css';
 
-const bestKey = 'bulk-away-arcade-best-v2';
+const bestKey = 'bulk-away-arcade-best-v4';
 const empty: ArcadeReadout = {
   score: 0,
   cargo: 0,
+  chassis: 'lifter',
   lives: 3,
-  time: 75,
+  time: 60,
   delivered: 0,
   notice: 'Ready for lift-off.',
   level: 1,
   levelIntro: 0,
   effects: { split: 0, repulsor: 0 },
   launchReady: false,
+  leg: 1,
+  upgrades: [],
+  dashCooldown: 0,
 };
-type Phase = 'ready' | 'loading' | 'playing' | 'paused' | 'calm' | 'finished';
+type Phase =
+  | 'ready'
+  | 'loading'
+  | 'playing'
+  | 'paused'
+  | 'docked'
+  | 'calm'
+  | 'finished';
 
 export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
   const CabinetTitle = embedded ? 'h2' : 'h1';
-  const CabinetBase = embedded ? 'details' : 'div';
+  const CabinetBase = 'details';
   const [phase, setPhase] = useState<Phase>('ready');
+  const [build, setBuild] = useState<Chassis>('lifter');
   const [hud, setHud] = useState(empty);
   const [best, setBest] = useState(0);
+  const [extendedBest, setExtendedBest] = useState(0);
   const [storageNote, setStorageNote] = useState(
     'Personal best stays on this device. No account needed.',
   );
@@ -59,10 +84,13 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
   const [cleanupRun, setCleanupRun] = useState(0);
   const [copied, setCopied] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const cabinet = useRef<HTMLElement>(null);
+  const alignOnStart = useRef(false);
   const runtime = useRef<ArcadeRuntime | null>(null);
   const ticket = useRef(0);
   const result = useRef<HTMLHeadingElement>(null);
   const resumeButton = useRef<HTMLButtonElement>(null);
+  const dockTitle = useRef<HTMLHeadingElement>(null);
   const audio = useRef<AudioContext | null>(null);
   const audioFx = useRef<ArcadeAudio | null>(null);
   const soundOn = useRef(false);
@@ -70,6 +98,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     const frame = requestAnimationFrame(() => {
       try {
         setBest(readBest(localStorage.getItem(bestKey)));
+        setExtendedBest(readBest(localStorage.getItem(`${bestKey}-extended`)));
       } catch {
         setStorageNote(
           'Your browser blocked storage. Scores last for this visit.',
@@ -87,19 +116,34 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     };
   }, []);
   useEffect(() => {
-    if (phase === 'playing') canvas.current?.focus({ preventScroll: true });
+    if (phase === 'playing') {
+      canvas.current?.focus({ preventScroll: true });
+      if (alignOnStart.current) {
+        alignOnStart.current = false;
+        const bounds = cabinet.current?.getBoundingClientRect();
+        if (bounds && (bounds.bottom > window.innerHeight || bounds.top < 0))
+          window.scrollTo({
+            top: window.scrollY + bounds.top - 8,
+            behavior: 'instant',
+          });
+      }
+    }
     if (phase === 'finished') result.current?.focus({ preventScroll: true });
     if (phase === 'paused')
       resumeButton.current?.focus({ preventScroll: true });
+    if (phase === 'docked') dockTitle.current?.focus({ preventScroll: true });
   }, [phase]);
   function finish(value: ArcadeReadout, easy = false) {
     setHud(value);
     setPhase('finished');
     if (!easy) {
-      setBest((previous) => Math.max(previous, value.score));
+      const key = value.leg > 1 ? `${bestKey}-extended` : bestKey;
+      (value.leg > 1 ? setExtendedBest : setBest)((previous) =>
+        Math.max(previous, value.score),
+      );
       try {
-        const saved = readBest(localStorage.getItem(bestKey));
-        localStorage.setItem(bestKey, String(Math.max(saved, value.score)));
+        const saved = readBest(localStorage.getItem(key));
+        localStorage.setItem(key, String(Math.max(saved, value.score)));
       } catch {
         setStorageNote(
           'Your browser blocked storage. Scores last for this visit.',
@@ -109,6 +153,15 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
   }
   function tone(kind: ArcadeSound) {
     audioFx.current?.play(kind);
+  }
+  function resumeAudio() {
+    if (soundOn.current && audio.current?.state === 'suspended') {
+      void audio.current.resume().catch(() => {
+        soundOn.current = false;
+        audioFx.current?.setEnabled(false);
+        setSound(false);
+      });
+    }
   }
   function toggleSound() {
     const next = !soundOn.current;
@@ -130,25 +183,35 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     }
   }
   async function start() {
+    resumeAudio();
     runtime.current?.destroy();
     runtime.current = null;
     const current = ++ticket.current;
     setCalm(false);
     setError('');
     setCopied(false);
-    setHud(empty);
+    setHud({ ...empty, chassis: build });
+    alignOnStart.current = true;
     setPhase('loading');
     try {
       const { startArcade } = await import('@/lib/arcade-runtime');
       if (current !== ticket.current || !canvas.current) return;
-      runtime.current = startArcade(canvas.current, {
-        update: setHud,
-        finish: (value) => finish(value),
-        pause: () => setPhase('paused'),
-        sound: tone,
-        beam: (value) => audioFx.current?.beam(value),
-        silence: () => audioFx.current?.silence(),
-      });
+      runtime.current = startArcade(
+        canvas.current,
+        {
+          update: setHud,
+          finish: (value) => finish(value),
+          pause: () => setPhase('paused'),
+          dock: (value) => {
+            setHud(value);
+            setPhase('docked');
+          },
+          sound: tone,
+          beam: (value) => audioFx.current?.beam(value),
+          silence: () => audioFx.current?.silence(),
+        },
+        build,
+      );
       setPhase('playing');
       canvas.current.focus({ preventScroll: true });
     } catch {
@@ -185,9 +248,14 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     setPhase('paused');
   }
   function resume() {
+    resumeAudio();
     setPhase('playing');
     canvas.current?.focus({ preventScroll: true });
     runtime.current?.resume();
+  }
+  function chooseUpgrade(choice: Upgrade) {
+    resumeAudio();
+    if (runtime.current?.upgrade(choice)) setPhase('playing');
   }
   function reset() {
     ++ticket.current;
@@ -199,11 +267,15 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     setError('');
   }
   const active = phase === 'playing' || phase === 'paused';
+  const inFlight = active || phase === 'docked';
+  const currentBest = hud.leg > 1 ? extendedBest : best;
   return (
     <section
+      ref={cabinet}
       className={`arcade-cabinet${embedded ? ' arcade-embedded' : ''}`}
       aria-label="Space Reclaimed arcade machine"
       data-arcade
+      data-phase={phase}
     >
       <div className="cabinet-marquee">
         <span className="cabinet-brand">Bulk Away presents</span>
@@ -221,7 +293,9 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
           </span>
           <span>
             {calm ? 'Delivered' : 'Cargo'}{' '}
-            <strong>{calm ? `${hud.delivered}/12` : `${hud.cargo}/5`}</strong>
+            <strong>
+              {calm ? `${hud.delivered}/12` : `${hud.cargo}/${capacity(hud)}`}
+            </strong>
           </span>
           <span>
             {calm ? 'Pace' : 'Time'}{' '}
@@ -232,7 +306,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
             <strong>{calm ? `${hud.cargo}/3` : hud.lives}</strong>
           </span>
         </div>
-        {!calm && active && (
+        {!calm && inFlight && (
           <div className="arcade-mission">
             <div
               className="arcade-level-line"
@@ -241,9 +315,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
               aria-atomic="true"
             >
               <strong>
-                {active || phase === 'finished'
-                  ? `Level ${hud.level} / 3 · ${levels[hud.level - 1].name}`
-                  : '3 levels. One out-of-this-world shift.'}
+                {`Level ${hud.level} · ${levels[hud.level - 1].name}`}
               </strong>
             </div>
             <div className="arcade-power-rack" aria-label="Power-up status">
@@ -253,11 +325,13 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
               >
                 <b aria-hidden="true">B</b>
                 <span>
-                  Split
+                  {hud.upgrades.includes('beam') ? 'Twin' : 'Split'}
                   <small>
                     {hud.effects.split > 0
                       ? `${Math.ceil(hud.effects.split)}s`
-                      : 'Find B'}
+                      : hud.upgrades.includes('beam')
+                        ? 'Installed'
+                        : 'Find B'}
                   </small>
                 </span>
               </span>
@@ -296,6 +370,19 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                   </small>
                 </span>
               </button>
+              {hud.upgrades.includes('drive') && (
+                <button
+                  className="arcade-dash"
+                  onPointerDown={(e) => e.preventDefault()}
+                  onClick={() => runtime.current?.dash()}
+                  disabled={phase !== 'playing' || hud.dashCooldown > 0}
+                >
+                  <Zap size={16} aria-hidden="true" />{' '}
+                  {hud.dashCooldown > 0
+                    ? `Dash · ${Math.ceil(hud.dashCooldown)}s`
+                    : 'Dash · Shift'}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -303,28 +390,44 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
           <canvas
             ref={canvas}
             className="arcade-canvas"
-            tabIndex={active ? 0 : -1}
+            tabIndex={phase === 'playing' ? 0 : -1}
             aria-label="UFO cleanup playfield. Use arrow keys or W A S D to move. Hover above junk to collect. Fly over lettered capsules for power-ups. Space launches cargo with an H charge. Bring cargo to the truck at the bottom. P or Escape pauses."
             aria-describedby="arcade-instructions"
-            hidden={!active}
+            hidden={!inFlight}
           >
             Use the untimed cleanup mode below for a game with text-based
             controls.
           </canvas>
           {(phase === 'ready' || phase === 'loading') && (
             <div className="arcade-title-screen">
-              <Image
-                className="arcade-saucer"
-                src="/arcade/saucer.svg"
-                width="174"
-                height="102"
-                alt=""
-              />
-              <h2>
-                Earth has a<br />
-                <em>clutter problem.</em>
-              </h2>
-              <p>You have a tractor beam. And a few new tricks.</p>
+              <h2>Choose your UFO.</h2>
+              <fieldset
+                className="arcade-chassis"
+                disabled={phase === 'loading'}
+              >
+                <legend className="sr-only">Starting chassis</legend>
+                {(Object.keys(chassis) as Chassis[]).map((id) => (
+                  <label key={id} data-selected={build === id}>
+                    <Image
+                      src={`/arcade/chassis-${id}.svg`}
+                      width={64}
+                      height={38}
+                      alt=""
+                    />
+                    <span>
+                      <strong>{chassis[id].name}</strong>
+                      <small>{chassis[id].tip}</small>
+                    </span>
+                    <input
+                      type="radio"
+                      name="arcade-chassis"
+                      value={id}
+                      checked={build === id}
+                      onChange={() => setBuild(id)}
+                    />
+                  </label>
+                ))}
+              </fieldset>
               <button
                 className="arcade-start"
                 onClick={start}
@@ -333,7 +436,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                 <Play size={20} aria-hidden="true" />
                 {phase === 'loading'
                   ? 'Preparing for lift-off…'
-                  : 'Start a 75-second shift'}
+                  : 'Start a 1-minute shift'}
               </button>
               <button
                 className="arcade-text-button"
@@ -343,8 +446,51 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                 Play untimed cleanup instead
               </button>
               <span className="arcade-screen-note">
-                75 seconds. Three levels. Grab B, R &amp; H power-ups.
+                Play a minute. Upgrade for more. Up to 3 minutes per run.
               </span>
+            </div>
+          )}
+          {phase === 'docked' && (
+            <div
+              className="arcade-upgrade-screen"
+              aria-labelledby="arcade-dock-title"
+            >
+              <h2 id="arcade-dock-title" ref={dockTitle} tabIndex={-1}>
+                Nice haul. Go again?
+              </h2>
+              <p>Pick an upgrade for another minute. Repair one shield.</p>
+              <div className="arcade-upgrade-options">
+                {(Object.keys(upgrades) as Upgrade[])
+                  .filter((key) => !hud.upgrades.includes(key))
+                  .map((key) => {
+                    const Icon =
+                      key === 'beam'
+                        ? ScanLine
+                        : key === 'hold'
+                          ? Package
+                          : Zap;
+                    return (
+                      <button key={key} onClick={() => chooseUpgrade(key)}>
+                        <Icon size={22} aria-hidden="true" />
+                        <span>
+                          <strong>{upgrades[key].name}</strong>
+                          <small>
+                            {key === 'hold'
+                              ? `Carry ${capacity(hud) + 3} items. Make fewer trips to the truck.`
+                              : upgrades[key].tip}
+                          </small>
+                        </span>
+                        <ArrowRight size={18} aria-hidden="true" />
+                      </button>
+                    );
+                  })}
+              </div>
+              <button
+                className="arcade-text-button"
+                onClick={() => runtime.current?.finish()}
+              >
+                Finish &amp; get my 5% reward
+              </button>
             </div>
           )}
           {phase === 'paused' && (
@@ -360,7 +506,10 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                 <Play size={18} aria-hidden="true" />
                 Resume shift
               </button>
-              <button className="arcade-text-button" onClick={reset}>
+              <button
+                className="arcade-text-button"
+                onClick={() => runtime.current?.finish()}
+              >
                 End this run
               </button>
             </div>
@@ -470,7 +619,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
         <div className="arcade-deck-actions">
           {!calm && (
             <button
-              className="arcade-round-button"
+              className="arcade-round-button arcade-pause-button"
               onPointerDown={(event) => event.preventDefault()}
               onClick={phase === 'paused' ? resume : pause}
               disabled={!active}
@@ -520,19 +669,22 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
               </>
             ) : (
               <>
-                Your arcade best<strong>{best.toLocaleString()}</strong>
+                {hud.leg > 1 ? 'Extended best' : '1-minute best'}
+                <strong>{currentBest.toLocaleString()}</strong>
               </>
             )}
           </span>
         </div>
       </div>
       <CabinetBase className="cabinet-base">
-        {embedded && (
+        {
           <summary>
             How to play &amp; options{' '}
-            <span className="embedded-best">Best: {best.toLocaleString()}</span>
+            <span className="embedded-best">
+              Best: {currentBest.toLocaleString()}
+            </span>
           </summary>
-        )}
+        }
         <div id="arcade-instructions" className="arcade-instructions">
           {calm ? (
             <p>
@@ -549,11 +701,38 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
               </p>
               <p>
                 <strong>Collect.</strong> Hover just above junk. Your beam works
-                automatically. Carry up to 5 items.
+                automatically. Scout flies fastest with 4 slots; Hauler flies
+                slower with 7; Lifter carries 5 and lifts in 20% less time.
+                Cargo Bay adds 3 slots to your chosen chassis.
               </p>
               <p>
                 <strong>Haul.</strong> Drop loads at the truck below. Full loads
-                earn a bonus. Dodge traffic marked !.
+                earn 100 bonus points. Bigger items take longer to lift and earn
+                more. Each uses one slot; points bank on delivery, and cargo
+                still aboard is credited when your run ends. Dodge traffic
+                marked !.
+              </p>
+              <table className="arcade-item-values">
+                <caption>Item rewards &amp; lift time</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Points</th>
+                    <th scope="col">Seconds*</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {junkTypes.map((item) => (
+                    <tr key={item.name}>
+                      <th scope="row">{item.name}</th>
+                      <td>{item.points}</td>
+                      <td>{item.seconds}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="arcade-item-footnote">
+                *Scout / Hauler timing. Lifter needs 20% less time.
               </p>
               <p>
                 <strong>Power up.</strong> Fly directly over a lettered capsule.
@@ -563,11 +742,17 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                 cargo to unload anywhere. Save it for a full load!
               </p>
               <p>
-                <strong>Level up.</strong> Every 25 seconds, a new area opens.
-                Neighborhood Sweep has passing cars; Commercial Chaos adds
-                swooping UFOs; Orbital Rush brings falling debris. Move out of
-                marked warning columns before debris drops. Each new level
-                clears nearby hazards and gives two seconds of protection.
+                <strong>Level up.</strong> Every 20 seconds, a new area opens.
+                Neighborhood Sweep has cars and slower, wider haulers;
+                Commercial Chaos adds swooping UFOs and drones that weave
+                downward after an entry warning; Orbital Rush brings falling
+                debris. Move out of marked warning columns before debris drops.
+                Each new level clears nearby hazards and gives two seconds of
+                protection. After a minute, finish for your reward or choose a
+                permanent upgrade and another minute. Extend twice for nine
+                areas in three minutes. Later routes add convoys, wider UFO
+                patrols, and debris aimed at your last position. Ion Dash uses
+                Shift or the Dash button and recharges in six seconds.
               </p>
             </>
           )}
@@ -586,13 +771,16 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
           </button>
         </div>
         <p className="arcade-storage-note">
-          {storageNote} Records are for this three-level edition. Untimed
-          cleanup doesn’t change the arcade record.{' '}
+          {storageNote} One-minute best: {best.toLocaleString()}. Extended best:{' '}
+          {extendedBest.toLocaleString()}. Untimed cleanup doesn’t change the
+          arcade record.{' '}
           <button
             onClick={() => {
               setBest(0);
+              setExtendedBest(0);
               try {
                 localStorage.removeItem(bestKey);
+                localStorage.removeItem(`${bestKey}-extended`);
                 setStorageNote('Personal best cleared from this device.');
               } catch {
                 setStorageNote(

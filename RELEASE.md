@@ -21,11 +21,12 @@ The service binds to Render's `PORT` on `0.0.0.0`. The Blueprint selects a paid 
 | Variable | Set in Render |
 | --- | --- |
 | `SMTP_PASS` | Google app password for `mailer@wsitrashvalet.com`; never put it in Git |
+| `GOOGLE_MAPS_SERVER_KEY` | Separate Geocoding API key restricted to the Render service’s outbound IP ranges; required before requests can be accepted |
 | `GOOGLE_MAPS_BROWSER_KEY` | Your website-restricted Google Maps/Places browser key; manual entry works without it |
 | `SITE_URL` | Leave unset for the Render preview; set to the exact primary HTTPS domain when connecting it |
 | `PUBLIC_LAUNCH` | `false` while reviewing; change to `true` when ready for indexing |
 
-The Blueprint already sets `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_USER=mailer@wsitrashvalet.com`, `NODE_VERSION`, `NODE_ENV`, and `HOST`. Do not override `PORT`. The crew receives requests at `service@bulkaway.com`; the customer is Reply-To, not an automatic email recipient.
+The Blueprint already sets `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_USER=mailer@wsitrashvalet.com`, `NODE_VERSION`, `NODE_ENV`, and `HOST`. Do not override `PORT`. The crew receives requests at `service@bulkaway.com`, with the customer as Reply-To. After that message is accepted, the customer receives a separate branded acknowledgment with the service mailbox as Reply-To. Both use the existing authenticated sender; no additional email environment variables are required. Customer-copy failures preserve the successful request reference and do not resend the crew message.
 
 Authorize the Render hostname and final domain in your Google key's HTTP referrer restrictions. Enable Maps JavaScript API and Places API (New), with billing enabled. The key is browser-visible by design; the SMTP password is server-only.
 
@@ -47,13 +48,13 @@ Authorize the Render hostname and final domain in your Google key's HTTP referre
 
 ## Repeatable checks and rollback
 
-From `website/`, run `npm ci --include=dev` and `npm run check:release`. The latter runs lint, types, unit tests, a production build, and an isolated production HTTP check on port 8791. That check clears email credentials, rejects invalid requests, and stops its server afterward. GitHub Actions runs the same release command on pushes and pull requests.
+From `website/`, run `npm ci --include=dev`, `npx playwright install chromium`, and `npm run check:release`. The release command runs lint, generated route types, domain tests, Vitest/Testing Library, a React Router production build, production HTTP checks on port 8791, and Playwright/axe browser journeys on port 8793. That check clears email credentials, rejects invalid requests, and stops its server afterward. GitHub Actions installs Chromium and runs the same release command on pushes and pull requests. The Render Blueprint sets `autoDeployTrigger: checksPass`; for an existing manually configured service, select “After CI Checks Pass” in its auto-deploy settings.
 
 Run `npm audit --omit=dev` when preparing a release. Keep `package-lock.json` committed and use `npm ci` in Render; do not replace it with an unpinned install.
 
 If a deploy regresses, use Render's rollback to the last successful deploy, then revert the source change and run the checks before redeploying. Environment-variable changes may need to be reverted separately. The [health check](https://render.com/docs/health-checks) establishes that the web server responds; it does not authenticate Google SMTP.
 
-## Preparation verification — September 8, 2026
+## Historical preparation verification — September 8, 2026
 
 Verified from an isolated export of the staged files with a fresh locked dependency install on Node 24.19.0 (Windows): lint, TypeScript, all 38 tests, the standalone production build, and production HTTP checks passed. Those checks include the home/privacy/SMS/arcade pages, deferred homepage game, artwork/fonts/sprites, compression and cache behavior, branded 404s, and invalid form/photo requests. The production dependency audit reported zero known vulnerabilities. The GitHub Actions workflow is prepared for Linux; it has not run remotely yet.
 
@@ -63,4 +64,4 @@ SMTP delivery and Google address selection still require the deployed-environmen
 
 The Git ignore rules exclude credentials, caches, build output, local tooling metadata, and the owner's raw artwork/fonts/private reference folder. All optimized assets required by the site are included under `website/public/`. Source and verification documentation remain included. Nothing in the private reference folder is edited or uploaded by this preparation.
 
-After reviewing the staged files, create the initial commit, connect your chosen remote, and push `main`. No remote repository or deployment is assumed.
+After reviewing and committing the changes, push to the existing GitHub repository. This migration does not create another Render service or automatically change the existing service settings.

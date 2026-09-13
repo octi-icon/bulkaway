@@ -1,0 +1,11 @@
+/* Generous topic boundaries; headings stay grouped with their own content. */
+.home > :global(.section-pad) { padding-block: 128px; }
+.home > :global(.services) { padding-top: 96px; padding-bottom: 96px; }
+.home > :global(.about) { padding-bottom: 104px; }
+.home > :global(.family) { padding-block: 112px; }
+.home > :global(.arcade-invitation) { padding-block: 64px; }
+@media (max-width: 760px) {
+  .home > :global(.section-pad) { padding-block: 104px; }
+  .home > :global(.services), .home > :global(.about) { padding-bottom: 80px; }
+  .home > :global(.arcade-invitation) { padding-block: 56px; }
+}
