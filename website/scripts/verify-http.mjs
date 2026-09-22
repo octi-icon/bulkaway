@@ -23,9 +23,9 @@ for (const [page, html] of [
 for (const destination of [
   '/services',
   '/team',
-  '/#how-it-works',
-  '/#about',
-  '/#pickup-request',
+  '/how-it-works',
+  '/about',
+  '/pickup',
 ]) {
   assert.ok(
     teamHtml.includes(`href="${destination}"`),

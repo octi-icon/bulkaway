@@ -516,7 +516,7 @@ strong {
   max-width: 470px;
 }
 .services h2 em,
-.about h2 em,
+.about :is(h1, h2) em,
 .faq h2 em,
 .family h2 em {
   color: #697d20;
@@ -647,10 +647,26 @@ strong {
   justify-content: space-between;
   margin-bottom: 48px;
 }
-.how-heading h2 {
+.how-heading :is(h1, h2) {
   font-size: 3.8rem;
 }
-.how-heading h2 br {
+.how-heading h1 em {
+  color: inherit;
+  white-space: normal;
+}
+.about-copy h1 em,
+.request-copy h1 em {
+  white-space: normal;
+}
+.about-grid > * {
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  main > .about:only-child .about-copy {
+    order: -1;
+  }
+}
+.how-heading :is(h1, h2) br {
   display: none;
 }
 .how-heading p {
@@ -718,7 +734,7 @@ strong {
   font-size: 3.8rem;
   margin-top: 8px;
 }
-.about-copy h2 {
+.about-copy :is(h1, h2) {
   font-size: 3.6rem;
 }
 .about-copy p {
@@ -737,10 +753,10 @@ strong {
   grid-template-columns: 0.85fr 1.15fr;
   gap: 90px;
 }
-.request-copy h2 {
+.request-copy :is(h1, h2) {
   font-size: 4.8rem;
 }
-.request-copy h2 em {
+.request-copy :is(h1, h2) em {
   color: var(--gold);
 }
 .request-copy > p {
@@ -1126,10 +1142,10 @@ footer {
   .about-sign > em {
     font-size: 3.2rem;
   }
-  .about-copy h2 {
+  .about-copy :is(h1, h2) {
     font-size: 3.1rem;
   }
-  .request-copy h2 {
+  .request-copy :is(h1, h2) {
     font-size: 4rem;
   }
   .steps {
@@ -1327,7 +1343,7 @@ footer {
     display: block;
     margin-bottom: 30px;
   }
-  .how-heading h2 {
+  .how-heading :is(h1, h2) {
     font-size: 3rem;
   }
   .how-heading p {
@@ -1372,7 +1388,7 @@ footer {
     height: 55px;
     margin-bottom: 18px;
   }
-  .about-copy h2 {
+  .about-copy :is(h1, h2) {
     font-size: 3.2rem;
   }
   .about-copy p {
@@ -1382,7 +1398,7 @@ footer {
     grid-template-columns: 1fr;
     gap: 38px;
   }
-  .request-copy h2 {
+  .request-copy :is(h1, h2) {
     font-size: 4rem;
   }
   .request-copy > p {

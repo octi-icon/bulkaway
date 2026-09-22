@@ -121,7 +121,11 @@ const prepTips = [
   ['The route', 'Note stairs, gates, and where the items are.'],
   ['The snapshot', 'Consider a photo of the pile. Photos are optional.'],
 ];
-export function PreflightCheck() {
+export function PreflightCheck({
+  requestHref = '#request',
+}: {
+  requestHref?: string;
+}) {
   const [checked, setChecked] = useState<number[]>([]);
   const ready = checked.length === prepTips.length;
   return (
@@ -174,7 +178,7 @@ export function PreflightCheck() {
           <p className="prep-note">
             No heavy lifting needed. This checklist and photos are optional.
           </p>
-          <a className="text-link" href="#request">
+          <a className="text-link" href={requestHref}>
             Start my request <ArrowUpRight size={18} aria-hidden="true" />
           </a>
           <button

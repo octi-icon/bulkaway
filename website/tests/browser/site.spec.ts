@@ -42,6 +42,9 @@ async function dismissPrivacy(page: import('@playwright/test').Page) {
 for (const path of [
   '/',
   '/services',
+  '/about',
+  '/how-it-works',
+  '/pickup',
   '/team',
   '/arcade',
   '/privacy',
@@ -124,6 +127,17 @@ test('team filter and before-after choices work after client navigation', async 
   await expect(page.locator('#crew-directory article:visible')).toHaveCount(5);
   await page.getByRole('button', { name: 'Business & operations' }).click();
   await expect(page.locator('#crew-directory article:visible')).toHaveCount(4);
+  const nick = page.locator('#nick-loftin');
+  await expect(page.getByRole('region', { name: 'Bulk Away crew.' }).locator('#nick-loftin')).toHaveCount(1);
+  await expect(page.locator('#crew-directory #nick-loftin')).toHaveCount(0);
+  await expect(nick.getByRole('heading', { name: 'Nick Loftin' })).toBeVisible();
+  await expect(nick.getByText('Lead Bulk Technician', { exact: true })).toBeVisible();
+  await nick.getByRole('button', { name: 'Show original photo of Nick Loftin' }).click();
+  await expect(nick.locator('img')).toHaveAttribute('src', '/team/nick-loftin-original-640.webp');
+  await nick.getByRole('button', { name: 'Back to atomic portrait of Nick Loftin' }).click();
+  await expect(nick.locator('img')).toHaveAttribute('src', '/team/nick-loftin-640.webp');
+  await page.getByRole('button', { name: 'Everyone', exact: true }).click();
+  await expect(page.locator('#crew-directory article:visible')).toHaveCount(9);
   await page
     .getByRole('navigation', { name: 'Main navigation' })
     .getByRole('link', { name: 'Services & rates', exact: true })

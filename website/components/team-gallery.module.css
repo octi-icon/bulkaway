@@ -167,6 +167,13 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 36px 28px;
 }
+.crew-field-team {
+  padding-bottom: 48px;
+  border-bottom: 1px solid #a69aae66;
+}
+.crew-field-team .crew-directory-heading {
+  margin-bottom: 30px;
+}
 .crew-person[hidden] {
   display: none;
 }

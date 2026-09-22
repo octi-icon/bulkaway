@@ -94,15 +94,20 @@ export function SiteHeader() {
           >
             Services & rates
           </DraftSafeLink>
-          <a
+          <DraftSafeLink
             onClick={() => setOpen(false)}
-            href={home ? '#how-it-works' : '/#how-it-works'}
+            href="/how-it-works"
+            aria-current={pathname === '/how-it-works' ? 'page' : undefined}
           >
             How it works
-          </a>
-          <a onClick={() => setOpen(false)} href={home ? '#about' : '/#about'}>
+          </DraftSafeLink>
+          <DraftSafeLink
+            onClick={() => setOpen(false)}
+            href="/about"
+            aria-current={pathname === '/about' ? 'page' : undefined}
+          >
             Our story
-          </a>
+          </DraftSafeLink>
           <DraftSafeLink
             onClick={() => setOpen(false)}
             href="/team"
@@ -110,13 +115,14 @@ export function SiteHeader() {
           >
             Meet the team
           </DraftSafeLink>
-          <a
+          <DraftSafeLink
             onClick={() => setOpen(false)}
             className="button button-small"
-            href={home ? '#pickup-request' : '/#pickup-request'}
+            href="/pickup"
+            aria-current={pathname === '/pickup' ? 'page' : undefined}
           >
             Request a pickup <ArrowUpRight size={18} />
-          </a>
+          </DraftSafeLink>
         </nav>
       </div>
     </header>

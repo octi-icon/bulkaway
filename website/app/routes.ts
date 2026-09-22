@@ -1,9 +1,17 @@
 import { type RouteConfig, index, route } from '@react-router/dev/routes';
 export default [
   index('routes/home.tsx'),
-  ...['services', 'team', 'arcade', 'privacy', 'sms', 'request'].map((name) =>
-    route(name, 'routes/' + name + '.tsx'),
-  ),
+  ...[
+    'services',
+    'about',
+    'how-it-works',
+    'team',
+    'arcade',
+    'privacy',
+    'sms',
+    'request',
+  ].map((name) => route(name, 'routes/' + name + '.tsx')),
+  route('pickup', 'routes/pickup-page.tsx'),
   route('api/pickup', 'routes/pickup.ts'),
   route('api/health', 'routes/health.ts'),
   route('robots.txt', 'routes/robots.ts'),

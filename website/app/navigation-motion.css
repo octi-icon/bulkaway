@@ -16,6 +16,9 @@
   text-decoration: underline;
   text-underline-offset: 6px;
 }
+.header-inner nav > a.button[aria-current='page'] {
+  color: var(--ink);
+}
 
 @media (max-width: 900px) {
   .header-inner nav,

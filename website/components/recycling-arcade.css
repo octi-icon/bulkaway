@@ -1,0 +1,214 @@
+.arcade-cabinet[data-phase='recycling']
+  :is(.arcade-hud, .arcade-status, .arcade-dpad, .arcade-pause-button) {
+  display: none;
+}
+.arcade-cabinet[data-phase='recycling'] .arcade-deck-actions {
+  grid-template-columns: 44px;
+}
+.arcade-cabinet[data-phase='finished'][data-recycling-result='true']
+  .arcade-hud {
+  display: none;
+}
+.recycling-bay {
+  padding: 12px;
+  color: var(--cream);
+  background: #17131e;
+  text-align: center;
+}
+.recycling-heading > span {
+  color: var(--lime);
+  font: 700 10px/1.4 monospace;
+  letter-spacing: 0.1em;
+}
+.recycling-heading h2 {
+  font-family: Brookvale, sans-serif;
+  font-size: 30px;
+  line-height: 1.1;
+  margin: 4px 0 10px;
+}
+.recycling-readout {
+  display: flex;
+  justify-content: space-between;
+  border-block: 1px solid #716779;
+  padding: 6px 0;
+  font-size: 11px;
+}
+.recycling-readout b {
+  color: var(--gold);
+  margin-left: 3px;
+}
+.recycling-conveyor {
+  position: relative;
+  overflow: hidden;
+  padding: 7px 0 8px;
+  background: linear-gradient(90deg, #262031, #383043 50%, #262031);
+}
+.recycling-batch {
+  display: block;
+  font: 10px/1.4 monospace;
+  color: #d5cddd;
+}
+.recycling-material {
+  display: block;
+  width: 70px;
+  height: 70px;
+  margin: 2px auto 0;
+  filter: drop-shadow(5px 4px 0 #100d16);
+}
+.recycling-belt {
+  height: 12px;
+  background: repeating-linear-gradient(90deg, #746781 0 5px, #302936 5px 18px);
+  border-block: 3px solid #ad9db9;
+  transform: skewX(-15deg);
+}
+.recycling-conveyor h3 {
+  font: 700 13px/1.35 var(--font-body, sans-serif);
+  margin: 7px 8px 0;
+  min-height: 2.7em;
+  display: grid;
+  place-items: center;
+}
+.recycling-conveyor h3:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+.recycling-bins {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 10px;
+}
+.recycling-bins button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 8px;
+  background: #2b2533;
+  color: var(--cream);
+  border: 2px solid #81728f;
+  border-radius: 3px;
+  box-shadow: inset 0 -4px #1d1727;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+}
+.recycling-bins button[data-bin='aside'] {
+  grid-column: 1 / -1;
+  justify-content: center;
+}
+.recycling-bins svg {
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  fill: #b8d46a;
+  stroke: #17131e;
+  stroke-width: 2px;
+}
+.recycling-bins [data-bin='plastic'] svg {
+  fill: #bacfdc;
+}
+.recycling-bins [data-bin='metal'] svg {
+  fill: #e8c55d;
+}
+.recycling-bins [data-bin='glass'] svg {
+  fill: #d5b6d1;
+}
+.recycling-bins [data-bin='aside'] svg {
+  fill: #f3efd7;
+}
+.recycling-bins kbd {
+  margin-left: auto;
+  font: 11px monospace;
+  color: #cfc5d5;
+}
+.recycling-bins [data-bin='aside'] kbd {
+  margin-left: 8px;
+}
+.recycling-bins button[data-result='correct'] {
+  border-color: var(--lime);
+  background: #354227;
+}
+.recycling-bins button[data-result='retry'] {
+  border-color: var(--gold);
+}
+.recycling-bins button:not([aria-disabled='true']):hover {
+  border-color: var(--cream);
+  background: #42354e;
+}
+.recycling-bins button[aria-disabled='true'] {
+  cursor: default;
+}
+.recycling-bay button:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.recycling-feedback {
+  display: block;
+  min-height: 4.2em;
+  margin: 8px 0;
+  color: var(--cream);
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: left;
+}
+.recycling-next {
+  width: 100%;
+  min-height: 44px;
+  background: var(--lime);
+  color: var(--ink);
+  border: 0;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 13px;
+}
+.recycling-next:disabled {
+  background: #3b3343;
+  color: #bfb4c9;
+  cursor: default;
+}
+.recycling-result {
+  color: var(--lime);
+  font-size: 13px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion='paused']) .recycling-material {
+    animation: recycling-arrive 220ms steps(6) both;
+  }
+  html:not([data-motion='paused'])
+    .recycling-conveyor[data-sorted='true']
+    .recycling-material {
+    animation: recycling-route 260ms steps(6) both;
+  }
+}
+@keyframes recycling-arrive {
+  from {
+    transform: translateX(-90px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes recycling-route {
+  to {
+    transform: translateY(45px) scale(0.5);
+    opacity: 0;
+  }
+}
+@media (max-height: 700px) {
+  .recycling-material {
+    width: 46px;
+    height: 46px;
+  }
+  .recycling-heading h2 {
+    font-size: 26px;
+  }
+  .recycling-bay {
+    padding: 8px;
+  }
+}

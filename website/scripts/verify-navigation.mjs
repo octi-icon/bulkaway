@@ -4,6 +4,9 @@ const origin = process.env.BASE_URL || 'http://127.0.0.1:8788';
 const routes = [
   '/',
   '/services',
+  '/about',
+  '/how-it-works',
+  '/pickup',
   '/team',
   '/privacy',
   '/sms',
@@ -33,13 +36,12 @@ for (const route of routes) {
     1,
     `${route}: one main landmark`,
   );
-  const prefix = route === '/' ? '' : '/';
   for (const destination of [
     '/services',
     '/team',
-    `${prefix}#how-it-works`,
-    `${prefix}#about`,
-    `${prefix}#pickup-request`,
+    '/how-it-works',
+    '/about',
+    '/pickup',
   ]) {
     assert.ok(
       navigation[0].includes(`href="${destination}"`),

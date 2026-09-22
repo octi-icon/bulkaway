@@ -10,7 +10,17 @@ export function loader() {
       .replaceAll('"', '&quot;');
   const entries =
     process.env.PUBLIC_LAUNCH === 'true'
-      ? ['', '/services', '/team', '/arcade', '/privacy', '/sms']
+      ? [
+          '',
+          '/services',
+          '/about',
+          '/how-it-works',
+          '/pickup',
+          '/team',
+          '/arcade',
+          '/privacy',
+          '/sms',
+        ]
           .map((path) => '<url><loc>' + escape(origin + path) + '</loc></url>')
           .join('')
       : '';

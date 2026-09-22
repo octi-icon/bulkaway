@@ -113,7 +113,8 @@ function Portrait({
 }
 
 export function TeamGallery() {
-  const [group, setGroup] = useState<'all' | 'advisory' | 'operations'>('all');
+  const [group, setGroup] = useState<'all' | Person['group']>('all');
+  const visibleCount = people.filter(person => group === 'all' || person.group === group).length;
   return (
     <section
       className={`${styles['crew-section']} section-pad`}
@@ -152,6 +153,20 @@ export function TeamGallery() {
             </Link>
           </div>
         </article>
+        <section className={styles['crew-field-team']} aria-labelledby="bulk-crew-heading">
+          <div className={styles['crew-directory-heading']}>
+            <h2 id="bulk-crew-heading">Bulk Away crew.</h2>
+          </div>
+          <div className={styles['crew-directory']}>
+            <article id="nick-loftin" className={styles['crew-person']}>
+              <Portrait slug="nick-loftin" name="Nick Loftin" />
+              <div className={styles['crew-person-copy']}>
+                <h3>Nick Loftin</h3>
+                <p>Lead Bulk Technician</p>
+              </div>
+            </article>
+          </div>
+        </section>
         <div className={styles['crew-directory-heading']}>
           <h2>A whole team in your corner.</h2>
           <fieldset className={styles['crew-filters']}>
@@ -176,19 +191,16 @@ export function TeamGallery() {
           </fieldset>
         </div>
         <p className={styles['crew-directory-note']}>
-          Roles shown are with Waste Solution Innovators.
+          Advisory board and business roles are with Waste Solution Innovators.
         </p>
         <output className="sr-only">
-          {group === 'all'
-            ? 'Showing all 9 team members.'
-            : group === 'advisory'
-              ? 'Showing 5 advisory board members.'
-              : 'Showing 4 business and operations team members.'}
+          Showing {visibleCount} {group === 'advisory' ? 'advisory board' : group === 'operations' ? 'business and operations team' : 'team'} {visibleCount === 1 ? 'member' : 'members'}.
         </output>
         <div id="crew-directory" className={styles['crew-directory']}>
           {people.map((person) => (
             <article
               key={person.slug}
+              id={person.slug}
               className={styles['crew-person']}
               hidden={group !== 'all' && group !== person.group}
             >

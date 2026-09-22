@@ -8,7 +8,7 @@ import '../team.css';
 export const metadata: Metadata = {
   title: 'Meet the Team | Bulk Away',
   description:
-    'Meet Bulk Away Division Leader Bill Loftin and the Waste Solution Innovators professionals in business development, HR, recruiting, training, project management, and our advisory board.',
+    'Meet Bulk Away Division Leader Bill Loftin, Lead Bulk Technician Nick Loftin, and the Waste Solution Innovators business, operations, and advisory team.',
   alternates: { canonical: '/team' },
   ...socialMetadata(
     'Meet the Team | Bulk Away',
@@ -24,7 +24,7 @@ export default function TeamPage() {
         <TeamGallery />
       </main>
       <footer className="crew-page-footer wrap">
-        <Link className="text-link" href="/#about">
+        <Link className="text-link" href="/">
           <ArrowLeft size={18} aria-hidden="true" /> Back to Bulk Away
         </Link>
         <Link href="/#family">Explore the WSI family of brands</Link>

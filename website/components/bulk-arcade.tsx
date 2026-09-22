@@ -39,6 +39,8 @@ import {
 import type { ArcadeRuntime, ArcadeReadout } from '@/lib/arcade-runtime';
 import { CalmArcade } from '@/components/calm-arcade';
 import type { Cleanup } from '@/lib/arcade-calm';
+import { RecyclingArcade } from '@/components/recycling-arcade';
+import type { SortingRun } from '@/lib/arcade-recycling';
 import '@/app/arcade/arcade.css';
 
 const bestKey = 'bulk-away-arcade-best-v4';
@@ -65,6 +67,7 @@ type Phase =
   | 'paused'
   | 'docked'
   | 'calm'
+  | 'recycling'
   | 'finished';
 
 export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
@@ -83,6 +86,12 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
   const [calm, setCalm] = useState(false);
   const [cleanupRun, setCleanupRun] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [recyclingResult, setRecyclingResult] = useState<SortingRun | null>(
+    null,
+  );
+  const [recyclingReturn, setRecyclingReturn] = useState<'ready' | 'finished'>(
+    'ready',
+  );
   const canvas = useRef<HTMLCanvasElement>(null);
   const cabinet = useRef<HTMLElement>(null);
   const alignOnStart = useRef(false);
@@ -183,6 +192,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     }
   }
   async function start() {
+    setRecyclingResult(null);
     resumeAudio();
     runtime.current?.destroy();
     runtime.current = null;
@@ -223,6 +233,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     }
   }
   function startCalm() {
+    setRecyclingResult(null);
     setCleanupRun((run) => run + 1);
     ++ticket.current;
     runtime.current?.destroy();
@@ -258,6 +269,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     if (runtime.current?.upgrade(choice)) setPhase('playing');
   }
   function reset() {
+    setRecyclingResult(null);
     ++ticket.current;
     runtime.current?.destroy();
     runtime.current = null;
@@ -265,6 +277,16 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
     setCalm(false);
     setHud(empty);
     setError('');
+  }
+  function startRecycling() {
+    resumeAudio();
+    ++ticket.current;
+    runtime.current?.destroy();
+    runtime.current = null;
+    audioFx.current?.silence();
+    setRecyclingReturn(phase === 'finished' ? 'finished' : 'ready');
+    setError('');
+    setPhase('recycling');
   }
   const active = phase === 'playing' || phase === 'paused';
   const inFlight = active || phase === 'docked';
@@ -276,6 +298,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
       aria-label="Space Reclaimed arcade machine"
       data-arcade
       data-phase={phase}
+      data-recycling-result={Boolean(recyclingResult)}
     >
       <div className="cabinet-marquee">
         <span className="cabinet-brand">Bulk Away presents</span>
@@ -448,6 +471,13 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
               <span className="arcade-screen-note">
                 Play a minute. Upgrade for more. Up to 3 minutes per run.
               </span>
+              <button
+                className="arcade-text-button"
+                onClick={startRecycling}
+                disabled={phase === 'loading'}
+              >
+                Play Recycling Bay
+              </button>
             </div>
           )}
           {phase === 'docked' && (
@@ -522,18 +552,34 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
               sound={tone}
             />
           )}
+          {phase === 'recycling' && (
+            <RecyclingArcade
+              sound={tone}
+              onFinish={(value) => {
+                setRecyclingResult(value);
+                setPhase('finished');
+              }}
+            />
+          )}
           {phase === 'finished' && (
             <div className="arcade-finish-screen">
               <Sparkles size={34} aria-hidden="true" />
               <h2 ref={result} tabIndex={-1}>
-                POOF, GONE!
+                {recyclingResult ? 'SORTED. NICE WORK!' : 'POOF, GONE!'}
               </h2>
               <p>
-                {hud.delivered} {hud.delivered === 1 ? 'piece' : 'pieces'} of
-                pixel junk cleared.
+                {recyclingResult
+                  ? `12 materials sorted · ${recyclingResult.score.toLocaleString()} recycling points.`
+                  : `${hud.delivered} ${hud.delivered === 1 ? 'piece' : 'pieces'} of pixel junk cleared.`}
                 <br />
                 Let’s tackle the real stuff.
               </p>
+              {recyclingResult && (
+                <span className="recycling-result">
+                  {recyclingResult.firstTry}/12 first try · Best streak{' '}
+                  {recyclingResult.bestStreak}
+                </span>
+              )}
               <div className="arcade-reward">
                 <strong>5% off</strong>
                 <span>your next removal</span>
@@ -570,6 +616,11 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                   {copied ? 'Code copied' : 'Copy code'}
                 </button>
                 <button onClick={calm ? startCalm : start}>Play again</button>
+                <button onClick={startRecycling}>
+                  {recyclingResult
+                    ? 'Sort another load'
+                    : 'Next stop: Recycling Bay'}
+                </button>
                 <button onClick={reset}>Choose mode</button>
               </div>
               <output className="sr-only">
@@ -579,12 +630,20 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
           )}
         </div>
         <p className="arcade-status" role={active ? undefined : 'status'}>
-          {active
-            ? hud.notice
-            : 'Finish either game mode. Get 5% off your next removal.'}
+          {active ? hud.notice : 'Finish a game. Get 5% off your next removal.'}
         </p>
       </div>
       <div className="cabinet-control-deck">
+        {phase === 'recycling' && (
+          <button
+            className="calm-mode-exit"
+            onClick={() => setPhase(recyclingReturn)}
+          >
+            {recyclingReturn === 'finished'
+              ? 'Back to my reward'
+              : 'Choose mode'}
+          </button>
+        )}
         {!calm && (
           <div className="arcade-dpad" aria-label="Directional controls">
             {(
@@ -646,7 +705,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
             )}
           </button>
           <span>
-            {calm ? (
+            {calm || phase === 'recycling' ? (
               'SOUND'
             ) : (
               <>
@@ -686,7 +745,15 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
           </summary>
         }
         <div id="arcade-instructions" className="arcade-instructions">
-          {calm ? (
+          {phase === 'recycling' || recyclingResult ? (
+            <p>
+              <strong>Sort the salvage.</strong> Choose a material bin or use
+              keys 1–5 while inside the sorting bay, then choose Next item.
+              First-try streaks earn bonus points. Set batteries and plastic
+              bags aside for separate drop-off. These are game sorting streams;
+              local collection rules vary.
+            </p>
+          ) : calm ? (
             <p>
               <strong>Your relaxed route.</strong> Select an item to beam it
               into the three-item hold. Unload whenever you like. When all four
