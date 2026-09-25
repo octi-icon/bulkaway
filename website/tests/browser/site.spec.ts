@@ -126,7 +126,15 @@ test('team filter and before-after choices work after client navigation', async 
     .click();
   await expect(page.locator('#crew-directory article:visible')).toHaveCount(5);
   await page.getByRole('button', { name: 'Business & operations' }).click();
-  await expect(page.locator('#crew-directory article:visible')).toHaveCount(4);
+  await expect(page.locator('#crew-directory article:visible')).toHaveCount(6);
+  const mike = page.locator('#mike-carter');
+  await expect(mike.getByText('Quality Assurance Supervisor', { exact: true })).toBeVisible();
+  await mike.getByRole('button', { name: 'Show original photo of Mike Carter' }).click();
+  await expect(mike.locator('img')).toHaveAttribute('src', '/team/mike-carter-original-640.webp');
+  const mynn = page.locator('#mynn-hawke-van-der-spek');
+  await expect(mynn.getByRole('heading', { name: 'Mynn Hawke-van der Spek' })).toBeVisible();
+  await expect(mynn.getByText('HR Admin Assistant', { exact: true })).toBeVisible();
+  await expect(mynn.locator('img, button')).toHaveCount(0);
   const nick = page.locator('#nick-loftin');
   await expect(page.getByRole('region', { name: 'Bulk Away crew.' }).locator('#nick-loftin')).toHaveCount(1);
   await expect(page.locator('#crew-directory #nick-loftin')).toHaveCount(0);
@@ -135,9 +143,9 @@ test('team filter and before-after choices work after client navigation', async 
   await nick.getByRole('button', { name: 'Show original photo of Nick Loftin' }).click();
   await expect(nick.locator('img')).toHaveAttribute('src', '/team/nick-loftin-original-640.webp');
   await nick.getByRole('button', { name: 'Back to atomic portrait of Nick Loftin' }).click();
-  await expect(nick.locator('img')).toHaveAttribute('src', '/team/nick-loftin-640.webp');
+  await expect(nick.locator('img')).toHaveAttribute('src', '/team/nick-loftin-640.webp?v=atomic-poster-20260924');
   await page.getByRole('button', { name: 'Everyone', exact: true }).click();
-  await expect(page.locator('#crew-directory article:visible')).toHaveCount(9);
+  await expect(page.locator('#crew-directory article:visible')).toHaveCount(11);
   await page
     .getByRole('navigation', { name: 'Main navigation' })
     .getByRole('link', { name: 'Services & rates', exact: true })

@@ -1,64 +1,87 @@
 {
   "origin": "User-supplied headshots, September 11 2026. Kris Watson identity confirmed by user.",
-  "treatment": "AI-edited photographic duotone. Bill portrait establishes cream/lime/gold/plum style; subsequent edits preserve each input identity using Bill only as style reference.",
+  "treatment": "Atomic Poster based on user-approved revised Heather and Regina examples: original pose/build retained, subtle period hair without exaggerated crown volume; varied ivory, charcoal, sage, teal and mustard clothing; printed halftone and weathered paper texture through faces, clothes and backdrops.",
   "exports": "320px and 640px WebP, quality 85, 4:5 north-aligned crop. Originals available on user request in gallery.",
   "portraits": [
     {
       "person": "bill-loftin",
       "source": "Bill Loftin, Principal.jpg",
-      "generatedFile": "exec-4017d2dd-3e09-4b78-8c8c-84a74f1a36c8.png"
+      "generatedFile": "exec-ae7d3041-18e1-4a37-8384-c64a4128a4d9.png",
+      "previousGeneratedFile": "exec-4017d2dd-3e09-4b78-8c8c-84a74f1a36c8.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "andrea-gray",
       "source": "Andrea Gray, Principal.jpg",
-      "generatedFile": "exec-4c23456d-04c9-41ff-b440-bd93635d3208.png"
+      "generatedFile": "exec-8a948c72-c4de-4d59-a0a7-14fcb2edcdb5.png",
+      "previousGeneratedFile": "exec-4c23456d-04c9-41ff-b440-bd93635d3208.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "robert-watson",
       "source": "Robert Watson, Principal.jpg",
-      "generatedFile": "exec-3778c694-a4fa-48aa-b4f6-4c0f87d7d76e.png"
+      "generatedFile": "exec-1f4cca0d-5a24-4b54-9f95-d3a5708689d2.png",
+      "previousGeneratedFile": "exec-3778c694-a4fa-48aa-b4f6-4c0f87d7d76e.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "justin-watson",
       "source": "Justin Watson, Chairman of the Board, Principal.jpg",
-      "generatedFile": "exec-2c757b63-ef2c-4f51-ac91-50a4c5c01f53.png"
+      "generatedFile": "exec-fa365efb-25a5-4819-b8db-c39e6a5c0cbf.png",
+      "previousGeneratedFile": "exec-2c757b63-ef2c-4f51-ac91-50a4c5c01f53.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "shauna-loftin",
       "source": "Shauna Loftin, Principal.jpg",
-      "generatedFile": "exec-9882e90b-3774-40ab-99f6-ba0fd5f11e46.png"
+      "generatedFile": "exec-bc9be456-8d99-4743-bed4-852a625f59f1.png",
+      "previousGeneratedFile": "exec-9882e90b-3774-40ab-99f6-ba0fd5f11e46.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "kris-watson",
       "source": "Kris Watson.jpg",
-      "generatedFile": "exec-898ce956-9e4e-4019-91d7-3ae030fa2d68.png"
+      "generatedFile": "exec-3d759455-961b-46de-a067-3edd468a7aa8.png",
+      "previousGeneratedFile": "exec-898ce956-9e4e-4019-91d7-3ae030fa2d68.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "eddie-carey",
       "source": "Eddie Carey.jpg",
-      "generatedFile": "exec-03676b7b-1897-4161-884e-bb7bdb28781e.png"
+      "generatedFile": "exec-ce0d8003-2b44-4092-8b62-c50c9ab44e91.png",
+      "previousGeneratedFile": "exec-03676b7b-1897-4161-884e-bb7bdb28781e.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "regina-enman",
       "source": "Regina Enman.jpg",
-      "generatedFile": "exec-e3838cab-5cbf-4396-8286-7a6c4e7cdfd7.png"
+      "generatedFile": "exec-fc470533-8030-4f75-8358-9b655be51c9b.png",
+      "previousGeneratedFile": "exec-e3838cab-5cbf-4396-8286-7a6c4e7cdfd7.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "heather-rapallo",
       "source": "Heather Rapallo.jpg",
-      "generatedFile": "exec-37c26cf1-4147-45ff-a535-28d9f07b4147.png"
+      "generatedFile": "exec-5875542e-1b31-4239-862e-b35a7aabc389.png",
+      "previousGeneratedFile": "exec-37c26cf1-4147-45ff-a535-28d9f07b4147.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "skylar-clemons",
       "source": "Skylar Clemons.jpg",
-      "generatedFile": "exec-2de1d33f-84b4-41f2-a050-a3fd6d60472e.png"
+      "generatedFile": "exec-fcddc5ad-91c2-4205-a16a-b1371859841a.png",
+      "previousGeneratedFile": "exec-2de1d33f-84b4-41f2-a050-a3fd6d60472e.png",
+      "updated": "2026-09-24"
     },
     {
       "person": "nick-loftin",
       "source": "codex-clipboard-bc530468-a6ea-4244-80ad-705456b79d6e.png",
-      "generatedFile": "exec-cdf5d887-0f6f-4b8a-81c8-5b509b6d100b.png",
+      "generatedFile": "exec-5075bcbf-ffeb-4cbe-aa0e-e1ad4e116b91.png",
       "added": "2026-09-15",
-      "role": "Lead Bulk Technician, Bulk Away"
+      "role": "Lead Bulk Technician, Bulk Away",
+      "previousGeneratedFile": "exec-cdf5d887-0f6f-4b8a-81c8-5b509b6d100b.png",
+      "updated": "2026-09-24"
     }
-  ]
+  ],
+  "promptSet": "atomic-poster-portraits.json"
 }

@@ -1,5 +1,11 @@
 # Bulk Away team portraits and interaction design
 
+## September 24 art direction update
+
+The owner selected Atomic Poster, then approved revised Heather and Regina examples after requesting closer preservation of original body shapes and less exaggerated hair. All eleven styled portraits now follow that corrected direction: original poses and builds, varied ivory/charcoal/sage/teal/mustard clothing, subtle period styling without raised crown bumps, and printed halftone texture across faces as well as clothing and backdrops. Original-photo controls and the separate Bulk Away crew row remain in place.
+
+This supersedes the photographic duotone direction below. The built-in image-generation tool produced the artwork; Sharp exported the 320/640px WebP delivery variants. Final prompts and source mappings are in `atomic-poster-portraits.json`; current assets are recorded in `team-portrait-assets.json`. Versioned styled-image URLs refresh cached portraits without changing original-photo URLs.
+
 ## Placement refinement
 
 After reviewing the full homepage, the owner found the roster made it too long. The complete gallery now lives at /team, reached through a compact introduction in the existing About section. Portrait interactions remain on that dedicated page; the homepage does not load the gallery images. Bill's portrait loads eagerly on the team page, while directory portraits remain lazy-loaded. This placement supersedes the original inline-homepage placement discussed below.
@@ -49,5 +55,4 @@ The main hero remains the likely initial visual priority, so the team images are
 Acceptance checks cover all ten names and supplied titles, functioning group filters, original-photo toggles, keyboard activation, visible focus, mobile wrapping, missing images, image payload sizes, and reduced-motion behavior. Responsive screenshots should show full heads and readable role labels. Production checks must continue to pass after the new component is included in lint coverage.
 
 There is no evidence supporting invented claims about these individuals, a new corporate reporting structure, or a guaranteed commercial benefit from this treatment. The two identical unnamed clipboard images were confirmed by the site owner as Kris Watson; only one is used. The owner remains the authority on individual likeness and corporate titles.
-
 

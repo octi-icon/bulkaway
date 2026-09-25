@@ -10,6 +10,7 @@ type Person = {
   name: string;
   role: string;
   group: 'advisory' | 'operations';
+  portraitPending?: boolean;
 };
 const people: Person[] = [
   {
@@ -66,6 +67,19 @@ const people: Person[] = [
     role: 'Project Manager',
     group: 'operations',
   },
+  {
+    slug: 'mike-carter',
+    name: 'Mike Carter',
+    role: 'Quality Assurance Supervisor',
+    group: 'operations',
+  },
+  {
+    slug: 'mynn-hawke-van-der-spek',
+    name: 'Mynn Hawke-van der Spek',
+    role: 'HR Admin Assistant',
+    group: 'operations',
+    portraitPending: true,
+  },
 ];
 
 function Portrait({
@@ -78,18 +92,19 @@ function Portrait({
   eager?: boolean;
 }) {
   const [original, setOriginal] = useState(false);
+  const portraitVersion = original ? '' : '?v=atomic-poster-20260924';
   return (
     <div className={styles['crew-portrait']} data-original={original}>
       {/* Pre-sized local WebP variants avoid runtime image processing. */}
       <img
-        src={`/team/${slug}${original ? '-original' : ''}-640.webp`}
-        srcSet={`/team/${slug}${original ? '-original' : ''}-320.webp 320w, /team/${slug}${original ? '-original' : ''}-640.webp 640w`}
+        src={`/team/${slug}${original ? '-original' : ''}-640.webp${portraitVersion}`}
+        srcSet={`/team/${slug}${original ? '-original' : ''}-320.webp${portraitVersion} 320w, /team/${slug}${original ? '-original' : ''}-640.webp${portraitVersion} 640w`}
         sizes="(max-width: 560px) 82vw, (max-width: 900px) 42vw, 400px"
         width={640}
         height={800}
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
-        alt={`${name}${original ? ', original photograph' : ', Bulk Away styled portrait'}`}
+        alt={`${name}${original ? ', original photograph' : ', Bulk Away atomic poster portrait'}`}
       />
       <button
         type="button"
@@ -204,7 +219,14 @@ export function TeamGallery() {
               className={styles['crew-person']}
               hidden={group !== 'all' && group !== person.group}
             >
-              <Portrait slug={person.slug} name={person.name} />
+              {person.portraitPending ? (
+                <div
+                  className={`${styles['crew-portrait']} ${styles['crew-portrait-blank']}`}
+                  aria-hidden="true"
+                />
+              ) : (
+                <Portrait slug={person.slug} name={person.name} />
+              )}
               <div className={styles['crew-person-copy']}>
                 <h3>{person.name}</h3>
                 <p>{person.role}</p>

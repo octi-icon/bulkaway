@@ -254,15 +254,20 @@ export default function Home() {
                 <em>A world of solutions.</em>
               </h2>
               <div className="family-parent">
-                <Image
-                  className="wsi-family-logo"
-                  unoptimized
-                  src="/brand/waste-solution-innovators.png"
-                  alt="Waste Solution Innovators"
-                  width={483}
-                  height={232}
-                  loading="lazy"
-                />
+                <a
+                  href="https://wsi.solutions"
+                  aria-label="Visit Waste Solution Innovators"
+                >
+                  <Image
+                    className="wsi-family-logo"
+                    unoptimized
+                    src="/brand/waste-solution-innovators.png"
+                    alt="Waste Solution Innovators"
+                    width={483}
+                    height={232}
+                    loading="lazy"
+                  />
+                </a>
                 <p>
                   Bulk Away is part of the Waste Solution Innovators family.
                   Different specialties. The same family spirit. Meet the brands
@@ -419,8 +424,8 @@ export default function Home() {
           </span>
           <a
             className="wsi-footer-link"
-            href="#family"
-            aria-label="Meet the Waste Solution Innovators family"
+            href="https://wsi.solutions"
+            aria-label="Visit Waste Solution Innovators"
           >
             <Image
               unoptimized

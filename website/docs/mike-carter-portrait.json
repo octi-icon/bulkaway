@@ -1,0 +1,13 @@
+{
+  "tool": "Built-in image_gen",
+  "source": "G:/My Drive/headshots/Carter_Mike_400-0155-Retouched.jpg",
+  "styleReference": "public/team/regina-enman-640.webp",
+  "generatedFile": "exec-22d5eb2e-baab-4844-9e2c-f8495e6dbc46.png",
+  "exports": [
+    "public/team/mike-carter-320.webp",
+    "public/team/mike-carter-640.webp",
+    "public/team/mike-carter-original-320.webp",
+    "public/team/mike-carter-original-640.webp"
+  ],
+  "prompt": "Use case: identity-preserve / style-transfer. Image 1 is Mike Carter's original photograph, STRICT reference for facial identity, hairline, body shape, pose, shoulder width and clothing silhouette. Image 2 is ONLY the approved Atomic Poster style reference (Regina), not anatomy. Create a single 4:5 team portrait of Mike in exactly that distressed 1960s atomic futurist screenprint style. Preserve Mike's recognizable face, receding slicked-back brown hair with natural low crown, moustache and short beard, eyes, expression, original head angle, shoulder slopes, torso proportions and arms-down pose. Do not slim, broaden, pad shoulders, beautify or invent hair volume. Frame from head to lower torso with comfortable space above hair, as style reference. Keep shirt silhouette from original but turn into a sage/charcoal retro futuristic collared work shirt with restrained ivory asymmetric facing, mustard piping and a tiny gold four-point star emblem; no purple, no suit coat. Use 4-5 ink tones, strongly visible halftone dots across FACE and shirt, worn ink flecks, cream paper grain, drawn printed shading not a smooth photo face pasted in. Cream paper backdrop, lime/sage orbital oval, gold starbursts and a restrained Googie saucer tower at edge matching Image2. Full rectangular opaque background. No text, border, caption, watermark or other people."
+}
