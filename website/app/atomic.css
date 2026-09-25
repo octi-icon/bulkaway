@@ -258,15 +258,17 @@
   );
 }
 .space-seal > span {
+  max-width: 65%;
   font-size: 0.65rem;
-  letter-spacing: 0.1em;
+  line-height: 1.1;
+  letter-spacing: 0.06em;
   font-weight: 700;
 }
 .space-seal > strong {
   font:
     1.8rem/0.95 Brookvale,
     serif;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 .clutter-controls {
   position: absolute;

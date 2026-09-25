@@ -7,6 +7,18 @@ import {
 } from '@/lib/arcade-recycling';
 
 describe('recycling bay', () => {
+  it('rewards proper recycling twice as much as trash and reduces retries without removing cargo', () => {
+    const oneItem = (bin: 'paper' | 'trash') => ({
+      ...createSorting(),
+      queue: [recyclingItems.findIndex((item) => item.bin === bin)],
+    });
+    expect(sortMaterial(oneItem('paper'), 'paper').score).toBe(200);
+    expect(sortMaterial(oneItem('trash'), 'trash').score).toBe(100);
+    const wrong = sortMaterial(oneItem('trash'), 'paper');
+    expect(wrong.score).toBe(0);
+    expect(wrong.sorted).toBe(false);
+    expect(sortMaterial(wrong, 'trash').score).toBe(25);
+  });
   it('keeps each material exactly once and puts special handling in the final batch', () => {
     const run = createSorting(() => 0.5);
     expect(new Set(run.queue).size).toBe(12);
@@ -39,7 +51,8 @@ describe('recycling bay', () => {
     expect(run.finished).toBe(true);
     expect(run.firstTry).toBe(12);
     expect(run.bestStreak).toBe(12);
-    expect(run.score).toBe(2150);
+    expect(run.score).toBe(2950);
+    expect(run.totals).toEqual({ recycling: 7, trash: 3, aside: 2 });
     expect(sortMaterial(run, 'paper')).toBe(run);
     expect(nextMaterial(run)).toBe(run);
   });

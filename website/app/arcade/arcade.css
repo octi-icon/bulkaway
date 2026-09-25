@@ -178,6 +178,19 @@
   font-size: 11px;
   color: var(--muted);
 }
+.arcade-cargo-streams {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 8px;
+  background: #17131e;
+  font: 700 11px/1.2 monospace;
+  color: var(--cream);
+  white-space: nowrap;
+}
+.arcade-cargo-streams span:first-child {
+  color: var(--lime);
+}
 .arcade-status {
   color: var(--cream);
   text-align: center;
@@ -1120,6 +1133,13 @@
   gap: 12px;
   font-size: 13px;
   margin-bottom: 2px;
+}
+.arcade-advance-notice {
+  display: block;
+  min-height: 1.4em;
+  margin: 0 0 3px;
+  font: 11px/1.2 Geograph, sans-serif;
+  color: var(--cream);
 }
 .arcade-level-line > strong {
   line-height: 1.5;

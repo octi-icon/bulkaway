@@ -15,6 +15,10 @@ import {
   dash,
   chassis,
   junkTypes,
+  DELIVERY_DOCKS,
+  deliverCargo,
+  pressureSettings,
+  approachingHazards,
   type Chassis,
 } from './arcade-engine.ts';
 
@@ -79,7 +83,7 @@ void test('three chassis trade speed, capacity and suction; upgrades add to each
   assert.ok(lift(3, 'lifter').seconds < lift(3, 'scout').seconds);
   assert.equal(lift(3, 'hauler').seconds, lift(3, 'scout').seconds);
 });
-void test('a mixed full load banks its actual value once at the truck', () => {
+void test('mixed cargo needs both docks and recycling earns double value once', () => {
   const w = createWorld();
   for (const kind of [0, 3, 2, 4, 5]) {
     w.junk = [{ x: w.x, y: w.y + 70, kind, charge: 0.999 }];
@@ -89,14 +93,59 @@ void test('a mixed full load banks its actual value once at the truck', () => {
   assert.equal(w.cargoValue, 1050);
   assert.equal(w.score, 0);
   w.y = H - 80;
+  w.x = DELIVERY_DOCKS.trash;
+  stepWorld(w, 0.01, 0, 0);
+  assert.equal(w.score, 950);
+  assert.equal(w.cargo, 1);
+  assert.equal(w.recyclingCargo, 1);
+  assert.equal(w.cargoValue, 100);
+  assert.equal(stepWorld(w, 0.01, 0, 0).banked, false);
+  w.x = DELIVERY_DOCKS.recycling;
   stepWorld(w, 0.01, 0, 0);
   assert.equal(w.score, 1150);
+  assert.equal(w.recycled, 1);
+  assert.equal(w.recyclingBonus, 100);
   assert.equal(w.cargoValue, 0);
   assert.equal(w.delivered, 5);
   stepWorld(w, 0.01, 0, 0);
   assert.equal(w.score, 1150);
 });
 
+void test('wrong docks retain recyclable cargo, and express/finish cannot claim its bonus', () => {
+  for (const action of ['launch', 'finish'] as const) {
+    const { w } = lift(6);
+    assert.equal(w.recyclingCargo, 1);
+    const value = w.cargoValue;
+    assert.equal(deliverCargo(w, 'trash'), false);
+    assert.equal(w.cargoValue, value);
+    assert.equal(w.score, 0);
+    w.launchReady = true;
+    if (action === 'launch') launchCargo(w);
+    else finishWorld(w);
+    assert.equal(w.score, value);
+    assert.equal(w.recyclingCargo, 0);
+    assert.equal(w.recyclingValue, 0);
+    assert.equal(w.recyclingBonus, 0);
+    assert.equal(deliverCargo(w, 'recycling'), false);
+    assert.equal(w.score, value);
+  }
+});
+void test('recycling-first unload retains trash across an upgrade and cannot score while docked', () => {
+  const { w } = lift(2);
+  w.cargo++;
+  w.cargoValue += 300;
+  w.docked = true;
+  assert.equal(deliverCargo(w, 'recycling'), false);
+  extendShift(w, 'hold');
+  assert.equal(deliverCargo(w, 'recycling'), true);
+  assert.equal(w.score, 200);
+  assert.equal(w.cargo, 1);
+  assert.equal(w.cargoValue, 300);
+  assert.equal(deliverCargo(w, 'recycling'), false);
+  assert.equal(deliverCargo(w, 'trash'), true);
+  assert.equal(w.score, 500);
+  assert.equal(w.delivered, 2);
+});
 void test('beam requires alignment, collects once, and respects capacity', () => {
   const w = createWorld();
   w.junk = [{ x: 400, y: 170, kind: 2, charge: 0 }];
@@ -108,19 +157,56 @@ void test('beam requires alignment, collects once, and respects capacity', () =>
   assert.equal(w.junk[0].charge, 0);
 });
 
-void test('levels follow elapsed time and transitions give breathing room', () => {
+void test('pressure rises within a level without sudden level events', () => {
   const w = createWorld();
   assert.equal(w.level, 1);
   w.elapsed = 19.99;
   w.traffic = [{ x: w.x, y: w.y, vx: 0, kind: 0 }];
-  assert.equal(stepWorld(w, 0.02, 0, 0).levelChanged, true);
-  assert.equal(w.level, 2);
-  assert.equal(w.traffic.length, 0);
+  assert.equal(stepWorld(w, 0.02, 0, 0).levelChanged, false);
+  assert.equal(w.pressure, 2);
+  assert.equal(w.level, 1);
+  assert.equal(w.traffic.length, 1);
   assert.ok(w.shield > 0);
   assert.equal(stepWorld(w, 0.02, 0, 0).levelChanged, false);
   w.elapsed = 39.99;
-  assert.equal(stepWorld(w, 0.02, 0, 0).levelChanged, true);
-  assert.equal(w.level, 3);
+  assert.equal(stepWorld(w, 0.02, 0, 0).levelChanged, false);
+  assert.equal(w.pressure, 3);
+  assert.equal(w.level, 1);
+});
+void test('hazards are previewed before arriving and spawn speed ramps continuously', () => {
+  assert.equal(approachingHazards(46), '');
+  assert.match(approachingHazards(45), /UFOs/);
+  assert.match(approachingHazards(40.1), /UFOs/);
+  assert.equal(approachingHazards(40), '');
+  assert.match(approachingHazards(25), /Debris/);
+  assert.match(approachingHazards(5), /Shift ending/);
+  assert.equal(approachingHazards(0), '');
+  const before = pressureSettings({ elapsed: 19.99, leg: 1, pressure: 1 });
+  const boundary = pressureSettings({ elapsed: 20, leg: 1, pressure: 2 });
+  const midway = pressureSettings({ elapsed: 25, leg: 1, pressure: 2 });
+  const after = pressureSettings({ elapsed: 30, leg: 1, pressure: 2 });
+  assert.deepEqual(before, boundary);
+  assert.ok(boundary.speed < midway.speed && midway.speed < after.speed);
+  assert.ok(
+    boundary.interval > midway.interval && midway.interval > after.interval,
+  );
+});
+void test('mid-shift escalation preserves the location, traffic and pickup state', () => {
+  const w = createWorld();
+  w.elapsed = 19.99;
+  w.time = 40.01;
+  w.shield = 0;
+  w.spawn = 1;
+  const traffic = { x: 100, y: 245, vx: 95, kind: 0 };
+  w.traffic = [traffic];
+  const junk = w.junk[0];
+  const event = stepWorld(w, 0.02, 0, 0);
+  assert.equal(w.level, 1, 'Location must not change in the middle of a shift');
+  assert.equal(event.levelChanged, false, 'No surprise level sound');
+  assert.ok(w.traffic.includes(traffic), 'Traffic must not vanish');
+  assert.ok(w.junk.includes(junk));
+  assert.equal(w.shield, 0, 'Escalation must not reset protection');
+  assert.ok(Math.abs(w.spawn - 0.98) < 0.001);
 });
 
 void test('repulsor turns collisions into bonuses once, then expires', () => {
@@ -215,8 +301,8 @@ void test('a complete run introduces all hazard types and keeps pickups and traf
   const pickups = new Set<string>();
   for (let i = 0; i < 1501; i++) {
     stepWorld(w, 0.05, 0, 0);
-    if (!seen.has(w.level)) seen.set(w.level, new Set());
-    w.traffic.forEach((t) => seen.get(w.level)!.add(t.kind));
+    if (!seen.has(w.pressure)) seen.set(w.pressure, new Set());
+    w.traffic.forEach((t) => seen.get(w.pressure)!.add(t.kind));
     w.powerups.forEach((p) => pickups.add(p.kind));
     assert.ok(w.traffic.length < 12);
     assert.ok(w.powerups.length <= 2);
@@ -231,16 +317,17 @@ void test('a complete run introduces all hazard types and keeps pickups and traf
   assert.equal(w.docked, true);
   assert.equal(w.over, false);
 });
-void test('truck banks cargo once and rewards a full load', () => {
+void test('truck banks trash once without multiplying delivery rewards', () => {
   const w = createWorld();
   w.y = H - 80;
+  w.x = DELIVERY_DOCKS.trash;
   w.cargo = 5;
   w.cargoValue = 5 * 100;
   assert.equal(stepWorld(w, 0.01, 0, 0).banked, true);
-  assert.equal(w.score, 600);
+  assert.equal(w.score, 500);
   assert.equal(w.delivered, 5);
   stepWorld(w, 0.01, 0, 0);
-  assert.equal(w.score, 600);
+  assert.equal(w.score, 500);
 });
 void test('patrol drones warn before weaving downward and heavy haulers have a wider collision body', () => {
   const w = createWorld(8);
@@ -276,6 +363,7 @@ void test('taller world has usable lower space and unloads only at its bottom', 
   w.cargo = 2;
   w.cargoValue = 2 * 100;
   w.y = 520;
+  w.x = DELIVERY_DOCKS.trash;
   assert.equal(stepWorld(w, 0.01, 0, 0).banked, false);
   w.y = H - 80;
   assert.equal(stepWorld(w, 0.01, 0, 0).banked, true);
@@ -309,7 +397,8 @@ void test('a minute docks once, freezes simulation, and only an explicit upgrade
   w.cargoValue = 3 * 100;
   stepWorld(w, 0.05, 0, 0);
   assert.equal(w.docked, true);
-  assert.equal(w.level, 3);
+  assert.equal(w.level, 1);
+  assert.equal(w.pressure, 3);
   const dock = structuredClone(w);
   stepWorld(w, 0.05, 1, 1);
   assert.deepEqual(w, dock);
@@ -320,7 +409,8 @@ void test('a minute docks once, freezes simulation, and only an explicit upgrade
   assert.equal(w.cargo, 3);
   assert.equal(w.score, 0);
   stepWorld(w, 0.05, 0, 0);
-  assert.equal(w.level, 4);
+  assert.equal(w.level, 2);
+  assert.equal(w.pressure, 4);
   assert.equal(capacity(w), 8);
   w.cargo = 8;
   w.cargoValue = 8 * 100;
@@ -362,14 +452,14 @@ void test('twin upgrade stacks with capsules; dash is gated, protected and recha
   assert.equal(dash(w), false);
   assert.deepEqual(createWorld().upgrades, []);
 });
-void test('all nine levels finish after three active minutes with bounded hazards', () => {
+void test('three player-chosen levels span nine pressure stages with bounded hazards', () => {
   const w = createWorld(9);
   const seen = new Set<number>();
   let docks = 0;
   for (let i = 0; i < 3610 && !w.over; i++) {
     w.shield = 1000;
     stepWorld(w, 0.05, 0, 0);
-    seen.add(w.level);
+    seen.add(w.pressure);
     assert.ok(w.traffic.length < 18);
     assert.ok(w.powerups.length <= 2);
     assert.ok(w.cargo <= capacity(w));
@@ -399,7 +489,7 @@ void test('simulation is deterministic, bounds movement and rejects corrupt stor
   assert.equal(readBest('1200'), 1200);
 });
 
-void test('cars and heavy haulers stay on the drawn roads throughout all nine levels', () => {
+void test('cars and heavy haulers stay on the drawn roads throughout all three levels', () => {
   const roads = [245, 415, 605];
   const kinds = new Set<number>();
   for (const seed of [7, 42, 1234]) {
@@ -408,12 +498,20 @@ void test('cars and heavy haulers stay on the drawn roads throughout all nine le
       w.shield = 1000;
       if (w.docked) extendShift(w, w.leg === 1 ? 'beam' : 'hold');
       stepWorld(w, 0.05, 0, 0);
-      for (const vehicle of w.traffic.filter(t => t.kind === 0 || t.kind === 4)) {
+      for (const vehicle of w.traffic.filter(
+        (t) => t.kind === 0 || t.kind === 4,
+      )) {
         kinds.add(vehicle.kind);
-        assert.ok(roads.includes(vehicle.y), 'Road vehicle spawned off the drawn roads at y=' + vehicle.y);
+        assert.ok(
+          roads.includes(vehicle.y),
+          'Road vehicle spawned off the drawn roads at y=' + vehicle.y,
+        );
       }
     }
-    assert.equal(w.level, 9);
+    assert.equal(w.level, 3);
   }
-  assert.deepEqual([...kinds].sort((a, b) => a - b), [0, 4]);
+  assert.deepEqual(
+    [...kinds].sort((a, b) => a - b),
+    [0, 4],
+  );
 });

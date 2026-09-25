@@ -23,6 +23,7 @@ it('supports scoped keyboard sorting, correction, focus and completing a load', 
       metal: '3',
       glass: '4',
       aside: '5',
+      trash: '6',
     };
     fireEvent.keyDown(heading, { key: keys[item.bin] });
     const next = screen.getByRole('button', {

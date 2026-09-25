@@ -6,6 +6,7 @@ import {
   nextMaterial,
   recyclingItems,
   recyclingBins,
+  sortingStream,
   type SortingRun,
   type RecyclingBin,
   type RecyclingSprite,
@@ -51,7 +52,8 @@ export function RecyclingArcade({
     if (value === current.current) return;
     current.current = value;
     setRun(value);
-    if (value.sorted) sound('collect');
+    if (value.sorted)
+      sound(sortingStream(bin) === 'recycling' ? 'bank' : 'collect');
   }
   function advance() {
     const value = nextMaterial(current.current);
@@ -80,8 +82,8 @@ export function RecyclingArcade({
       }}
     >
       <header className="recycling-heading">
-        <span>RECYCLING BAY · {batch + 1}/3</span>
-        <h2>Give it another life.</h2>
+        <span>SORTING YARD · {batch + 1}/3</span>
+        <h2>Right bin. Bigger win.</h2>
         <div className="recycling-readout">
           <span>
             Sorted <b>{run.index + Number(run.sorted)}/12</b>
@@ -98,9 +100,9 @@ export function RecyclingArcade({
         <span className="recycling-batch">
           {
             [
-              'The basics',
-              'New shapes, same materials',
-              'Watch for special handling',
+              'Clean or contaminated?',
+              'Keep the good stuff in the loop',
+              'Watch for special drop-offs',
             ][batch]
           }
         </span>
@@ -125,42 +127,56 @@ export function RecyclingArcade({
           {item.name}
         </h3>
       </div>
-      <fieldset
-        className="recycling-bins"
-        aria-label="Sort into a destination"
-      >
-        {recyclingBins.map((bin) => (
-          <button
-            type="button"
-            key={bin.id}
-            data-bin={bin.id}
-            data-result={
-              run.chosen === bin.id
-                ? run.sorted
-                  ? 'correct'
-                  : 'retry'
-                : undefined
-            }
-            aria-disabled={run.sorted}
-            onClick={() => sort(bin.id)}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              shapeRendering="crispEdges"
-            >
-              {bin.id === 'aside' ? (
-                <path d="M4 7H20V21H4Z M8 7V3H16V7 M12 10V15 M12 17V19" />
-              ) : (
-                <path d="M3 5H21V8H3Z M5 8H19V22H5Z M8 5V2H16V5 M9 12V18 M15 12V18" />
-              )}
-            </svg>
-            <span>{bin.label}</span>
-            <kbd>{bin.key}</kbd>
-          </button>
+      <div className="sorting-destinations">
+        {(['recycling', 'trash', 'aside'] as const).map((stream) => (
+          <fieldset key={stream} className={`recycling-bins sorting-${stream}`}>
+            <legend>
+              {stream === 'recycling'
+                ? 'Recycling · 200 pts'
+                : stream === 'trash'
+                  ? 'Trash · 100 pts'
+                  : 'Special drop-off · 150 pts'}
+            </legend>
+            {recyclingBins
+              .filter((bin) => sortingStream(bin.id) === stream)
+              .map((bin) => (
+                <button
+                  type="button"
+                  key={bin.id}
+                  data-bin={bin.id}
+                  data-result={
+                    run.chosen === bin.id
+                      ? run.sorted
+                        ? 'correct'
+                        : 'retry'
+                      : undefined
+                  }
+                  aria-disabled={run.sorted}
+                  onClick={() => sort(bin.id)}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    shapeRendering="crispEdges"
+                  >
+                    {bin.id === 'aside' ? (
+                      <path d="M4 7H20V21H4Z M8 7V3H16V7 M12 10V15 M12 17V19" />
+                    ) : (
+                      <path d="M3 5H21V8H3Z M5 8H19V22H5Z M8 5V2H16V5 M9 12V18 M15 12V18" />
+                    )}
+                  </svg>
+                  <span>{bin.label}</span>
+                  <kbd>{bin.key}</kbd>
+                </button>
+              ))}
+          </fieldset>
         ))}
-      </fieldset>
-      <output className="recycling-feedback" aria-live="polite" aria-atomic="true">
+      </div>
+      <output
+        className="recycling-feedback"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         {run.notice}
       </output>
       <button

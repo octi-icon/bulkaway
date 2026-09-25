@@ -28,6 +28,7 @@ import {
   chassis,
   capacity,
   junkTypes,
+  approachingHazards,
   type Chassis,
   type Upgrade,
 } from '@/lib/arcade-engine';
@@ -43,10 +44,13 @@ import { RecyclingArcade } from '@/components/recycling-arcade';
 import type { SortingRun } from '@/lib/arcade-recycling';
 import '@/app/arcade/arcade.css';
 
-const bestKey = 'bulk-away-arcade-best-v4';
+const bestKey = 'bulk-away-arcade-best-v5';
 const empty: ArcadeReadout = {
   score: 0,
   cargo: 0,
+  recyclingCargo: 0,
+  recycled: 0,
+  recyclingBonus: 0,
   chassis: 'lifter',
   lives: 3,
   time: 60,
@@ -333,14 +337,16 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
           <div className="arcade-mission">
             <div
               className="arcade-level-line"
-              data-new-level={phase === 'playing' && hud.levelIntro > 0}
               aria-live="polite"
               aria-atomic="true"
             >
               <strong>
-                {`Level ${hud.level} · ${levels[hud.level - 1].name}`}
+                {`Level ${hud.level}/3 · ${levels[hud.level - 1].name}`}
               </strong>
             </div>
+            <output className="arcade-advance-notice">
+              {approachingHazards(hud.time, hud.leg) || '\u00a0'}
+            </output>
             <div className="arcade-power-rack" aria-label="Power-up status">
               <span
                 data-active={hud.effects.split > 0}
@@ -409,12 +415,18 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
             </div>
           </div>
         )}
+        {active && !calm && (
+          <div className="arcade-cargo-streams" aria-label="Cargo destinations">
+            <span>← Recycling ×2 · {hud.recyclingCargo}</span>
+            <span>Bulk / Trash · {hud.cargo - hud.recyclingCargo} →</span>
+          </div>
+        )}
         <div className="arcade-playfield">
           <canvas
             ref={canvas}
             className="arcade-canvas"
             tabIndex={phase === 'playing' ? 0 : -1}
-            aria-label="UFO cleanup playfield. Use arrow keys or W A S D to move. Hover above junk to collect. Fly over lettered capsules for power-ups. Space launches cargo with an H charge. Bring cargo to the truck at the bottom. P or Escape pauses."
+            aria-label="UFO cleanup playfield. Use arrow keys or W A S D to move. Hover above junk to collect. Deliver R-marked clean boxes and cans to Recycling at bottom left for double points. Other items go to Bulk / Trash at bottom right. Mixed cargo needs both docks. Space launches cargo with an H charge for base points. P or Escape pauses."
             aria-describedby="arcade-instructions"
             hidden={!inFlight}
           >
@@ -488,7 +500,10 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
               <h2 id="arcade-dock-title" ref={dockTitle} tabIndex={-1}>
                 Nice haul. Go again?
               </h2>
-              <p>Pick an upgrade for another minute. Repair one shield.</p>
+              <p>
+                Next: {levels[Math.min(hud.level, levels.length - 1)].name}.
+                Choose an upgrade for another minute and repair one shield.
+              </p>
               <div className="arcade-upgrade-options">
                 {(Object.keys(upgrades) as Upgrade[])
                   .filter((key) => !hud.upgrades.includes(key))
@@ -569,7 +584,7 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
               </h2>
               <p>
                 {recyclingResult
-                  ? `12 materials sorted · ${recyclingResult.score.toLocaleString()} recycling points.`
+                  ? `${recyclingResult.queue.length} materials sorted · ${recyclingResult.score.toLocaleString()} sorting points.`
                   : `${hud.delivered} ${hud.delivered === 1 ? 'piece' : 'pieces'} of pixel junk cleared.`}
                 <br />
                 Let’s tackle the real stuff.
@@ -578,6 +593,16 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                 <span className="recycling-result">
                   {recyclingResult.firstTry}/12 first try · Best streak{' '}
                   {recyclingResult.bestStreak}
+                  <br />
+                  {recyclingResult.totals.recycling} recycled ·{' '}
+                  {recyclingResult.totals.trash} trash ·{' '}
+                  {recyclingResult.totals.aside} special drop-off
+                </span>
+              )}
+              {!recyclingResult && !calm && hud.recycled > 0 && (
+                <span className="recycling-result">
+                  {hud.recycled} recycled · +{hud.recyclingBonus} recycling
+                  bonus included
                 </span>
               )}
               <div className="arcade-reward">
@@ -747,11 +772,12 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
         <div id="arcade-instructions" className="arcade-instructions">
           {phase === 'recycling' || recyclingResult ? (
             <p>
-              <strong>Sort the salvage.</strong> Choose a material bin or use
-              keys 1–5 while inside the sorting bay, then choose Next item.
-              First-try streaks earn bonus points. Set batteries and plastic
-              bags aside for separate drop-off. These are game sorting streams;
-              local collection rules vary.
+              <strong>Sort the salvage.</strong> Recycling earns 200 points,
+              trash 100, special drop-off 150. First-try streaks add up to 100;
+              corrected answers earn a quarter of base points. Choose a bin or
+              use keys 1–6 inside the yard, then Next item. Glass has its own
+              drop-off; batteries and clean plastic bags need specialist
+              collection. Local acceptance rules vary.
             </p>
           ) : calm ? (
             <p>
@@ -773,18 +799,21 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                 Cargo Bay adds 3 slots to your chosen chassis.
               </p>
               <p>
-                <strong>Haul.</strong> Drop loads at the truck below. Full loads
-                earn 100 bonus points. Bigger items take longer to lift and earn
-                more. Each uses one slot; points bank on delivery, and cargo
-                still aboard is credited when your run ends. Dodge traffic
-                marked !.
+                <strong>Sort your haul.</strong> R-marked clean cardboard and
+                cans go left to Recycling for double their base points. Trash
+                and bulky items go right to the truck for crew handling. Mixed
+                loads need both docks; a wrong dock keeps your cargo. The
+                destination strip shows your hold. Bigger items take longer to
+                lift. Cargo Launch and items still aboard at the end earn base
+                points without the recycling bonus. Full express loads earn 100
+                extra. Dodge traffic marked !.
               </p>
               <table className="arcade-item-values">
                 <caption>Item rewards &amp; lift time</caption>
                 <thead>
                   <tr>
                     <th scope="col">Item</th>
-                    <th scope="col">Points</th>
+                    <th scope="col">Base points</th>
                     <th scope="col">Seconds*</th>
                   </tr>
                 </thead>
@@ -809,17 +838,15 @@ export function BulkArcade({ embedded = false }: { embedded?: boolean }) {
                 cargo to unload anywhere. Save it for a full load!
               </p>
               <p>
-                <strong>Level up.</strong> Every 20 seconds, a new area opens.
-                Neighborhood Sweep has cars and slower, wider haulers;
-                Commercial Chaos adds swooping UFOs and drones that weave
-                downward after an entry warning; Orbital Rush brings falling
-                debris. Move out of marked warning columns before debris drops.
-                Each new level clears nearby hazards and gives two seconds of
-                protection. After a minute, finish for your reward or choose a
-                permanent upgrade and another minute. Extend twice for nine
-                areas in three minutes. Later routes add convoys, wider UFO
-                patrols, and debris aimed at your last position. Ion Dash uses
-                Shift or the Dash button and recharges in six seconds.
+                <strong>Set your pace.</strong> Each level is one minute in the
+                same location. Traffic builds gradually; a short heads-up
+                precedes UFOs and falling debris. Existing hazards keep moving.
+                After a minute, finish for your reward or choose an upgrade to
+                enter the next location. There are three optional levels, with
+                later routes adding convoys, wider UFO patrols and aimed debris.
+                New levels start with a clear approach and three seconds of
+                protection. Ion Dash uses Shift or the Dash button and recharges
+                in six seconds.
               </p>
             </>
           )}

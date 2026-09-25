@@ -19,6 +19,9 @@ export type ArcadeReadout = Pick<
   World,
   | 'score'
   | 'cargo'
+  | 'recyclingCargo'
+  | 'recycled'
+  | 'recyclingBonus'
   | 'chassis'
   | 'lives'
   | 'time'
@@ -75,6 +78,9 @@ export function startArcade(
   const snapshot = (): ArcadeReadout => ({
     score: world.score,
     cargo: world.cargo,
+    recyclingCargo: world.recyclingCargo,
+    recycled: world.recycled,
+    recyclingBonus: world.recyclingBonus,
     chassis: world.chassis,
     lives: world.lives,
     time: world.time,

@@ -25,6 +25,8 @@ The service binds to Render's `PORT` on `0.0.0.0`. The Blueprint selects a paid 
 | `GOOGLE_MAPS_BROWSER_KEY` | Your website-restricted Google Maps/Places browser key; manual entry works without it |
 | `SITE_URL` | Leave unset for the Render preview; set to the exact primary HTTPS domain when connecting it |
 | `PUBLIC_LAUNCH` | `false` while reviewing; change to `true` when ready for indexing |
+| `HELM_INTAKE_URL` | Helm origin (e.g. `https://helm.example.com`); with the secret, pickups are recorded in Helm |
+| `HELM_INTAKE_SECRET` | Shared HMAC secret from the Helm owner (equals Helm `WSI_INTAKE_SECRET_BULK_AWAY`); never in Git |
 
 The Blueprint already sets `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_USER=mailer@wsitrashvalet.com`, `NODE_VERSION`, `NODE_ENV`, and `HOST`. Do not override `PORT`. The crew receives requests at `service@bulkaway.com`, with the customer as Reply-To. After that message is accepted, the customer receives a separate branded acknowledgment with the service mailbox as Reply-To. Both use the existing authenticated sender; no additional email environment variables are required. Customer-copy failures preserve the successful request reference and do not resend the crew message.
 
@@ -40,7 +42,7 @@ Authorize the Render hostname and final domain in your Google key's HTTP referre
 
 ## Current boundaries
 
-- The form requests a quote and preferred date; it does not confirm appointments. Helm integration is future work.
+- The form requests a quote and preferred date; it does not confirm appointments. When `HELM_INTAKE_URL` + `HELM_INTAKE_SECRET` are set, each accepted pickup is also recorded in Helm's Bulk Away queue through the shared `wsi_web_intake_v1` hand-off (see website/README.md); unset = email only.
 - SMS consent language is present. Twilio delivery and the client portal are not connected.
 - SPACE5 is a crew-applied 5% discount, not a unique redemption token. Scores stay on the player's device; there is no shared leaderboard or redemption database.
 - Rate limits and idempotency are process-local. Keep one service instance until those stores become shared and durable.

@@ -3,6 +3,22 @@ import AxeBuilder from '@axe-core/playwright';
 import { recyclingItems, recyclingBins } from '../../lib/arcade-recycling';
 
 for (const width of [390, 1440]) {
+  test(`flight exposes both cargo destinations at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/arcade');
+    await page.getByRole('button', { name: 'Close and use necessary only' }).click();
+    await page.getByRole('button', { name: 'Start a 1-minute shift' }).click();
+    const routes = page.getByLabel('Cargo destinations');
+    await expect(routes).toContainText('← Recycling ×2 · 0');
+    await expect(routes).toContainText('Bulk / Trash · 0 →');
+    await expect(page.getByRole('button', { name: 'Move up' })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    const cabinet = page.locator('.arcade-cabinet');
+    expect((await cabinet.boundingBox())!.height).toBeLessThan(900);
+    await cabinet.screenshot({ path: `test-results/recycling-flight-${width}.png` });
+    await page.getByRole('button', { name: 'Pause game', exact: true }).click();
+    await expect(routes).toBeVisible();
+  });
   test(`recycling sorts a full load with keyboard and tap at ${width}px`, async ({
     page,
   }) => {
@@ -25,7 +41,13 @@ for (const width of [390, 1440]) {
         key.startsWith('bulk-away-arcade-best'),
       ),
     );
-    await bay.getByRole('button', { name: 'Set aside 5' }).click();
+    await expect(
+      bay.getByRole('group', { name: 'Recycling · 200 pts' }),
+    ).toBeVisible();
+    await expect(
+      bay.getByRole('group', { name: 'Trash · 100 pts' }),
+    ).toBeVisible();
+    await bay.getByRole('button', { name: 'Special drop-off 5' }).click();
     await expect(bay.getByRole('status')).toContainText('Try again');
     await expect(bay.getByRole('button', { name: 'Next item' })).toBeDisabled();
     const cabinet = page.locator('.arcade-cabinet');
@@ -91,7 +113,9 @@ test('hauling results offer recycling without losing the earned reward', async (
   page,
 }) => {
   await page.goto('/arcade');
-  await page.getByRole('button', { name: 'Close and use necessary only' }).click();
+  await page
+    .getByRole('button', { name: 'Close and use necessary only' })
+    .click();
   await page.getByRole('button', { name: 'Start a 1-minute shift' }).click();
   await page.getByRole('button', { name: 'Pause game', exact: true }).click();
   await page.getByRole('button', { name: 'End this run' }).click();

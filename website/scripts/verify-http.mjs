@@ -47,8 +47,8 @@ for (const label of [
   'Split Beam',
   'Repulsor',
   'Launch cargo',
-  'Commercial Chaos',
-  'Orbital Rush',
+  'Set your pace.',
+  'three optional levels',
 ]) {
   assert.ok(arcadeHtml.includes(label), `arcade renders ${label} guidance`);
 }

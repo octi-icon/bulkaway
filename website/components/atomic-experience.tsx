@@ -196,12 +196,14 @@ export function SpaceSign() {
             fetchPriority="high"
           />
         </div>
-        <div className="space-seal" aria-hidden="true">
-          <span>BIG ON</span>
+        <div className="space-seal">
+          <span>
+            PLAY THE<br />GAME
+          </span>
           <strong>
-            getting
+            get 5%
             <br />
-            it gone.
+            off.
           </strong>
         </div>
         <div

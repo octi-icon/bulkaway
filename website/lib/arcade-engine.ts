@@ -30,7 +30,14 @@ export const W = 800;
 export const H = 800;
 // Shared by traffic spawning and the painted roads. Flying hazards use the sky.
 export const ROAD_LANES = [245, 415, 605] as const;
+export const DELIVERY_DOCKS = { recycling: 195, trash: 575 } as const;
 export const levels = [
+  { name: 'Neighborhood Sweep' },
+  { name: 'Commercial Circuit' },
+  { name: 'Orbital Yard' },
+] as const;
+// Pressure changes introduce future spawns, never a new location mid-flight.
+const waves = [
   {
     name: 'Neighborhood Sweep',
     tip: 'Dodge cars and wide haulers. Grab the capsules.',
@@ -86,6 +93,30 @@ export const levels = [
     speed: 195,
   },
 ] as const;
+export function pressureSettings(
+  w: Pick<World, 'elapsed' | 'leg' | 'pressure'>,
+) {
+  const index = w.pressure - 1;
+  const current = waves[index];
+  const previous = waves[Math.max((w.leg - 1) * 3, index - 1)];
+  const blend = Math.max(0, Math.min(1, (w.elapsed - index * 20) / 10));
+  return {
+    speed: previous.speed + (current.speed - previous.speed) * blend,
+    interval:
+      previous.interval + (current.interval - previous.interval) * blend,
+  };
+}
+export function approachingHazards(time: number, leg = 1) {
+  if (time > 40 && time <= 45)
+    return 'UFOs approaching — keep an escape route.';
+  if (time > 20 && time <= 25)
+    return 'Debris incoming — watch for marked columns.';
+  if (time > 0 && time <= 5)
+    return leg === MAX_LEGS
+      ? 'Final shift ending soon. Bring it home.'
+      : 'Shift ending soon. Finish or choose an upgrade.';
+  return '';
+}
 export const upgrades = {
   beam: {
     name: 'Twin Beam',
@@ -129,11 +160,14 @@ export type Powerup = { x: number; y: number; kind: PowerKind; ttl: number };
 export const junkTypes = [
   { name: 'Sofa', seconds: 1.4, points: 300 },
   { name: 'Mattress', seconds: 1.1, points: 225 },
-  { name: 'Boxes', seconds: 0.45, points: 100 },
+  { name: 'Clean cardboard', seconds: 0.45, points: 100 },
   { name: 'Refrigerator', seconds: 1.65, points: 350 },
   { name: 'Tire', seconds: 0.6, points: 125 },
   { name: 'Television', seconds: 0.85, points: 175 },
+  { name: 'Empty cans', seconds: 0.4, points: 100 },
+  { name: 'Bagged trash', seconds: 0.5, points: 100 },
 ] as const;
+export const isRecyclable = (kind: number) => kind === 2 || kind === 6;
 export const junkNames = junkTypes.map((item) => item.name);
 export type Junk = { x: number; y: number; kind: number; charge: number };
 export type Traffic = {
@@ -155,6 +189,10 @@ export type World = {
   delivered: number;
   cargo: number;
   cargoValue: number;
+  recyclingCargo: number;
+  recyclingValue: number;
+  recycled: number;
+  recyclingBonus: number;
   chassis: Chassis;
   lives: number;
   shield: number;
@@ -165,6 +203,7 @@ export type World = {
   over: boolean;
   notice: string;
   level: number;
+  pressure: number;
   levelIntro: number;
   powerups: Powerup[];
   powerSpawn: number;
@@ -178,6 +217,7 @@ export type World = {
   dash: number;
   dashCooldown: number;
   deliveryFlash: number;
+  deliveryX: number;
   hazardIndex: number;
 };
 export function capacity(w: Pick<World, 'chassis' | 'upgrades'>) {
@@ -200,6 +240,8 @@ export function finishWorld(w: World) {
   w.delivered += w.cargo;
   w.cargo = 0;
   w.cargoValue = 0;
+  w.recyclingCargo = 0;
+  w.recyclingValue = 0;
   w.notice = 'Shift complete. Hello, space!';
 }
 export function extendShift(w: World, upgrade: Upgrade) {
@@ -213,6 +255,9 @@ export function extendShift(w: World, upgrade: Upgrade) {
     return false;
   w.upgrades.push(upgrade);
   w.leg++;
+  w.level = w.leg;
+  w.pressure = (w.leg - 1) * 3 + 1;
+  w.levelIntro = 0;
   w.time = ROUND_SECONDS;
   w.docked = false;
   w.traffic = [];
@@ -255,13 +300,46 @@ function bankCargo(w: World) {
   w.delivered += w.cargo;
   w.cargo = 0;
   w.cargoValue = 0;
+  w.recyclingCargo = 0;
+  w.recyclingValue = 0;
+  w.deliveryX = w.x;
   w.notice = `POOF, GONE! +${points} points delivered.`;
+}
+// Each dock accepts its own stream only. Wrong-dock visits never lose cargo or pay.
+export function deliverCargo(w: World, stream: keyof typeof DELIVERY_DOCKS) {
+  if (w.over || w.docked) return false;
+  const recycle = stream === 'recycling';
+  const count = recycle ? w.recyclingCargo : w.cargo - w.recyclingCargo;
+  if (!count) {
+    if (w.cargo)
+      w.notice = recycle
+        ? 'This load goes to Bulk / Trash →'
+        : 'Clean boxes and cans go to ← Recycling.';
+    return false;
+  }
+  const value = recycle ? w.recyclingValue : w.cargoValue - w.recyclingValue;
+  const points = value * (recycle ? 2 : 1);
+  w.score += points;
+  w.delivered += count;
+  w.cargo -= count;
+  w.cargoValue -= value;
+  if (recycle) {
+    w.recyclingCargo = 0;
+    w.recyclingValue = 0;
+    w.recycled += count;
+    w.recyclingBonus += value;
+  }
+  w.deliveryFlash = 0.7;
+  w.deliveryX = DELIVERY_DOCKS[stream];
+  w.notice = `${recycle ? 'Recycled! 2× value' : 'Bulk / trash delivered'} · +${points}${w.cargo ? ` · ${w.cargo} left for the other dock.` : ''}`;
+  return true;
 }
 export function launchCargo(w: World) {
   if (w.over || w.docked || !w.launchReady || !w.cargo) return false;
   bankCargo(w);
   w.launchReady = false;
-  w.notice = 'Special delivery! Cargo launched straight to the truck.';
+  w.notice =
+    'Express delivery! Base points banked; recycling bonus needs the dock.';
   return true;
 }
 function random(w: World) {
@@ -273,13 +351,13 @@ function addJunk(w: World) {
     y = 0;
   for (let attempt = 0; attempt < 40; attempt++) {
     x = 65 + random(w) * 670;
-    y = 170 + random(w) * (H - 315);
+    y = 170 + random(w) * (H - 345);
     if (w.junk.every((item) => Math.hypot(item.x - x, item.y - y) > 58)) break;
   }
   w.junk.push({
     x,
     y,
-    kind: Math.floor(random(w) * 6),
+    kind: Math.floor(random(w) * junkTypes.length),
     charge: 0,
   });
 }
@@ -292,6 +370,10 @@ export function createWorld(seed = 42, build: Chassis = 'lifter'): World {
     delivered: 0,
     cargo: 0,
     cargoValue: 0,
+    recyclingCargo: 0,
+    recyclingValue: 0,
+    recycled: 0,
+    recyclingBonus: 0,
     chassis: build,
     lives: 3,
     shield: 2,
@@ -302,7 +384,8 @@ export function createWorld(seed = 42, build: Chassis = 'lifter'): World {
     over: false,
     notice: 'Hover above junk to beam it up.',
     level: 1,
-    levelIntro: 3,
+    pressure: 1,
+    levelIntro: 0,
     powerups: [],
     powerSpawn: 5,
     powerIndex: 0,
@@ -315,9 +398,14 @@ export function createWorld(seed = 42, build: Chassis = 'lifter'): World {
     dash: 0,
     dashCooldown: 0,
     deliveryFlash: 0,
+    deliveryX: DELIVERY_DOCKS.trash,
     hazardIndex: 0,
   };
   for (let i = 0; i < 10; i++) addJunk(w);
+  // Every opening field demonstrates both destinations, regardless of the seed.
+  w.junk[0].kind = 2;
+  w.junk[1].kind = 6;
+  w.junk[2].kind = 7;
   return w;
 }
 export type StepEvents = {
@@ -355,20 +443,7 @@ export function stepWorld(
   w.levelIntro = Math.max(0, w.levelIntro - dt);
   for (const key of ['split', 'repulsor'] as const)
     w.effects[key] = Math.max(0, w.effects[key] - dt);
-  const level = Math.min(
-    w.leg * 3,
-    1 + Math.floor((w.elapsed + 0.000001) / 20),
-  );
-  if (level !== w.level) {
-    w.level = level;
-    w.levelIntro = 3;
-    w.traffic = [];
-    w.spawn = 2;
-    w.shield = Math.max(w.shield, 2);
-    w.powerSpawn = Math.min(w.powerSpawn, 1);
-    w.notice = levels[level - 1].tip;
-    events.levelChanged = true;
-  }
+  w.pressure = Math.min(w.leg * 3, 1 + Math.floor((w.elapsed + 0.000001) / 20));
   const length = Math.hypot(dx, dy) || 1;
   const speed = w.dash > 0 ? 540 : chassis[w.chassis].speed;
   w.x = Math.max(
@@ -379,9 +454,11 @@ export function stepWorld(
     60,
     Math.min(H - 60, w.y + (dy / Math.max(1, length)) * speed * dt),
   );
-  if (w.cargo && w.y > H - 120 && Math.abs(w.x - 400) < 110) {
-    bankCargo(w);
-    events.banked = true;
+  if (w.cargo && w.y > H - 120) {
+    for (const stream of ['recycling', 'trash'] as const) {
+      if (Math.abs(w.x - DELIVERY_DOCKS[stream]) < 110)
+        events.banked = deliverCargo(w, stream);
+    }
   }
   w.powerSpawn -= dt;
   if (w.powerSpawn <= 0) {
@@ -413,12 +490,16 @@ export function stepWorld(
       if (j.charge >= 1) {
         w.cargo++;
         w.cargoValue += item.points;
+        if (isRecyclable(j.kind)) {
+          w.recyclingCargo++;
+          w.recyclingValue += item.points;
+        }
         w.junk = w.junk.filter((item) => item !== j);
         addJunk(w);
         w.notice =
           w.cargo === capacity(w)
-            ? 'Full load! Head to the truck below.'
-            : `${item.name} aboard. ${item.points} pts at unload.`;
+            ? 'Full load! ← Recycling · Bulk / Trash →'
+            : `${item.name} aboard. ${isRecyclable(j.kind) ? '← Recycle for ' + item.points * 2 : 'Bulk / Trash → ' + item.points} pts.`;
         events.collected = true;
       }
     } else j.charge = Math.max(0, j.charge - dt);
@@ -426,8 +507,8 @@ export function stepWorld(
   w.spawn -= dt;
   if (w.spawn <= 0) {
     const fromLeft = random(w) > 0.5;
-    const settings = levels[w.level - 1];
-    const area = (w.level - 1) % 3;
+    const settings = pressureSettings(w);
+    const area = (w.pressure - 1) % 3;
     const roster =
       area === 0 ? [0, 0, 4] : area === 1 ? [1, 3, 0, 1] : [2, 1, 3, 4];
     const kind = roster[w.hazardIndex++ % roster.length];
@@ -435,7 +516,8 @@ export function stepWorld(
     const lane = Math.floor(position * ROAD_LANES.length);
     w.traffic.push({
       x: fromLeft ? -60 : 860,
-      y: kind === 0 || kind === 4 ? ROAD_LANES[lane] : 90 + position * (H - 265),
+      y:
+        kind === 0 || kind === 4 ? ROAD_LANES[lane] : 90 + position * (H - 265),
       vx: (fromLeft ? 1 : -1) * settings.speed,
       kind,
     });
@@ -471,7 +553,10 @@ export function stepWorld(
     }
     if (kind === 4) hazard.vx *= 0.65;
     if (area === 0 && w.leg > 1 && kind === 0)
-      w.traffic.push({ ...hazard, y: ROAD_LANES[(lane + 1) % ROAD_LANES.length] });
+      w.traffic.push({
+        ...hazard,
+        y: ROAD_LANES[(lane + 1) % ROAD_LANES.length],
+      });
     w.spawn = settings.interval;
   }
   for (const t of w.traffic) {

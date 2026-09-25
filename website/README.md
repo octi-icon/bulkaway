@@ -52,9 +52,11 @@ The interactive homepage request flow retains its steps, quantities, photos, add
 
 Install the browser once with `npx playwright install chromium` (on Linux CI: `npx playwright install --with-deps chromium`). `npm run test:components` runs Vitest and Testing Library; `npm run test:browser` runs Chromium journeys and axe checks against an isolated production server on port 8793.
 
-## Requests and future Helm integration
+## Requests and the Helm intake hand-off
 
-`lib/pickup-schema.ts` owns the Zod schema and inferred request contract; `lib/pickup.ts` preserves the shared validation helpers. `lib/pickup-mail.ts` builds the branded messages. `lib/mail.ts` owns delivery; `/api/pickup` coordinates both. Replace that delivery boundary with Helm scheduling once available, preserving explicit quote/date confirmation. Do not claim confirmed appointments until Helm actually confirms them.
+`lib/pickup-schema.ts` owns the Zod schema and inferred request contract; `lib/pickup.ts` preserves the shared validation helpers. `lib/pickup-mail.ts` builds the branded messages. `lib/mail.ts` owns delivery; `/api/pickup` coordinates both. The form still requests a quote and preferred date; nothing here confirms an appointment until Helm actually confirms it.
+
+`lib/helm-intake.ts` is the reference implementation of the shared WSI website contract `wsi_web_intake_v1` (documented in Helm at `docs/contracts/wsi-web-intake-v1.md`). After the crew email is accepted, the server signs the already-validated pickup (HMAC-SHA256 over `timestamp.body`, WebCrypto) and POSTs it to `HELM_INTAKE_URL/api/web-intake` with the visitor's existing idempotency key, so a retry never duplicates. Helm records it as a website request in the Bulk Away queue (`BA-R-…`). The hand-off is best effort: a Helm outage yields `helm: "unrecorded"` in the API result and a server warning, the crew email has already delivered, and nothing changes for the visitor. Set `HELM_INTAKE_URL` and `HELM_INTAKE_SECRET` in Render (the secret equals Helm's `WSI_INTAKE_SECRET_BULK_AWAY`); leave both unset to disable. Other WSI sites adopt the same file by changing the site id, form kind and `fields`.
 
 The current endpoint uses same-origin checks, a honeypot, payload bounds, five attempts per client per 15-minute process window, and an hour of process-local idempotency. These controls reset on process restarts and are not shared across instances. Before scaling horizontally, move rate limits and request receipts to durable shared storage. Do not enable automatic retries on uncertain SMTP delivery; the form directs customers to the crew instead.
 

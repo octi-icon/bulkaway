@@ -81,6 +81,42 @@
   gap: 6px;
   margin-top: 10px;
 }
+.sorting-destinations {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sorting-destinations .recycling-bins {
+  margin: 0;
+  padding: 6px;
+  border: 1px solid #81728f;
+  border-radius: 4px;
+  background: #211c2a;
+}
+.sorting-destinations legend {
+  padding: 0 5px;
+  text-align: left;
+  font: 700 11px/1.4 monospace;
+  color: var(--cream);
+}
+.sorting-destinations .sorting-recycling {
+  grid-column: 1 / -1;
+  border-color: var(--lime);
+}
+.sorting-recycling legend {
+  color: var(--lime);
+}
+.sorting-trash,
+.sorting-aside {
+  grid-template-columns: 1fr;
+}
+.sorting-trash legend {
+  color: var(--gold);
+}
+.sorting-trash button[data-bin='trash'] svg {
+  fill: var(--gold);
+}
 .recycling-bins button {
   display: flex;
   align-items: center;

@@ -1,5 +1,6 @@
 import { validatePickup } from '@/lib/pickup';
 import { sendPickup, type MailConfig } from '@/lib/mail';
+import type { HelmIntakeConfig } from '@/lib/helm-intake';
 import type { PickupDelivery } from '@/lib/pickup-delivery';
 import { PayloadTooLarge } from '@/lib/read-json';
 import {
@@ -10,7 +11,10 @@ import {
 } from '@/lib/photos';
 import { createHash } from 'node:crypto';
 import { verifyServiceAddress, CoverageError } from '@/lib/service-coverage';
-import { admitPickupRequest, pickupRateLimitMessage } from '@/lib/pickup-admission';
+import {
+  admitPickupRequest,
+  pickupRateLimitMessage,
+} from '@/lib/pickup-admission';
 const deliveries = new Map<
   string,
   {
@@ -131,9 +135,19 @@ export async function processAdmittedPickup(request: Request) {
             reference,
             process.env as MailConfig,
             photos,
+            {
+              idempotencyKey: key,
+              config: process.env as HelmIntakeConfig,
+              sourceUrl: new URL(request.url).origin + '/request',
+            },
           ),
         )
         .then((delivery) => {
+          if (delivery.helm === 'unrecorded')
+            console.warn(
+              'Pickup accepted by email; Helm intake hand-off unrecorded — enter it manually.',
+              { reference },
+            );
           if (delivery.confirmation === 'unconfirmed')
             console.warn(
               'Pickup accepted; customer confirmation delivery unconfirmed.',

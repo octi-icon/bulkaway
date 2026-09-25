@@ -5,6 +5,8 @@ import {
   capacity,
   powers,
   junkTypes,
+  DELIVERY_DOCKS,
+  isRecyclable,
   type World,
   type Chassis,
 } from './arcade-engine';
@@ -67,6 +69,13 @@ const glyphs: Record<string, string> = {
   '9': '111101111001110',
   A: '010101111101101',
   B: '110101110101110',
+  C: '111100100100111',
+  G: '111100101101111',
+  I: '111010010010111',
+  S: '111100111001111',
+  T: '111010010010010',
+  '/': '001001010100100',
+  X: '101101010101101',
   D: '110101101101110',
   E: '111100110100111',
   H: '101101111101101',
@@ -138,7 +147,7 @@ function loadingBay(c: Pen, truck: HTMLCanvasElement) {
   // An open, raised loading platform: the approach stays visible around the truck.
   // Keep the original pixel geometry aligned with the world's lower edge.
   c.save();
-  c.translate(0, H - 600);
+  c.translate(DELIVERY_DOCKS.trash - 400, H - 600);
   for (let y = 505; y < 580; y += CELL) {
     const half = 87.5 + (y - 505) * 0.45;
     rect(c, 400 - half, y, half * 2, CELL, palette.D);
@@ -170,7 +179,7 @@ function loadingBay(c: Pen, truck: HTMLCanvasElement) {
   rect(c, 320, 465, 160, 27.5, palette.O);
   rect(c, 320, 465, 160, CELL, palette.C);
   rect(c, 320, 467.5, 157.5, 20, palette.Y);
-  label(c, 'UNLOAD HERE', 400, 472.5, palette.K);
+  label(c, 'BULK/TRASH', 400, 472.5, palette.K);
   // Down arrows and fixed landing lamps mark the clear approach at either side.
   for (const x of [302.5, 497.5]) {
     rect(c, x, 497.5, 5, 10, palette.L);
@@ -184,6 +193,22 @@ function loadingBay(c: Pen, truck: HTMLCanvasElement) {
   oval(c, 403, 575, 83, 5, palette.K);
   stamp(c, truck, 398, 540);
   c.restore();
+}
+function recyclingDock(c: Pen) {
+  const x = DELIVERY_DOCKS.recycling;
+  const y = H - 135;
+  rect(c, x - 110, y + 107, 220, 12, palette.K);
+  rect(c, x - 100, y + 25, 200, 82, palette.B);
+  rect(c, x - 100, y + 25, 200, 5, palette.L);
+  rect(c, x + 92, y + 30, 8, 77, palette.G);
+  rect(c, x - 85, y, 170, 25, palette.L);
+  label(c, 'RECYCLING', x, y + 5, palette.K);
+  for (const dx of [-47, 30]) {
+    rect(c, x + dx, y + 39, 42, 42, palette.G);
+    rect(c, x + dx - 5, y + 35, 52, 8, palette.C);
+    rect(c, x + dx + 8, y + 52, 24, 5, palette.L);
+  }
+  label(c, '2X', x, y + 88, palette.C);
 }
 function backdrop(c: Pen, truck: HTMLCanvasElement, district = 0) {
   rect(c, 0, 0, W, H, ['#17131f', '#142026', '#20172b'][district]);
@@ -259,6 +284,7 @@ function backdrop(c: Pen, truck: HTMLCanvasElement, district = 0) {
       rect(c, x + 10 + k * 15, top + 15, 5, 7.5, palette.O);
   }
   loadingBay(c, truck);
+  recyclingDock(c);
 }
 
 export function createArcadePainter(c: Pen, scale: number) {
@@ -283,6 +309,29 @@ export function createArcadePainter(c: Pen, scale: number) {
   const junk = junkPixels.map((rows) => sprite(rows)),
     car = sprite(carPixels),
     truck = sprite(truckPixels);
+  junk.push(
+    sprite([
+      '..CCCCCC....CCCCCC..',
+      '..ATTTTA....ATTTTA..',
+      '..ATCTTA....ATCTTA..',
+      '..ATCTTA....ATCTTA..',
+      '..ATTTTA....ATTTTA..',
+      '..CCCCCC....CCCCCC..',
+    ]),
+  );
+  junk.push(
+    sprite([
+      '......SSSS......',
+      '......KSSK......',
+      '....SSDDDDSS....',
+      '...SDDDDDDDDS...',
+      '..SDDDDDDDDDDS..',
+      '..SDDDDSDDDDDS..',
+      '..SDDDDSDDDDDS..',
+      '...SSDDDDDDSS...',
+      '.....SSSSSS.....',
+    ]),
+  );
   const debris = sprite([
     '.....OOO......',
     '...OYYYOO.....',
@@ -391,10 +440,17 @@ export function createArcadePainter(c: Pen, scale: number) {
         j.y - lift * Math.max(15, (j.y - w.y) * 0.65),
       );
       if (j.charge > 0) {
-        label(c, String(junkTypes[j.kind].points), j.x, j.y + 39, palette.Y);
+        label(
+          c,
+          String(junkTypes[j.kind].points * (isRecyclable(j.kind) ? 2 : 1)),
+          j.x,
+          j.y + 39,
+          palette.Y,
+        );
         rect(c, j.x - 25, j.y + 28, 50, 5, palette.D);
         rect(c, j.x - 25, j.y + 28, 50 * j.charge, 5, palette.L);
       }
+      if (isRecyclable(j.kind)) label(c, 'R', j.x + 25, j.y - 20, palette.L);
     }
     for (const t of w.traffic) {
       if (t.warning && t.warning > 0) {
@@ -463,7 +519,7 @@ export function createArcadePainter(c: Pen, scale: number) {
         const t = 1 - w.deliveryFlash / 0.7;
         rect(
           c,
-          400 + (i - 3.5) * t * 15,
+          w.deliveryX + (i - 3.5) * t * 15,
           H - 90 - Math.sin(t * Math.PI) * (20 + i * 3),
           5,
           5,

@@ -2,8 +2,9 @@ export const recyclingBins = [
   { id: 'paper', label: 'Paper', key: '1' },
   { id: 'plastic', label: 'Plastic', key: '2' },
   { id: 'metal', label: 'Metal', key: '3' },
-  { id: 'glass', label: 'Glass', key: '4' },
-  { id: 'aside', label: 'Set aside', key: '5' },
+  { id: 'glass', label: 'Glass drop-off', key: '4' },
+  { id: 'aside', label: 'Special drop-off', key: '5' },
+  { id: 'trash', label: 'Trash', key: '6' },
 ] as const;
 export type RecyclingBin = (typeof recyclingBins)[number]['id'];
 export type RecyclingSprite =
@@ -15,6 +16,13 @@ export type RecyclingSprite =
   | 'jar'
   | 'battery'
   | 'bag';
+export const sortingPoints = {
+  recycling: 200,
+  trash: 100,
+  aside: 150,
+} as const;
+export const sortingStream = (bin: RecyclingBin) =>
+  bin === 'trash' || bin === 'aside' ? bin : 'recycling';
 type Material = {
   name: string;
   bin: RecyclingBin;
@@ -45,11 +53,11 @@ export const recyclingItems: readonly Material[] = [
     note: 'Aluminum cans belong in the metal stream.',
   },
   {
-    name: 'Empty glass bottle',
-    bin: 'glass',
-    sprite: 'bottle',
+    name: 'Used tissue',
+    bin: 'trash',
+    sprite: 'paper',
     color: '#b8d46a',
-    note: 'Glass bottles go in the glass stream.',
+    note: 'Used tissues go in trash, not the clean paper stream.',
   },
   {
     name: 'Dry cardboard box',
@@ -73,25 +81,25 @@ export const recyclingItems: readonly Material[] = [
     note: 'Steel food cans go with the other metals.',
   },
   {
+    name: 'Greasy cardboard with food stuck on it',
+    bin: 'trash',
+    sprite: 'box',
+    color: '#b8d46a',
+    note: 'This food-soiled piece goes in trash. Separate clean cardboard for recycling.',
+  },
+  {
     name: 'Rinsed glass jar',
     bin: 'glass',
     sprite: 'jar',
-    color: '#b8d46a',
-    note: 'Empty glass jars belong with glass bottles.',
-  },
-  {
-    name: 'Dry paper envelope',
-    bin: 'paper',
-    sprite: 'paper',
     color: '#e8c55d',
-    note: 'Clean paper envelopes belong in the paper stream.',
+    note: 'Glass needs its own collection or drop-off, not the mixed curbside bin.',
   },
   {
-    name: 'Empty plastic shampoo bottle',
-    bin: 'plastic',
-    sprite: 'bottle',
+    name: 'Mixed bagged household trash',
+    bin: 'trash',
+    sprite: 'bag',
     color: '#d5b6d1',
-    note: 'This empty, rinsed rigid bottle goes with plastic.',
+    note: 'Mixed bagged trash stays out of recycling. Recyclables should be loose and clean.',
   },
   {
     name: 'Rechargeable lithium battery',
@@ -120,6 +128,7 @@ export type SortingRun = {
   finished: boolean;
   notice: string;
   chosen: RecyclingBin | null;
+  totals: { recycling: number; trash: number; aside: number };
 };
 export function createSorting(random: () => number = Math.random): SortingRun {
   const queue: number[] = [];
@@ -143,6 +152,7 @@ export function createSorting(random: () => number = Math.random): SortingRun {
     finished: false,
     notice: 'Choose a destination for this item.',
     chosen: null,
+    totals: { recycling: 0, trash: 0, aside: 0 },
   };
 }
 export function sortMaterial(run: SortingRun, bin: RecyclingBin): SortingRun {
@@ -157,7 +167,10 @@ export function sortMaterial(run: SortingRun, bin: RecyclingBin): SortingRun {
       notice: `Try again. ${item.note}`,
     };
   const streak = run.tried ? 0 : run.streak + 1;
-  const earned = run.tried ? 50 : 100 + Math.min(4, streak - 1) * 25;
+  const stream = sortingStream(bin);
+  const base = sortingPoints[stream];
+  const bonus = run.tried ? 0 : Math.min(4, streak - 1) * 25;
+  const earned = run.tried ? Math.floor(base / 4) : base + bonus;
   return {
     ...run,
     sorted: true,
@@ -166,7 +179,8 @@ export function sortMaterial(run: SortingRun, bin: RecyclingBin): SortingRun {
     streak,
     bestStreak: Math.max(run.bestStreak, streak),
     firstTry: run.firstTry + (run.tried ? 0 : 1),
-    notice: `+${earned} · ${item.note}`,
+    totals: { ...run.totals, [stream]: run.totals[stream] + 1 },
+    notice: `+${earned}${bonus ? ` (${bonus} streak bonus)` : ''} · ${item.note}`,
   };
 }
 export function nextMaterial(run: SortingRun): SortingRun {
